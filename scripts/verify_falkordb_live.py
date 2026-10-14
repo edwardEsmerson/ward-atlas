@@ -38,6 +38,7 @@ MODULE_PATH = ROOT / ".local/falkordb/falkordb.so"
 PROVENANCE_PATH = ROOT / ".local/falkordb/PROVENANCE.json"
 RUNS_PATH = ROOT / ".local/falkordb-runs"
 MORNING_STATUS = ROOT / "MORNING-STATUS.md"
+README_PATH = ROOT / "README.md"
 VERSION = "1.0"
 
 
@@ -811,11 +812,28 @@ def validate_morning_status() -> list[str]:
         raise VerificationFailure("MORNING-STATUS.md is missing")
     content = MORNING_STATUS.read_text(encoding="utf-8")
     required = [
+        "python3 scripts/install_falkordb_module.py",
         "python3 scripts/verify_expected_results.py --expected tests/expected-results.json --matrix tests/adversarial-matrix.json --require-six-scenarios",
         "python3 scripts/verify_falkordb_live.py --require-live --fail-on-zero --fresh-owned-graph --db-port 18732 --empty-reseed-idempotence-reconnect --report /workspace/evidence/wardatlas/falkordb-scenarios.json --verify-morning-status",
         "/workspace/evidence/wardatlas/falkordb-scenarios.json",
     ]
     missing = [item for item in required if item not in content]
+    setup_order = required[:3]
+    positions = [content.find(item) for item in setup_order]
+    if any(position < 0 for position in positions) or positions != sorted(positions):
+        missing.append("MORNING-STATUS.md commands must bootstrap before oracle and live verification")
+    if not README_PATH.is_file():
+        missing.append("README.md is missing the clean setup instructions")
+    else:
+        readme = README_PATH.read_text(encoding="utf-8")
+        readme_steps = [
+            "python3 scripts/install_falkordb_module.py",
+            "python3 scripts/verify_expected_results.py",
+            "python3 scripts/verify_falkordb_live.py --require-live",
+        ]
+        readme_positions = [readme.find(item) for item in readme_steps]
+        if any(position < 0 for position in readme_positions) or readme_positions != sorted(readme_positions):
+            missing.append("README.md must document installer, oracle, and live verifier in that order")
     concepts = [
         "Pentium Silver N5030",
         "AVX",

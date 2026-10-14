@@ -8,12 +8,15 @@
 - The build adds a small repeatable fixture loader and live FalkorDB verifier; it does not use a fake graph and does not add a UI.
 - Public artifact provenance: `falkordb/falkordb:6.0.2`; project-local module SHA-256 is `93bc3c1d484f7fcad45c9409c32034c79e876596b18ce5b03922be007dba889c`. `MODULE LIST` on the owned Redis server reported module name `graph`, runtime module version `60002` (FalkorDB 6.0.2), and the owned server log confirmed that exact module path. **Redis 8.0.5** was the server runtime.
 
-## Exact validation commands
+## Exact clean setup and validation commands
 
 ```sh
+python3 scripts/install_falkordb_module.py
 python3 scripts/verify_expected_results.py --expected tests/expected-results.json --matrix tests/adversarial-matrix.json --require-six-scenarios
 python3 scripts/verify_falkordb_live.py --require-live --fail-on-zero --fresh-owned-graph --db-port 18732 --empty-reseed-idempotence-reconnect --report /workspace/evidence/wardatlas/falkordb-scenarios.json --verify-morning-status
 ```
+
+The installer is the required first step for every clean checkout because `.local/` is intentionally ignored and not committed. It downloads and digest-verifies only the pinned public module; it does not install a global dependency or contact a Docker daemon. `README.md` has the same sequence and a project-local report variant for users outside this workshop.
 
 The live verifier starts only its owned Redis process with the actual FalkorDB module, binds only `127.0.0.1:18732`, uses a unique graph name, deletes only that graph, and stops its own process. If the selected port cannot be bound, it exits without connecting to an occupant.
 
@@ -23,6 +26,7 @@ The live verifier starts only its owned Redis process with the actual FalkorDB m
 - Passing run `31c2c4b7ece24b168d7f4814762a4f74` host sample: `MemTotal=3,477,356 kB`, `MemAvailable=2,238,288 kB`; the environment does not expose the queried cgroup memory/cpu limit files.
 - That owned FalkorDB process reached an **RSS peak (`VmHWM`) of 39,120 KiB**. Its report records 102 graph queries and individual client-side command timing samples (including PING/module discovery), without making generalized benchmark claims. This exact run is preserved at `/workspace/evidence/wardatlas/falkordb-scenarios-success-pre-status-recheck.json`.
 - The successful-run sample above is preserved in `/workspace/evidence/wardatlas/falkordb-scenarios-success-pre-status-recheck.json`. Separate harness attempts 8 and 9 passed all eight live scenarios and 27 assertions but exited nonzero on morning-status wording checks, not graph behavior: attempt 8 found a case-sensitive `deferred`/`Deferred` mismatch; attempt 9 found that `RSS` and `Redis 8.0.5` were required terms not present literally. Both failure reports are retained, and the status text plus semantic validation are now repaired. Earlier live verifier defects and their repair evidence are retained in `/workspace/evidence/wardatlas/falkordb-scenarios-attempt-1-failure.json` through `falkordb-scenarios-attempt-7-failure.json`.
+- A deliberate no-`.local/` probe reproduced the clean-checkout bootstrap prerequisite: the live verifier failed closed with `project-local FalkorDB module/provenance missing` before starting a process or issuing graph queries. The failure report is `/workspace/evidence/wardatlas/verify-missing-project-local-module.json` (0 graph queries). The missing prerequisite is now first in the README and exact setup sequence above; a clean-source-export run is pending below.
 
 ## Scenario and evidence status
 
@@ -34,9 +38,9 @@ The live verifier starts only its owned Redis process with the actual FalkorDB m
 ## Deferred work and blockers
 
 - Deferred: read-only API/browser workflow, visual graph explorer, dashboard, handover/action drafting, timeline/replay and mobile/desktop evidence. This task is restricted to the fixture and live-query feasibility slice; those features remain future work after live database feasibility.
-- No host/database blocker was encountered in this live verification.
+- No host/database blocker was encountered in the live run. Clean-source-export reproduction of the documented bootstrap chain remains pending for this checkpoint.
 - Competition eligibility risk: official rules require participant technical understanding and meaningful contribution; autonomous AI output alone may be rejected. This status does not claim to satisfy that rule for the owner.
 
 ## Next
 
-The exact commands above now pass in this worktree. Next, integrate this verified graph workflow behind a minimal read-only API and synthetic outage briefing, then add browser/API and desktop/mobile evidence; keep restricted-source non-disclosure and source provenance checks intact.
+First verify the documented three-command setup from a clean tracked-source export with no `.local/`, preserving the report and any failure. Once it passes, integrate the verified graph workflow behind a minimal read-only API and synthetic outage briefing; then add browser/API and desktop/mobile evidence while keeping restricted-source non-disclosure and provenance checks intact.
