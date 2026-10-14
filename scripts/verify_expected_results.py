@@ -75,11 +75,51 @@ def validate(expected: dict, matrix: dict, require_six: bool) -> int:
         fail("canonical outage expectations must contain two five-node paths")
     if len({tuple(path) for path in paths}) != 2:
         fail("canonical paths must be distinct")
+    evidence = expected.get("expected_evidence_by_path")
+    if not isinstance(evidence, list) or len(evidence) != len(paths):
+        fail("each canonical path must pin its provenance payload")
+    for index, row in enumerate(evidence):
+        if row.get("path") != paths[index]:
+            fail("provenance path order must match the canonical path oracle")
+        for key in ("source_ids", "source_titles", "observed_at"):
+            values = row.get(key)
+            if not isinstance(values, list) or len(values) != 4 or any(not v for v in values):
+                fail(f"canonical path {index} must pin four nonempty {key}")
+    if evidence[0]["source_ids"] != expected_outage.get("source_ids_by_path", [None])[0]:
+        fail("first canonical provenance IDs disagree with the multi-hop scenario pin")
+    if evidence[1]["source_ids"] != expected_outage.get("source_ids_by_path", [None, None])[1]:
+        fail("second canonical provenance IDs disagree with the multi-hop scenario pin")
+    if evidence[0]["observed_at"] != expected_outage.get("observed_at_by_path", [None])[0]:
+        fail("first canonical evidence timestamps disagree with the multi-hop scenario pin")
+    if evidence[1]["observed_at"] != expected_outage.get("observed_at_by_path", [None, None])[1]:
+        fail("second canonical evidence timestamps disagree with the multi-hop scenario pin")
+    sop = by_scenario["stale-reference-current-sop-conflict"]["expected"]
+    for key in (
+        "stale_source_id", "stale_source_title", "stale_observed_at",
+        "current_source_ids", "current_source_titles", "current_observed_at",
+    ):
+        value = sop.get(key)
+        if not value or (isinstance(value, list) and any(not item for item in value)):
+            fail(f"SOP conflict oracle must pin nonempty provenance field {key}")
+    if len(sop["current_source_ids"]) != 2 or len(sop["current_source_titles"]) != 2 or len(sop["current_observed_at"]) != 2:
+        fail("SOP conflict oracle must pin exactly two current evidence records")
     denial = by_scenario["denied-source-nondisclosure"]["expected"]
     if denial.get("visible_paths_before_denied_fixture") != denial.get("visible_paths_after_denied_fixture"):
         fail("denied-source oracle must pin identical visible paths before and after")
+    if denial.get("visible_paths_before_denied_fixture") != paths:
+        fail("denied-source visible path pin must match the canonical outage paths")
+    if denial.get("visible_evidence_before_denied_fixture") != denial.get("visible_evidence_after_denied_fixture"):
+        fail("denied-source oracle must pin identical evidence before and after")
     if denial.get("denied_identifiers_or_derived_paths_disclosed") is not False:
         fail("denied-source oracle must forbid identifier and derived-path disclosure")
+    if denial.get("denied_count_or_existence_disclosed") is not False:
+        fail("denied-source oracle must forbid hidden-count and existence leakage")
+    for key in (
+        "denied_source_id", "denied_department_id", "denied_role_id",
+        "denied_source_title", "denied_fact_text", "denied_equipment_id",
+    ):
+        if not isinstance(denial.get(key), str) or not denial[key]:
+            fail(f"denied-source oracle must pin a nonempty disclosure tripwire: {key}")
 
     assertion_count = sum(c["nonzero_assertion_count"] for c in cases)
     print(

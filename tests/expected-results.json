@@ -28,6 +28,20 @@
       "ROLE-MATERIALS-DUTY"
     ]
   ],
+  "expected_evidence_by_path": [
+    {
+      "path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+      "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+      "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+      "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"]
+    },
+    {
+      "path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"],
+      "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+      "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+      "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]
+    }
+  ],
   "scenarios": [
     {
       "id": "cold-empty-graph",
@@ -47,6 +61,14 @@
         "row_count": 2,
         "department_ids": ["DEPT-CENTRAL-STERILE", "DEPT-MATERIALS-LOGISTICS"],
         "current_role_ids": ["ROLE-STERILE-OPS-COORD", "ROLE-MATERIALS-DUTY"],
+        "source_ids_by_path": [
+          ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+          ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"]
+        ],
+        "observed_at_by_path": [
+          ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"],
+          ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]
+        ],
         "excluded_stale_role_id": "ROLE-OLD-STERILE-ROTATION",
         "excluded_disconnected_department_id": "DEPT-OUTPATIENT-ADMIN"
       },
@@ -79,6 +101,12 @@
         "stale_referenced_equipment_id": "CONVEYOR-C3",
         "current_conflicting_version_ids": ["SOP-OPS-9-V2", "SOP-OPS-9-V3"],
         "current_conflicting_role_claims": ["ROLE-FACILITIES-DUTY", "ROLE-MATERIALS-LEAD"],
+        "stale_source_id": "SRC-SOP-ARCHIVE-9",
+        "stale_source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+        "stale_observed_at": "2026-01-10T12:00:00Z",
+        "current_source_ids": ["SRC-SOP-CURRENT-V2", "SRC-SOP-CURRENT-V3"],
+        "current_source_titles": ["Synthetic SOP-OPS-9 Current Text v2", "Synthetic SOP-OPS-9 Current Text v3"],
+        "current_observed_at": ["2026-10-14T16:00:00Z", "2026-10-14T16:04:00Z"],
         "conflict_status": "unresolved",
         "silently_selected_winner": false
       },
@@ -91,6 +119,9 @@
         "denied_source_id": "SRC-RESTRICTED-92",
         "denied_department_id": "DEPT-RESTRICTED-COMPLIANCE",
         "denied_role_id": "ROLE-RESTRICTED-OWNER",
+        "denied_source_title": "Restricted Continuity Annex 92",
+        "denied_fact_text": "Restricted-only instruction: contact the secure lift coordinator.",
+        "denied_equipment_id": "EQUIP-RESTRICTED-92",
         "visible_paths_before_denied_fixture": [
           ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
           ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
@@ -99,7 +130,16 @@
           ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
           ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
         ],
+        "visible_evidence_before_denied_fixture": [
+          {"path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"], "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"]},
+          {"path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"], "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]}
+        ],
+        "visible_evidence_after_denied_fixture": [
+          {"path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"], "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"]},
+          {"path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"], "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]}
+        ],
         "denied_identifiers_or_derived_paths_disclosed": false,
+        "denied_count_or_existence_disclosed": false,
         "visible_row_count_delta": 0
       },
       "oracle": "Visible rows must be byte-for-byte equivalent in their ordered ID paths before and after adding restricted-source graph facts; denied IDs, text, counts, and derived paths are forbidden."
