@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Pinned, candidate-independent expected results for the synthetic FalkorDB outage-to-ownership slice.",
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "Actual FalkorDB graph module; Redis without FalkorDB is not a passing substitute.",
+    "graph_ownership": "Every verification run creates a unique graph name and may delete only that graph.",
+    "fixture_hospital": "Northstar Demo Hospital (fictional)",
+    "incident_id": "INC-204",
+    "outage_equipment_id": "CONVEYOR-C4",
+    "service_id": "SVC-MATERIAL-TRANSFER"
+  },
+  "expected_paths": [
+    [
+      "INC-204",
+      "CONVEYOR-C4",
+      "SVC-MATERIAL-TRANSFER",
+      "DEPT-CENTRAL-STERILE",
+      "ROLE-STERILE-OPS-COORD"
+    ],
+    [
+      "INC-204",
+      "CONVEYOR-C4",
+      "SVC-MATERIAL-TRANSFER",
+      "DEPT-MATERIALS-LOGISTICS",
+      "ROLE-MATERIALS-DUTY"
+    ]
+  ],
+  "scenarios": [
+    {
+      "id": "cold-empty-graph",
+      "expected": {
+        "impact_paths": [],
+        "row_count": 0
+      },
+      "oracle": "This file's fixed empty-list and zero-row expectation; query output is not used to derive the oracle."
+    },
+    {
+      "id": "multi-hop-outage-current-ownership",
+      "expected": {
+        "impact_paths": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "row_count": 2,
+        "department_ids": ["DEPT-CENTRAL-STERILE", "DEPT-MATERIALS-LOGISTICS"],
+        "current_role_ids": ["ROLE-STERILE-OPS-COORD", "ROLE-MATERIALS-DUTY"],
+        "excluded_stale_role_id": "ROLE-OLD-STERILE-ROTATION",
+        "excluded_disconnected_department_id": "DEPT-OUTPATIENT-ADMIN"
+      },
+      "oracle": "Exact ordered ID paths are pinned here, independently of candidate query results."
+    },
+    {
+      "id": "disconnected-decoy-exclusion",
+      "expected": {
+        "decoy_department_id": "DEPT-OUTPATIENT-ADMIN",
+        "decoy_role_id": "ROLE-OUTPATIENT-DESK",
+        "decoy_path_count": 0,
+        "incident_path_count": 2
+      },
+      "oracle": "The decoy IDs and zero-path expectation are fixed before query implementation."
+    },
+    {
+      "id": "equipment-outage-counterfactual",
+      "expected": {
+        "baseline_path_count": 2,
+        "counterfactual_equipment_status": "available",
+        "counterfactual_path_count": 0,
+        "baseline_paths_restored_after_rollback": true
+      },
+      "oracle": "A controlled status change on the owned graph must remove the outage impact paths, then rollback must restore the pinned paths."
+    },
+    {
+      "id": "stale-reference-current-sop-conflict",
+      "expected": {
+        "stale_version_id": "SOP-OPS-9-V1",
+        "stale_referenced_equipment_id": "CONVEYOR-C3",
+        "current_conflicting_version_ids": ["SOP-OPS-9-V2", "SOP-OPS-9-V3"],
+        "current_conflicting_role_claims": ["ROLE-FACILITIES-DUTY", "ROLE-MATERIALS-LEAD"],
+        "conflict_status": "unresolved",
+        "silently_selected_winner": false
+      },
+      "oracle": "A superseded reference and two contradictory current claims must remain explicit; neither current claim is chosen as authoritative."
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "expected": {
+        "viewer_scope": "operations",
+        "denied_source_id": "SRC-RESTRICTED-92",
+        "denied_department_id": "DEPT-RESTRICTED-COMPLIANCE",
+        "denied_role_id": "ROLE-RESTRICTED-OWNER",
+        "visible_paths_before_denied_fixture": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "visible_paths_after_denied_fixture": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "denied_identifiers_or_derived_paths_disclosed": false,
+        "visible_row_count_delta": 0
+      },
+      "oracle": "Visible rows must be byte-for-byte equivalent in their ordered ID paths before and after adding restricted-source graph facts; denied IDs, text, counts, and derived paths are forbidden."
+    },
+    {
+      "id": "seed-reseed-idempotence",
+      "expected": {
+        "seed_runs": 2,
+        "node_count_delta_after_second_seed": 0,
+        "relationship_count_delta_after_second_seed": 0,
+        "duplicate_fixture_ids": [],
+        "impact_paths_after_each_seed": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ]
+      },
+      "oracle": "Deterministic fixture IDs and stable relationship counts are specified here; candidate counts are only compared to the first seed, never used as expected values."
+    },
+    {
+      "id": "reconnect-preserves-results",
+      "expected": {
+        "new_client_connection_required": true,
+        "impact_paths_after_reconnect": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "row_count": 2
+      },
+      "oracle": "The fixed two paths must be returned over a newly created client connection to the same owned graph."
+    }
+  ]
+}

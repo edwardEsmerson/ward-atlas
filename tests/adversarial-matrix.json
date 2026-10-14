@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/expected-results.json",
+  "oracle_policy": "Expected identifiers, paths, non-disclosure rules, and outcome counts are authored before query behavior and are not inferred from candidate output.",
+  "cases": [
+    {
+      "id": "cold-empty-graph",
+      "scenario_id": "cold-empty-graph",
+      "attack_or_edge_case": "Run impact and SOP queries against a newly created, empty graph.",
+      "setup": "Create a unique graph owned by this verifier; do not seed fixtures.",
+      "pinned_assertions": ["zero impact rows", "zero SOP findings"],
+      "nonzero_assertion_count": 2,
+      "failure_detected": "Phantom defaults, stale shared data, or assumption of preloaded rows."
+    },
+    {
+      "id": "multi-hop-outage-current-ownership",
+      "scenario_id": "multi-hop-outage-current-ownership",
+      "attack_or_edge_case": "Trace an open outage through equipment, a supported service, served departments, and current owning roles.",
+      "setup": "Seed only deterministic fictional fixture records in the owned graph.",
+      "pinned_assertions": ["exact two ordered paths", "exact departments", "exact current roles", "stale role excluded"],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Missing multi-hop graph reasoning, wrong ownership, stale owner selected, or extra row."
+    },
+    {
+      "id": "disconnected-decoy-exclusion",
+      "scenario_id": "disconnected-decoy-exclusion",
+      "attack_or_edge_case": "Keep a plausible department and owner in the graph but disconnected from the affected service.",
+      "setup": "Seed the outpatient-admin decoy and its role without an incident/service path.",
+      "pinned_assertions": ["decoy contributes zero paths", "only two affected paths returned"],
+      "nonzero_assertion_count": 2,
+      "failure_detected": "Entity-name similarity or broad table scan mistaken for a graph relationship."
+    },
+    {
+      "id": "equipment-outage-counterfactual",
+      "scenario_id": "equipment-outage-counterfactual",
+      "attack_or_edge_case": "Change the outage equipment state to available, observe impact disappear, and roll back.",
+      "setup": "Use a transaction or an explicit update/restore on this test-owned graph only.",
+      "pinned_assertions": ["baseline has two paths", "available counterfactual has zero paths", "restored graph has the exact baseline paths"],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "Impact output detached from graph state or irreversible fixture mutation."
+    },
+    {
+      "id": "stale-reference-current-sop-conflict",
+      "scenario_id": "stale-reference-current-sop-conflict",
+      "attack_or_edge_case": "An old SOP references replaced equipment while two current versions disagree about escalation ownership.",
+      "setup": "Seed one superseded reference and two current contradictory claims with unresolved status.",
+      "pinned_assertions": ["stale version and old equipment found", "both current versions returned", "conflict remains unresolved", "no winner inferred"],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Stale reference hidden, conflicting current claim silently resolved, or unsupported authority asserted."
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "scenario_id": "denied-source-nondisclosure",
+      "attack_or_edge_case": "Attach a restricted evidence path containing a restricted source, department, role, and distinctive hidden fact.",
+      "setup": "Capture operations-scope output, add restricted-only facts, and query again with the same operations scope.",
+      "pinned_assertions": ["visible paths unchanged", "no denied IDs/text", "no denied count", "no derived path or role disclosed"],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Direct leakage, existence/count leakage, or inference through an inaccessible source."
+    },
+    {
+      "id": "seed-reseed-idempotence",
+      "scenario_id": "seed-reseed-idempotence",
+      "attack_or_edge_case": "Apply the same fixture loader twice to the same owned graph.",
+      "setup": "Measure graph counts and paths after first seed and after reseed.",
+      "pinned_assertions": ["node count unchanged", "relationship count unchanged", "no duplicate deterministic IDs", "same two paths"],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Duplicate nodes/relationships or drift after repeat ingestion."
+    },
+    {
+      "id": "reconnect-preserves-results",
+      "scenario_id": "reconnect-preserves-results",
+      "attack_or_edge_case": "Close the first client socket and query again through a new client connection.",
+      "setup": "Keep the same test-owned graph; create a fresh client rather than reuse a warm connection.",
+      "pinned_assertions": ["new socket created", "exact two paths remain"],
+      "nonzero_assertion_count": 2,
+      "failure_detected": "Connection-local caching or results unavailable after reconnect."
+    }
+  ]
+}
