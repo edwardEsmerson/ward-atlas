@@ -270,6 +270,10 @@ def explicit_bind_preflight(port: int) -> None:
     """Bind-check the requested address; on failure, never probe its occupant."""
     probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
+        # Permit safe reuse of a just-closed owned listener's TIME_WAIT socket.
+        # An active listener still makes bind fail; this never connects to it.
+        # The selected port remains accepted only after this bind succeeds.
+        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         probe.bind(("127.0.0.1", port))
     except OSError as exc:
         raise VerificationFailure(
