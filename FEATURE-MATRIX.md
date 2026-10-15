@@ -15,6 +15,7 @@ This matrix distinguishes implemented product behavior from behavior exercised b
 ## Current evidence
 
 - Original graph contract: `/workspace/evidence/wardatlas/falkordb-scenarios.json` and clean source-checkout reproduction `/workspace/evidence/wardatlas/falkordb-scenarios-clean-checkout.json`.
+- Clean source-only integration for this UI slice: `/workspace/evidence/wardatlas/clean-source-integration-be729a6.log`, `/workspace/evidence/wardatlas/falkordb-scenarios-clean-final.json`, and `/workspace/evidence/wardatlas/ui-clean-source/wardatlas-workflow.json`.
 - UI workflow contract: `/workspace/evidence/wardatlas/ui/wardatlas-workflow.json`.
 - Browser assertions: `/workspace/evidence/wardatlas/ui/browser-assertions.json`.
 - Desktop/mobile screenshots and Playwright trace: `/workspace/evidence/wardatlas/ui/desktop.png`, `mobile.png`, and `trace.zip`.
