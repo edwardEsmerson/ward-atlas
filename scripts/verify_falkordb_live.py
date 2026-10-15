@@ -25,6 +25,17 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from install_falkordb_module import (
+    AMD64_MANIFEST_DIGEST,
+    ARTIFACT,
+    INDEX_DIGEST,
+    MODULE_LAYER_DIGEST,
+    MODULE_MEMBER,
+    MODULE_SHA256,
+    PLATFORM,
+    SOURCE,
+    install as install_falkordb_module,
+)
 from wardatlas_fixtures import (
     IMPACT_QUERY,
     SOP_CONFLICT_QUERY,
@@ -271,15 +282,44 @@ def explicit_bind_preflight(port: int) -> None:
 def assert_provenance() -> dict[str, Any]:
     if not MODULE_PATH.is_file() or not PROVENANCE_PATH.is_file():
         raise VerificationFailure(
-            "project-local FalkorDB module/provenance missing; run scripts/install_falkordb_module.py"
+            "project-local FalkorDB module/provenance missing after bootstrap"
         )
+    if not MODULE_PATH.resolve().is_relative_to(ROOT) or not PROVENANCE_PATH.resolve().is_relative_to(ROOT):
+        raise VerificationFailure("FalkorDB module and provenance must remain project-local")
     receipt = json.loads(PROVENANCE_PATH.read_text(encoding="utf-8"))
     actual_hash = hashlib.sha256(MODULE_PATH.read_bytes()).hexdigest()
-    if receipt.get("artifact") != "falkordb/falkordb:6.0.2":
-        raise VerificationFailure("unexpected FalkorDB module artifact in provenance receipt")
-    if receipt.get("module_sha256") != actual_hash:
+    required_receipt = {
+        "source": SOURCE,
+        "artifact": ARTIFACT,
+        "platform": PLATFORM,
+        "image_index_digest": INDEX_DIGEST,
+        "platform_manifest_digest": AMD64_MANIFEST_DIGEST,
+        "module_layer_digest": MODULE_LAYER_DIGEST,
+        "member": MODULE_MEMBER,
+        "module_sha256": MODULE_SHA256,
+        "destination": str(MODULE_PATH.resolve()),
+    }
+    mismatched = [key for key, value in required_receipt.items() if receipt.get(key) != value]
+    if mismatched:
+        raise VerificationFailure(f"FalkorDB provenance receipt differs from the pinned artifact: {mismatched}")
+    if actual_hash != MODULE_SHA256 or receipt.get("module_sha256") != actual_hash:
         raise VerificationFailure("FalkorDB module SHA-256 does not match its provenance receipt")
     return {**receipt, "module_sha256_verified": actual_hash}
+
+
+def ensure_project_local_module() -> dict[str, Any]:
+    """Bootstrap the pinned module when a clean source checkout has no .local/."""
+    if not MODULE_PATH.is_file() or not PROVENANCE_PATH.is_file():
+        try:
+            installed = install_falkordb_module(MODULE_PATH)
+        except Exception as exc:
+            raise VerificationFailure(
+                "automatic project-local FalkorDB bootstrap failed; no database was started: "
+                f"{type(exc).__name__}: {exc}"
+            ) from exc
+        if installed.get("module_sha256") != MODULE_SHA256:
+            raise VerificationFailure("bootstrap returned an unexpected FalkorDB module digest")
+    return assert_provenance()
 
 
 class LiveVerifier:
@@ -362,7 +402,7 @@ class LiveVerifier:
         server = shutil.which("redis-server")
         if server is None:
             raise VerificationFailure("redis-server executable is unavailable; no server was installed")
-        provenance = assert_provenance()
+        provenance = ensure_project_local_module()
         RUNS_PATH.mkdir(parents=True, exist_ok=True)
         run_dir = RUNS_PATH / self.run_id
         run_dir.mkdir(mode=0o700)
@@ -812,28 +852,29 @@ def validate_morning_status() -> list[str]:
         raise VerificationFailure("MORNING-STATUS.md is missing")
     content = MORNING_STATUS.read_text(encoding="utf-8")
     required = [
-        "python3 scripts/install_falkordb_module.py",
         "python3 scripts/verify_expected_results.py --expected tests/expected-results.json --matrix tests/adversarial-matrix.json --require-six-scenarios",
         "python3 scripts/verify_falkordb_live.py --require-live --fail-on-zero --fresh-owned-graph --db-port 18732 --empty-reseed-idempotence-reconnect --report /workspace/evidence/wardatlas/falkordb-scenarios.json --verify-morning-status",
         "/workspace/evidence/wardatlas/falkordb-scenarios.json",
     ]
     missing = [item for item in required if item not in content]
-    setup_order = required[:3]
+    setup_order = required[:2]
     positions = [content.find(item) for item in setup_order]
     if any(position < 0 for position in positions) or positions != sorted(positions):
-        missing.append("MORNING-STATUS.md commands must bootstrap before oracle and live verification")
+        missing.append("MORNING-STATUS.md must run the pinned oracle before the live verifier")
+    if "automatically bootstraps" not in content.casefold():
+        missing.append("MORNING-STATUS.md must explain clean-checkout automatic module bootstrap")
     if not README_PATH.is_file():
         missing.append("README.md is missing the clean setup instructions")
     else:
         readme = README_PATH.read_text(encoding="utf-8")
         readme_steps = [
-            "python3 scripts/install_falkordb_module.py",
+            "automatically bootstraps",
             "python3 scripts/verify_expected_results.py",
             "python3 scripts/verify_falkordb_live.py --require-live",
         ]
         readme_positions = [readme.find(item) for item in readme_steps]
         if any(position < 0 for position in readme_positions) or readme_positions != sorted(readme_positions):
-            missing.append("README.md must document installer, oracle, and live verifier in that order")
+            missing.append("README.md must document automatic bootstrap, oracle, and live verifier in that order")
     concepts = [
         "Pentium Silver N5030",
         "AVX",
