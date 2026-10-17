@@ -84,7 +84,7 @@
     },
     {
       "id": "reconnect-time-normalization-and-rejection",
-      "expected": {"reconnect_same_result": true, "offset_input": "2026-10-14T22:30:00+02:00", "normalized_as_of": "2026-10-14T20:30:00Z", "offset_role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"], "malformed_time_rejected_before_mutation": true, "missing_effective_time_rejected_before_mutation": true, "no_external_effects": true},
+      "expected": {"reconnect_same_result": true, "complete_semantic_snapshot_preserved": true, "source_versions_loss_mutant_rejected": true, "offset_input": "2026-10-14T22:30:00+02:00", "normalized_as_of": "2026-10-14T20:30:00Z", "offset_role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"], "malformed_time_rejected_before_mutation": true, "missing_effective_time_rejected_before_mutation": true, "no_external_effects": true},
       "oracle": "A fresh connection is stable, explicit offsets normalize to UTC, malformed/missing effective times fail before any owned graph mutation, and behavior remains local-only."
     }
   ]

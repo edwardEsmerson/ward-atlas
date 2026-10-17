@@ -53,6 +53,16 @@ MATRIX_DEFAULT = ROOT / "tests/source-change-adversarial-matrix.json"
 MORNING_STATUS = ROOT / "MORNING-STATUS.md"
 FEATURE_MATRIX = ROOT / "FEATURE-MATRIX.md"
 CLI_PATH = ROOT / "scripts/wardatlas_source_changes.py"
+NON_SEMANTIC_TELEMETRY = frozenset({"graph_query_count", "graph_query_elapsed_ms"})
+
+
+def semantic_snapshot(result: dict[str, Any]) -> dict[str, Any]:
+    """Strip only explicitly non-semantic CLI query telemetry for equality."""
+    return {key: value for key, value in result.items() if key not in NON_SEMANTIC_TELEMETRY}
+
+
+def semantic_snapshots_equal(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    return semantic_snapshot(left) == semantic_snapshot(right)
 
 
 class SourceLiveVerifier:
@@ -266,6 +276,9 @@ class SourceLiveVerifier:
             assert self.live.client is not None
             old_token = self.live.client.connection_token
             old_client_id = int(self.live.command("old source-change CLIENT ID", "CLIENT", "ID"))
+            # This full semantic baseline is deliberately the final operation
+            # on the old graph connection before it is closed.
+            before_reconnect = snapshot(store, EFFECTIVE_AT)
             self.live.client.close()
             self.live.client = RespConnection("127.0.0.1", self.live.port)
             new_token = self.live.client.connection_token
@@ -273,6 +286,24 @@ class SourceLiveVerifier:
             reconnected = snapshot(store, EFFECTIVE_AT)
             self.check(case, "new Redis socket/client reconnects to same FalkorDB graph", old_token != new_token and old_client_id != new_client_id, {"old_client_id": old_client_id, "new_client_id": new_client_id})
             self.check(case, "reconnect preserves current role path and exact remaining candidate queue", reconnected.get("role_path") == fixed_after and reconnected.get("review_candidates") == [TICKET], reconnected)
+            semantic_equal = semantic_snapshots_equal(before_reconnect, reconnected)
+            self.check(
+                case,
+                "complete semantic snapshot including source versions, assignment provenance, SOP conflict, coverage and queue is identical across reconnect",
+                semantic_equal,
+                {"before": semantic_snapshot(before_reconnect), "after": semantic_snapshot(reconnected)},
+            )
+            # Reproduce the verifier finding with the exact mutant: if a
+            # reconnect result silently loses source history, the same full
+            # semantic comparator must reject it.
+            source_versions_mutant = dict(reconnected)
+            source_versions_mutant["source_versions"] = []
+            self.check(
+                case,
+                "full-result comparator rejects a post-reconnect source_versions=[] mutant",
+                not semantic_snapshots_equal(before_reconnect, source_versions_mutant),
+                {"before_source_version_count": len(before_reconnect.get("source_versions", [])), "mutant_source_versions": source_versions_mutant["source_versions"]},
+            )
             self.check(case, "no external effect was performed or represented", reconnected.get("external_effects") == [] and "actions_proposed" not in reconnected, reconnected.get("external_effects"))
             source_text = CLI_PATH.read_text(encoding="utf-8")
             tree = ast.parse(source_text)

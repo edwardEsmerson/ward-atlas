@@ -71,6 +71,8 @@ EXPECTED_SCENARIOS = {
     },
     "reconnect-time-normalization-and-rejection": {
         "reconnect_same_result": True,
+        "complete_semantic_snapshot_preserved": True,
+        "source_versions_loss_mutant_rejected": True,
         "offset_input": "2026-10-14T22:30:00+02:00",
         "normalized_as_of": "2026-10-14T20:30:00Z",
         "offset_role_path": EXPECTED_PATHS["after"],
@@ -79,7 +81,7 @@ EXPECTED_SCENARIOS = {
         "no_external_effects": True,
     },
 }
-EXPECTED_ASSERTION_FLOORS = [5, 3, 5, 5, 4, 5, 5, 6]
+EXPECTED_ASSERTION_FLOORS = [5, 3, 5, 5, 4, 5, 5, 8]
 
 
 class OracleFailure(ValueError):
