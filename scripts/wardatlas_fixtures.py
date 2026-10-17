@@ -58,6 +58,10 @@ NODES = [
     node("SOPVersion", "SOP-OPS-9-V1", sop_id="SOP-OPS-9", current=False, referenced_equipment_id="CONVEYOR-C3", escalation_role_id="ROLE-FACILITIES-DUTY", conflict_status="superseded", access="operations"),
     node("SOPVersion", "SOP-OPS-9-V2", sop_id="SOP-OPS-9", current=True, referenced_equipment_id="CONVEYOR-C4", escalation_role_id="ROLE-FACILITIES-DUTY", conflict_status="unresolved", access="operations"),
     node("SOPVersion", "SOP-OPS-9-V3", sop_id="SOP-OPS-9", current=True, referenced_equipment_id="CONVEYOR-C4", escalation_role_id="ROLE-MATERIALS-LEAD", conflict_status="unresolved", access="operations"),
+    # These are role identifiers named by source claims, not current owners or
+    # verified contacts. Their only relationship to each SOP is CLAIMS_ROLE.
+    node("Role", "ROLE-FACILITIES-DUTY", access="operations", claim_only=True),
+    node("Role", "ROLE-MATERIALS-LEAD", access="operations", claim_only=True),
     node("Evidence", "SRC-SOP-ARCHIVE-9", title="Synthetic SOP-OPS-9 Archived Text v1", observed_at="2026-01-10T12:00:00Z", access="operations"),
     node("Evidence", "SRC-SOP-CURRENT-V2", title="Synthetic SOP-OPS-9 Current Text v2", observed_at="2026-10-14T16:00:00Z", access="operations"),
     node("Evidence", "SRC-SOP-CURRENT-V3", title="Synthetic SOP-OPS-9 Current Text v3", observed_at="2026-10-14T16:04:00Z", access="operations"),
@@ -87,6 +91,11 @@ EDGES = [
     edge("SOP-OPS-9-V1", "EVIDENCED_BY", "SRC-SOP-ARCHIVE-9", "REL-SOP-V1-EVIDENCE", access="operations"),
     edge("SOP-OPS-9-V2", "EVIDENCED_BY", "SRC-SOP-CURRENT-V2", "REL-SOP-V2-EVIDENCE", access="operations"),
     edge("SOP-OPS-9-V3", "EVIDENCED_BY", "SRC-SOP-CURRENT-V3", "REL-SOP-V3-EVIDENCE", access="operations"),
+    edge("SOP-OPS-9-V2", "APPLIES_TO", "CONVEYOR-C4", "REL-SOP-V2-APPLIES-C4", access="operations"),
+    edge("SOP-OPS-9-V3", "APPLIES_TO", "CONVEYOR-C4", "REL-SOP-V3-APPLIES-C4", access="operations"),
+    edge("SOP-OPS-9-V1", "APPLIES_TO", "CONVEYOR-C3", "REL-SOP-V1-APPLIES-C3", access="operations"),
+    edge("SOP-OPS-9-V2", "CLAIMS_ROLE", "ROLE-FACILITIES-DUTY", "REL-SOP-V2-CLAIMS-FACILITIES", access="operations"),
+    edge("SOP-OPS-9-V3", "CLAIMS_ROLE", "ROLE-MATERIALS-LEAD", "REL-SOP-V3-CLAIMS-MATERIALS", access="operations"),
     edge("SOP-OPS-9-V2", "SOP_CONFLICT", "SOP-OPS-9-V3", "REL-SOP-9-CONFLICT", status="unresolved", access="operations"),
     # Restricted branch is fully graph-connected from the visible incident
     # and service, but every hidden hop is access-filtered at query time.

@@ -28,6 +28,12 @@ from verify_falkordb_live import (
     text,
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
+from wardatlas_sop_impact import (
+    CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
+    CONFLICT_WITNESS_QUERY,
+    STALE_QUERY,
+    assemble_response as assemble_sop_impact_response,
+)
 from wardatlas_shift_board import (
     BRANCH_AT,
     BRANCH_EVENT_QUERY,
@@ -171,6 +177,20 @@ APP_HTML = r'''<!doctype html>
     .branch-box p { margin:5px 0 0; color:#c4c8bd; font-size:10px; line-height:1.5; }
     .shift-unknown { color:#f1c278; }
     .shift-case[hidden] { display:none; }
+    .sop-impact { margin:0 0 18px; border-color:#5b4d38; background:linear-gradient(145deg,#302a22,#182832 64%); }
+    .sop-impact-intro { color:#bfcbc7; font-size:12px; line-height:1.55; margin:4px 0 15px; max-width:880px; }
+    .sop-impact-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:14px; }
+    .sop-impact-pane { min-width:0; border:1px solid #554735; border-radius:11px; padding:13px; background:#171f2188; }
+    .sop-impact-pane h3 { color:#d6c6a9; text-transform:uppercase; font-size:9px; letter-spacing:.13em; margin:0 0 9px; }
+    .sop-impact-path { overflow-wrap:anywhere; border-left:2px solid var(--mint); padding:8px 10px; margin:8px 0; background:#102d2680; color:#d9e8e2; font-size:10px; line-height:1.65; }
+    .sop-impact-path small { display:block; color:#a5bbb5; margin-top:4px; }
+    .sop-impact-claim { border-top:1px solid #504632; padding:9px 0; font-size:11px; line-height:1.55; }
+    .sop-impact-claim strong { color:#f0d9a9; }
+    .sop-impact-claim span { display:block; color:#afc0bb; font-size:10px; overflow-wrap:anywhere; }
+    .sop-impact-edge { color:#f4cf8c; font-size:10px; line-height:1.6; overflow-wrap:anywhere; }
+    .sop-impact-stale { border:1px solid #665035; border-radius:9px; padding:10px 12px; margin-top:12px; color:#d8c6a8; font-size:10px; line-height:1.55; background:#30281d88; }
+    .sop-impact-empty { color:#f1c278; font-size:12px; padding:6px 0; }
+    @media (max-width:760px) { .sop-impact-grid { grid-template-columns:1fr; } }
     #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
     @media (max-width:900px) { .grid { grid-template-columns:1fr; } .hero { grid-template-columns:1fr; align-items:start; } .incident-card { max-width:420px; } }
@@ -212,6 +232,20 @@ APP_HTML = r'''<!doctype html>
           </article>
         </div>
         <div id="shift-board-notice" class="notice" aria-live="polite"></div>
+      </section>
+      <section id="sop-impact" class="card sop-impact" aria-labelledby="sop-impact-title">
+        <div class="card-head"><div><div class="eyebrow">Graph-native evidence trace</div><h2 id="sop-impact-title">When an SOP conflict touches an outage</h2></div><span id="sop-impact-badge" class="tag amber">Loading linked evidence…</span></div>
+        <p class="sop-impact-intro">Only explicit APPLIES_TO, SOP_CONFLICT and CLAIMS_ROLE edges with operations-visible source evidence join these records. SOP claims are not current owners, contacts, instructions, or a selected winner.</p>
+        <div id="sop-impact-empty" class="sop-impact-empty" hidden>Empty / unknown. No incident path, SOP version, role claim, or source is inferred from a blank graph.</div>
+        <div id="sop-impact-content" hidden>
+          <div class="sop-impact-grid">
+            <div class="sop-impact-pane"><h3>Observed outage impact · <span id="sop-impact-as-of"></span></h3><div id="sop-impact-event" class="subtle"></div><div id="sop-impact-paths"></div></div>
+            <div class="sop-impact-pane"><h3>Explicit unresolved conflict witness</h3><div id="sop-impact-edge" class="sop-impact-edge"></div><div id="sop-impact-claims"></div></div>
+          </div>
+          <div id="sop-impact-stale" class="sop-impact-stale"></div>
+          <p id="sop-impact-unknown" class="subtle" hidden></p>
+        </div>
+        <div id="sop-impact-notice" class="notice" aria-live="polite"></div>
       </section>
       <div id="legacy-grid" class="grid" hidden>
         <div class="stack">
@@ -301,9 +335,55 @@ APP_HTML = r'''<!doctype html>
         $('conveyor-evidence-label').textContent='Observed event/source facts are separate from graph-derived impact paths. Branch assumptions are hypothetical only; an unknown or unlinked fact remains unknown.';
       }
     }
+    function renderSopImpact(data) {
+      const empty=data.board_state==='empty/unknown';
+      $('sop-impact-empty').hidden=!empty; $('sop-impact-content').hidden=empty;
+      $('sop-impact-badge').textContent=empty?'Empty · unknown':data.conflict_linkage_status==='linked-unresolved'?'Source-linked · unresolved':'Conflict linkage · unknown';
+      if(empty) return;
+      $('sop-impact-as-of').textContent=data.as_of;
+      const eventBox=$('sop-impact-event'); eventBox.replaceChildren();
+      if(data.observed_event) eventBox.append(element('div','',`Observed source fact · ${data.observed_event.event_id} · ${data.observed_event.value} at ${data.observed_event.event_at} · ${data.observed_event.source_id} · ${data.observed_event.source_title} · evidence observed ${data.observed_event.source_observed_at}`));
+      else eventBox.append(element('div','','No source-backed observed state event is available.'));
+      const paths=$('sop-impact-paths'); paths.replaceChildren();
+      if(!data.impact_paths.length) paths.append(element('div',data.impact_state==='restored'?'subtle':'shift-unknown',data.impact_state==='restored'?'No active outage paths at this observed time. The SOP source conflict remains a separate unresolved fact.':data.observed_event?`An observed ${data.observed_event.value} event exists, but no complete graph-derived impact path is available; linkage is incomplete / unknown.`:'No active path is established; impact is unknown, not safe.'));
+      for(const [index,path] of data.impact_paths.entries()) {
+        const row=element('div','sop-impact-path'); row.append(document.createTextNode(path.join('  →  ')));
+        const evidence=data.path_evidence[index];
+        const evidenceTrail=evidence.source_ids.map((id,sourceIndex)=>`${id} · ${evidence.source_titles[sourceIndex]} · observed ${evidence.observed_at[sourceIndex]}`).join(' → ');
+        row.append(element('small','',`CURRENT OWNER PATH · ${evidenceTrail}`)); paths.append(row);
+      }
+      const edge=$('sop-impact-edge'); edge.replaceChildren();
+      if(data.conflict_edge) {
+        const apps=data.applicability_edges.map(item=>`${item.from} -[${item.relationship}]-> ${item.to}`).join(' · ');
+        edge.append(element('div','',apps));
+        edge.append(element('div','',`${data.conflict_edge.from} -[${data.conflict_edge.relationship} · ${data.conflict_edge.status}]-> ${data.conflict_edge.to}`));
+      } else edge.append(element('div','shift-unknown','Conflict linkage is incomplete / unknown. No absence or resolution is inferred.'));
+      const claims=$('sop-impact-claims'); claims.replaceChildren();
+      if(!data.role_claims.length) claims.append(element('div','subtle','No source-backed role claim is available.'));
+      for(const claim of data.role_claims) {
+        const row=element('div','sop-impact-claim');
+        row.append(element('strong','',`${claim.sop_version_id} · ${claim.claim_label} → ${claim.role_id}`));
+        row.append(element('span','',`${claim.claim_relationship} · ${claim.source_id} · ${claim.source_title} · observed ${claim.observed_at}`)); claims.append(row);
+      }
+      const stale=data.stale_version;
+      $('sop-impact-stale').textContent=stale?`Archived history · ${stale.id} references retired ${stale.referenced_equipment_id} · ${stale.source_id} · observed ${stale.observed_at}. Visible history, not joined to the C4 conflict witness.`:'No archived SOP version is visible in this graph.';
+      const unknown=$('sop-impact-unknown'); unknown.hidden=Boolean(data.complete_conflict_witness_returned); unknown.textContent=data.complete_conflict_witness_returned?'':`No complete conflict-to-impact witness is available. Status remains ${data.conflict_linkage_status}; no “no conflict” or “resolved” conclusion is asserted.`;
+    }
     async function loadShiftBoard() {
       const params=new URLSearchParams({scope:'operations',dock_at:$('dock-time').value,conveyor_at:conveyorAt,branch_at:branchAt});
-      const board=await api(`/api/shift-board?${params.toString()}`); renderShiftBoard(board); return board;
+      const board=await api(`/api/shift-board?${params.toString()}`); renderShiftBoard(board);
+      const impactParams=new URLSearchParams({scope:'operations',as_of:conveyorAt});
+      loadSopImpact(impactParams.toString()); return board;
+    }
+    async function loadSopImpact(query) {
+      try {
+        const impact=await api(`/api/sop-impact?${query}`); renderSopImpact(impact);
+        $('sop-impact-notice').textContent='';
+      } catch(e) {
+        $('sop-impact-badge').textContent='Trace unavailable';
+        $('sop-impact-empty').hidden=true; $('sop-impact-content').hidden=true;
+        $('sop-impact-notice').textContent=`SOP impact trace unavailable: ${e.message}. The existing briefing and shift board remain available.`;
+      }
     }
     function renderPaths(data) {
       const svg=$('graph'); svg.replaceChildren();
@@ -317,8 +397,8 @@ APP_HTML = r'''<!doctype html>
         'INC-204':['OPEN INCIDENT','INC-204'], 'CONVEYOR-C4':['UNAVAILABLE EQUIPMENT','Material transfer C4'],
         'SVC-MATERIAL-TRANSFER':['SERVICE','Material transfer'], 'DEPT-CENTRAL-STERILE':['AFFECTED DEPARTMENT','Central sterile ops'],
         'ROLE-STERILE-OPS-COORD':['CURRENT ROLE','Sterile ops coordinator'], 'DEPT-MATERIALS-LOGISTICS':['AFFECTED DEPARTMENT','Materials logistics'],
-        'ROLE-MATERIALS-DUTY':['CURRENT ROLE','Materials duty role'], 'SOP-OPS-9-V2':['CURRENT SOP CLAIM','Facilities duty'],
-        'SOP-OPS-9-V3':['CURRENT SOP CLAIM','Materials lead']
+        'ROLE-MATERIALS-DUTY':['CURRENT ROLE','Materials duty role'], 'SOP-OPS-9-V2':['UNVERIFIED SOP CLAIM','Facilities duty'],
+        'SOP-OPS-9-V3':['UNVERIFIED SOP CLAIM','Materials lead']
       };
       const ns='http://www.w3.org/2000/svg';
       for(const edge of data.edges) {
@@ -551,6 +631,31 @@ class WardAtlasService:
                 "source": sop["current_versions"][0]["id"], "target": sop["current_versions"][1]["id"], "kind": "SOP_CONFLICT", "status": "unresolved"
             }
         return {"scope": "operations", "nodes": list(nodes.values()), "edges": list(edges.values()), "impact_path_count": len(data["impact_paths"]), "sop_conflict_status": sop["conflict_status"] if sop else None}
+
+    def sop_impact(self, as_of: str = CONVEYOR_OUTAGE_AT) -> dict:
+        """Return the edge-sensitive, source-linked SOP-to-impact trace.
+
+        Timestamp validation is completed before any FalkorDB query. The
+        outage timeline and SOP relationship witness are deliberately queried
+        separately so observed restoration cannot resolve a source conflict.
+        """
+        normalized = normalize_timestamp(as_of)
+        board = self.shift_board(DOCK_EFFECTIVE, normalized, BRANCH_AT)
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                claims = self._rows(connection, SOP_IMPACT_CLAIMS_QUERY)
+                witness = self._rows(connection, CONFLICT_WITNESS_QUERY)
+                stale = self._rows(connection, STALE_QUERY)
+            finally:
+                connection.close()
+        return assemble_sop_impact_response(
+            normalized,
+            board.get("conveyor"),
+            claims,
+            witness,
+            stale,
+        )
 
     @staticmethod
     def _event_order(row: dict) -> datetime:
@@ -889,7 +994,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -908,13 +1013,19 @@ class Handler(BaseHTTPRequestHandler):
                     values.get("branch_at", [BRANCH_AT])[0],
                 )
                 self._send(200, data)
+            elif parsed.path == "/api/sop-impact":
+                values = parse_qs(parsed.query, keep_blank_values=True)
+                if "as_of" in values and len(values["as_of"]) != 1:
+                    raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
+                data = service.sop_impact(values.get("as_of", [CONVEYOR_OUTAGE_AT])[0])
+                self._send(200, data)
             elif parsed.path == "/api/actions":
                 items = service.saved_actions()
                 self._send(200, {"actions": items, "count": len(items), "storage": "local-only"})
             else:
                 self._error(404, "Not found.")
         except ValueError:
-            if parsed.path == "/api/shift-board":
+            if parsed.path in {"/api/shift-board", "/api/sop-impact"}:
                 self._error(400, "Invalid timestamp; use an explicit ISO-8601 offset.")
             else:
                 self._error(503, "Local graph or action state is unavailable.")

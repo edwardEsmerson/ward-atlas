@@ -39,6 +39,25 @@ The latest exact results and the honest implemented/verified/planned feature mat
 
 `tests/expected-results.json` is the original eight-outcome oracle for the current outage flow. The independent shift-board oracle is `tests/shift-board-expected-results.json`; `tests/shift-board-adversarial-matrix.json` maps all eight integrated outcomes to nonzero checks. Run `python3 scripts/verify_shift_board_contract.py` with the four pinned planner packet paths (see the operator-approved command) to verify the immutable JSON/matrix mapping without consulting candidate behavior. The live UI verifier applies that oracle to actual FalkorDB results, including cold empty, INC-207's 20:29/20:30 ownership boundary and explicit-edge queue, INC-204's 18:30/19:30 replay and 18:50 branch, cross-case isolation, restricted-source invariance, local confirmation, idempotent reseed/reconnect, and owned cleanup. Its browser run includes the cold/empty view and responsive board. All entities and sources are synthetic. No patient data, clinical advice, real hospital integration, or external writes are included.
 
+## Graph-backed SOP conflict impact trace
+
+The additive `/api/sop-impact?scope=operations&as_of=...` view joins the INC-204 → CONVEYOR-C4 → material-transfer service paths to SOP-OPS-9 only through explicit `APPLIES_TO`, `SOP_CONFLICT`, and `CLAIMS_ROLE` relationships plus source-evidence edges. Its claim rows are always labeled **unverified SOP claim**, separately from roster-derived current-owner paths. Removing either pinned applicability or conflict edge removes the complete witness but does not infer that the SOP is resolved or that no conflict exists. The archived V1/C3 source remains visible as history and is not attached to the C4 witness. Offset timestamps normalize to UTC; an observed restoration removes active impact paths without resolving the independent SOP disagreement. This is read-only, synthetic, operations-scoped and non-clinical.
+
+Exercise all ten pinned groups against actual FalkorDB and the live API/browser from a clean source checkout (the verifier bootstraps the existing digest-pinned local module when needed):
+
+```sh
+: "${WORKSHOP_PORT_BASE:?set the allocated private port base}"
+: "${WORKSHOP_PORT_SPAN:?set the allocated private port span}"
+DB_PORT="$((WORKSHOP_PORT_BASE + 20))"
+APP_PORT="$((WORKSHOP_PORT_BASE + 21))"
+test "$((APP_PORT - WORKSHOP_PORT_BASE))" -lt "$WORKSHOP_PORT_SPAN"
+python3 scripts/verify_sop_impact_contract.py --expected tests/sop-impact-expected-results.json --matrix tests/sop-impact-adversarial-matrix.json --pinned-plan /workspace/worktrees/planner-3bfcb0d8abbc45bc82e0fab8d715c2da/plans/planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md --require-ten-cases
+python3 -m unittest tests.test_sop_impact_contract
+python3 scripts/verify_sop_impact_live.py --pinned-plan /workspace/worktrees/planner-3bfcb0d8abbc45bc82e0fab8d715c2da/plans/planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md --db-port "$DB_PORT" --app-port "$APP_PORT" --report "/workspace/evidence/sop-conflict-impact-trace/$WORKSHOP_LANE/live.json" --evidence-dir "/workspace/evidence/sop-conflict-impact-trace/$WORKSHOP_LANE/browser"
+```
+
+The live check uses a run-unique lane-named graph, binds only loopback, mutates only its named test-owned edges, opens a fresh FalkorDB client, and cleans only its graph, app, state directory and database process. The browser report includes desktop/mobile assertions and screenshots. A build-time live pass is implementation evidence, not independent acceptance; the fresh independent reverify remains a separate gate.
+
 ## Shift-board graph walkthrough
 
 - **Dock ownership:** `Incident(INC-207) -[:AFFECTS]-> Equipment -[:SUPPORTS]-> Service -[:SERVES]-> Department -[:OWNED_BY]-> Role -[:EVIDENCED_BY]-> Evidence`. The ownership relationship has a half-open `[effective_from, effective_to)` interval and an explicit source ID. `SRC-DOCK-ROSTER-R2` is observed at 20:18Z, effective at 20:30Z, and points to R1 with `SUPERSEDES`; the 20:29 and 20:30 queries therefore change only the final role node.
