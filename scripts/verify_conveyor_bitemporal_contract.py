@@ -407,10 +407,6 @@ def verify_existing_oracles(root: Path, expected: dict[str, Any]) -> dict[str, s
         if str(path.relative_to(root)) not in {
             "tests/conveyor-bitemporal-expected-results.json",
             "tests/conveyor-bitemporal-adversarial-matrix.json",
-            # A separate accepted handover snapshot contract is pinned by
-            # its own validator; it was added after this task's frozen baseline.
-            "tests/handover-known-time-expected-results.json",
-            "tests/handover-known-time-adversarial-matrix.json",
         }
     }
     require(discovered == set(PINNED_EXISTING), "pre-existing test oracle/matrix file set differs from the frozen inventory")
