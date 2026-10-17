@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/graph-explorer-expected-results.json",
+  "oracle_policy": "Each outcome group maps to fixed expected-result JSON pointers and nonzero checks. Values and assertions are pinned before explorer behavior; candidate output is never the oracle.",
+  "frozen_oracle_hashes": {
+    "tests/adversarial-matrix.json": "6d0edbc69620da85b494185879565c8260c9d2d3fe6afdd5bf56c5acd92205ba",
+    "tests/cascade-adversarial-matrix.json": "c74431b0c2bebbdc25419bf58d39129d150779e1ef7418b64c80dee6979398db",
+    "tests/cascade-expected-results.json": "52fd4abe069e850e4ee070b8e6d0f9ed26fff5ad1e5e0c47efb28ad78227581b",
+    "tests/dock-bitemporal-adversarial-matrix.json": "84127f273043a03299823905bbecc06a755f79cb9a3b34c44793815eda7f5318",
+    "tests/dock-bitemporal-expected-results.json": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205",
+    "tests/escalation-adversarial-matrix.json": "7e8e6c9813e88544dd61b78e208a48d3edfd48d7b4f3a3b6dbbb1a119c51af17",
+    "tests/escalation-expected-results.json": "b9db49c9398d76c063ac126b5234024ba32dbac1fb7806b443e4f6508868e929",
+    "tests/expected-results.json": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+    "tests/handover-brief-adversarial-matrix.json": "d084f31a1b542670ab99818852cba8e1141bfb56688845c439b01f5ac1d89003",
+    "tests/handover-brief-expected-results.json": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1",
+    "tests/handover-drift-adversarial-matrix.json": "439adc3ed2f32c4e310d397ddf671bfb835dbaf8086b4b940f7d7335d22582aa",
+    "tests/handover-drift-expected-results.json": "76121f6061fe6bec13d007b2dc3f9dadd737809b1be52e895674c7c39e156c1d",
+    "tests/review-receipt-adversarial-matrix.json": "0d5f0832699daa2ba69a9a4d3cde2225e4d672830fc613070f015c0788302b9a",
+    "tests/review-receipt-expected-results.json": "382383b65ae8a9984550227c8ad9000d893bcd9e0171298ec3bf6adb7e170972",
+    "tests/role-scope-adversarial-matrix.json": "2cc162e4f4a01daa81bbc0e8c57d9f7f2bc0a6167c603e8613afa3fbb8b02ee3",
+    "tests/role-scope-expected-results.json": "fc83b36dd9cfea900a1885816c6b84ffe7a1ab3d5c62d45be87f97a7368a9867",
+    "tests/shift-board-adversarial-matrix.json": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7",
+    "tests/shift-board-expected-results.json": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428",
+    "tests/sop-impact-adversarial-matrix.json": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6",
+    "tests/sop-impact-expected-results.json": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca",
+    "tests/source-change-adversarial-matrix.json": "2afff10adb99964a821291d491169487600f37aa41d7b2d153dc98b463a0da84",
+    "tests/source-change-expected-results.json": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097"
+  },
+  "groups": [
+    {
+      "case_id": "cold-empty-no-phantom-graph",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:45"],
+      "attack_or_edge_case": "Open the explorer against a cold, owned empty graph and try to infer that no outage, risk, or conflict exists.",
+      "setup": "Create a unique test-owned empty graph; do not seed fixtures or include hidden nodes in visible counts.",
+      "pinned_assertions": [
+        {"id": "cold.complete-fixed-outcome", "pointer": "/cases/0/expected", "equals_case_value": true},
+        {"id": "cold.full-result-empty-unknown", "pointer": "/cases/0/expected/board_state", "equals_case_value": true},
+        {"id": "cold.no-default-case-or-role", "pointer": "/cases/0/expected/default_incident_equipment_source_or_role", "equals_case_value": true},
+        {"id": "cold.no-risk-or-conflict-conclusion", "pointer": "/cases/0/expected/risk_or_conflict_absence_concluded", "equals_case_value": true},
+        {"id": "cold.no-exposed-counts", "pointer": "/cases/0/expected/exposed_counts", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "A default drawing, stale graph data, visible hidden-data count, or empty-means-safe conclusion creates a phantom result."
+    },
+    {
+      "case_id": "inc204-outage-typed-path-and-provenance",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:46"],
+      "attack_or_edge_case": "At the pinned outage time, require both exact incident-to-current-role paths, typed relationships, and separate source-evidence links.",
+      "setup": "Seed only the accepted synthetic INC-204/C4 graph in a unique test-owned graph and query at 2026-10-14T18:30:00Z.",
+      "pinned_assertions": [
+        {"id": "inc204.complete-fixed-outcome", "pointer": "/cases/1/expected", "equals_case_value": true},
+        {"id": "inc204.exact-ordered-paths", "pointer": "/cases/1/expected/ordered_paths", "equals_case_value": true},
+        {"id": "inc204.relationship-ids-and-types", "pointer": "/cases/1/expected/path_edges", "equals_case_value": true},
+        {"id": "inc204.separate-source-edge-ids", "pointer": "/cases/1/expected/evidence_edges", "equals_case_value": true},
+        {"id": "inc204.source-id-title-observation-tuples", "pointer": "/cases/1/expected/path_evidence", "equals_case_value": true},
+        {"id": "inc204.no-direct-incident-role-evidence", "pointer": "/cases/1/expected/direct_incident_to_role_evidence_edge_asserted", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "A reordered or invented path, wrong relationship ID/type, stale role, dropped source title/time, or direct incident-to-role evidence edge replaces graph provenance."
+    },
+    {
+      "case_id": "sop-witness-stays-claims-not-owners",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:47"],
+      "attack_or_edge_case": "Inspect both current SOP versions, explicit C4 applicability and conflict edges, source-backed claims, and archived V1 without assigning either claim as owner.",
+      "setup": "Query the explicitly linked operations-scope SOP witness and keep the archived C3 source distinct from the current C4 conflict.",
+      "pinned_assertions": [
+        {"id": "sop.complete-fixed-outcome", "pointer": "/cases/2/expected", "equals_case_value": true},
+        {"id": "sop.exact-applicability-and-conflict-edges", "pointer": "/cases/2/expected/applicability_edges", "equals_case_value": true},
+        {"id": "sop.unresolved-conflict-relationship", "pointer": "/cases/2/expected/conflict_edge", "equals_case_value": true},
+        {"id": "sop.claim-ids-labels-and-source-tuples", "pointer": "/cases/2/expected/claims", "equals_case_value": true},
+        {"id": "sop.archived-v1-stays-outside-c4-witness", "pointer": "/cases/2/expected/stale_archive", "equals_case_value": true},
+        {"id": "sop.claims-never-become-owners", "pointer": "/cases/2/expected/claims_are_current_owner_facts", "equals_case_value": true},
+        {"id": "sop.no-winner-selected", "pointer": "/cases/2/expected/winner_selected", "equals_case_value": true},
+        {"id": "sop.no-incident-to-sop-causal-edge", "pointer": "/cases/2/expected/direct_incident_to_sop_causal_edge_asserted", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "A claim is promoted to ownership, a winner is silently selected, archive V1 is joined to C4, or a causal incident-to-SOP edge is invented."
+    },
+    {
+      "case_id": "observed-time-vs-hypothetical-branch",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:48"],
+      "attack_or_edge_case": "Compare the observed 19:30Z restoration with the 18:50Z hypothetical restore branch and ensure the mainline remains unchanged.",
+      "setup": "Read the accepted event history and branch in separate time selections without mutating observed events.",
+      "pinned_assertions": [
+        {"id": "time.complete-fixed-outcome", "pointer": "/cases/3/expected", "equals_case_value": true},
+        {"id": "time.observed-restoration-paths-and-source", "pointer": "/cases/3/expected/observed_restoration", "equals_case_value": true},
+        {"id": "time.active-impact-edges-are-gone", "pointer": "/cases/3/expected/observed_restoration/active_impact_edges", "equals_case_value": true},
+        {"id": "time.branch-id-edge-and-hypothetical-event", "pointer": "/cases/3/expected/hypothetical_branch", "equals_case_value": true},
+        {"id": "time.branch-does-not-mutate-mainline", "pointer": "/cases/3/expected/hypothetical_branch/observed_state_mutated", "equals_case_value": true},
+        {"id": "time.restoration-retains-exact-source-backed-claims", "pointer": "/cases/3/expected/observed_restoration/sop_claims_remain", "equals_case_value": true},
+        {"id": "time.restoration-does-not-resolve-sop-conflict", "pointer": "/cases/3/expected/observed_restoration/sop_conflict_status", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "A hypothetical event is called observed, the branch leaks into mainline, or observed restoration is treated as conflict resolution or proof of no risk."
+    },
+    {
+      "case_id": "dock-ownership-boundary-and-review-edges",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:49"],
+      "attack_or_edge_case": "Compare INC-207 immediately before and at R2's effective boundary, retaining source history and only explicit review candidates.",
+      "setup": "Seed the accepted dock case; query 20:29Z and 20:30Z; inspect the cited/supersession relationships and preserve INC-204 as a separate component.",
+      "pinned_assertions": [
+        {"id": "dock.complete-fixed-outcome", "pointer": "/cases/4/expected", "equals_case_value": true},
+        {"id": "dock.exact-path-edge-ids-and-types", "pointer": "/cases/4/expected/case_path_edges", "equals_case_value": true},
+        {"id": "dock.ownership-role-boundary-and-source-times", "pointer": "/cases/4/expected/ownership_boundary", "equals_case_value": true},
+        {"id": "dock.both-source-versions-preserved", "pointer": "/cases/4/expected/both_roster_sources_preserved", "equals_case_value": true},
+        {"id": "dock.explicit-review-edge-ids-and-candidates", "pointer": "/cases/4/expected/review_edges", "equals_case_value": true},
+        {"id": "dock.lexical-only-decoy-is-excluded", "pointer": "/cases/4/expected/excluded_lexical_only_artifact", "equals_case_value": true},
+        {"id": "dock.unlinked-coverage-stays-unknown", "pointer": "/cases/4/expected/unlinked_coverage_status", "equals_case_value": true},
+        {"id": "dock-and-conveyor-cases-remain-separate", "pointer": "/cases/4/expected/inc204_and_inc207_joined", "equals_case_value": true},
+        {"id": "dock-revision-is-not-causal-for-inc204", "pointer": "/cases/4/expected/dock_roster_revision_caused_inc204_outage", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "R2 is applied early, R1 history is overwritten, lexical similarity invents a dependency, or the unrelated dock and conveyor incidents are joined."
+    },
+    {
+      "case_id": "edge-and-evidence-removal-change-only-dependent-witness",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:50"],
+      "attack_or_edge_case": "Remove only test-owned path, ownership, SOP applicability/conflict, or evidence edges; separately delete only the V2 evidence source node and compare every unaffected witness.",
+      "setup": "Use isolated unique test-owned graphs for each edge-removal counterfactual and one owned graph for deleting SRC-SOP-CURRENT-V2; reseed only the graph owned by the check.",
+      "pinned_assertions": [
+        {"id": "mutation.complete-fixed-outcome", "pointer": "/cases/5/expected", "equals_case_value": true},
+        {"id": "mutation.all-test-owned-edge-and-evidence-target-ids", "pointer": "/cases/5/expected/test_owned_edge_removal_targets", "equals_case_value": true},
+        {"id": "mutation.removed-edge-makes-only-dependent-witness-unknown", "pointer": "/cases/5/expected/single_edge_removal_semantics", "equals_case_value": true},
+        {"id": "mutation.delete-only-v2-source-node", "pointer": "/cases/5/expected/delete_only_v2_source_node/owned_graph_node_deleted", "equals_case_value": true},
+        {"id": "mutation.v2-evidence-link-disappears-but-claim-and-conflict-remain", "pointer": "/cases/5/expected/delete_only_v2_source_node/remaining_edges", "equals_case_value": true},
+        {"id": "mutation.v2-source-row-is-suppressed", "pointer": "/cases/5/expected/delete_only_v2_source_node/v2_source_row_returned", "equals_case_value": true},
+        {"id": "mutation.v2-claim-relationship-remains-unverified", "pointer": "/cases/5/expected/delete_only_v2_source_node/v2_claim_edge_remains", "equals_case_value": true},
+        {"id": "mutation.v2-missing-evidence-is-incomplete-unknown", "pointer": "/cases/5/expected/delete_only_v2_source_node/v2_source_evidence_status", "equals_case_value": true},
+        {"id": "mutation.only-v2-source-tuple-is-suppressed-incomplete", "pointer": "/cases/5/expected/delete_only_v2_source_node/v2_source_tuple_after_delete", "equals_case_value": true},
+        {"id": "mutation.v3-source-tuple-is-unchanged", "pointer": "/cases/5/expected/delete_only_v2_source_node/v3_claim_and_source_unchanged", "equals_case_value": true},
+        {"id": "mutation.reseed-restores-v2-source-and-evidence-edge", "pointer": "/cases/5/expected/delete_only_v2_source_node/reseed_restores_exact_v2_source_tuple_and_edge", "equals_case_value": true},
+        {"id": "mutation.incident-paths-and-conflict-stay-independent", "pointer": "/cases/5/expected/delete_only_v2_source_node/incident_paths_after_delete", "equals_case_value": true},
+        {"id": "mutation.no-false-conflict-resolution", "pointer": "/cases/5/expected/delete_only_v2_source_node/no_resolution_or_absence_conclusion", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 13,
+      "failure_detected": "A missing edge is reconstructed, unrelated paths/sources change, V2 evidence leaks after its source node is deleted, V2 claim/conflict edges disappear, V3 changes, or unknown is mislabeled resolved/absent."
+    },
+    {
+      "case_id": "restricted-subgraph-full-view-invariance",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:51"],
+      "attack_or_edge_case": "Inject the fixed distinctive restricted original, dock, and SOP fixtures; compare all operations-visible graph and accessibility surfaces.",
+      "setup": "Capture operations output, add only the pinned restricted synthetic nodes/edges in the owned graph, then recapture API graph, details, DOM/accessibility text, and case counts.",
+      "pinned_assertions": [
+        {"id": "acl.complete-fixed-outcome", "pointer": "/cases/6/expected", "equals_case_value": true},
+        {"id": "acl.operations-scope-and-restricted-label", "pointer": "/cases/6/expected/viewer_scope", "equals_case_value": true},
+        {"id": "acl.exact-restricted-tripwire-identifiers-and-text", "pointer": "/cases/6/expected/restricted_probes", "equals_case_value": true},
+        {"id": "acl.full-visible-surface-semantic-invariance", "pointer": "/cases/6/expected/visible_api_graph_detail_dom_accessibility_and_case_counts_semantically_identical_before_after", "equals_case_value": true},
+        {"id": "acl.no-direct-count-path-or-paraphrase-leak", "pointer": "/cases/6/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_paraphrase_disclosed", "equals_case_value": true},
+        {"id": "acl.no-hidden-count-exposure", "pointer": "/cases/6/expected/hidden_counts_exposed", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Direct or derived disclosure, hidden count/existence leakage, hidden IDs used in the layout, or an API/DOM delta reveals restricted facts."
+    },
+    {
+      "case_id": "graph-query-not-layout-and-selection-agreement",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:52"],
+      "attack_or_edge_case": "Select actual returned nodes, relationships, and sources on desktop and mobile; compare exact detail-pane records and safe evidence labels.",
+      "setup": "Use query-returned records from the selected graph/time; exercise keyboard focus and selection without relying on coordinates or static layout arrays.",
+      "pinned_assertions": [
+        {"id": "selection.complete-fixed-outcome", "pointer": "/cases/7/expected", "equals_case_value": true},
+        {"id": "selection.exact-node-edge-source-types-ids-and-times", "pointer": "/cases/7/expected/selection_examples", "equals_case_value": true},
+        {"id": "selection.missing-record-is-unknown", "pointer": "/cases/7/expected/missing_relationship_or_source_label", "equals_case_value": true},
+        {"id": "selection.every-rendered-record-is-query-returned", "pointer": "/cases/7/expected/rendered_node_and_edge_ids_are_returned_by_selected_graph_query", "equals_case_value": true},
+        {"id": "selection.api-and-accessible-ui-agree", "pointer": "/cases/7/expected/api_and_accessible_ui_semantically_agree", "equals_case_value": true},
+        {"id": "selection.keyboard-selection-does-not-use-coordinates", "pointer": "/cases/7/expected/keyboard_selection_and_focus_work_without_coordinates", "equals_case_value": true},
+        {"id": "selection.labels-use-safe-text", "pointer": "/cases/7/expected/labels_rendered_as_safe_text", "equals_case_value": true},
+        {"id": "selection.layout-cannot-recreate-edge", "pointer": "/cases/7/expected/layout_or_similarity_recreates_missing_edge", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "A fixed sketch supplies graph data, a missing edge remains clickable, labels disagree between API and accessible UI, or selection requires mouse coordinates."
+    },
+    {
+      "case_id": "repeat-reconnect-read-only-and-cleanup",
+      "planner_refs": ["planner-d7534434df6b4d01876c99a92bbb3f11.md:53"],
+      "attack_or_edge_case": "Reseed twice, reconnect with a new FalkorDB client/restarted app, inspect read-only counters and clean up only test-owned resources.",
+      "setup": "Run the selected-time projection against one unique test-owned graph; record semantic output before/after reseed and reconnect; stop only verifier-owned processes.",
+      "pinned_assertions": [
+        {"id": "repeat.complete-fixed-outcome", "pointer": "/cases/8/expected", "equals_case_value": true},
+        {"id": "repeat.no-duplicate-fixtures", "pointer": "/cases/8/expected/node_count_delta_after_second_seed", "equals_case_value": true},
+        {"id": "repeat.no-duplicate-relationships-or-IDs", "pointer": "/cases/8/expected/relationship_count_delta_after_second_seed", "equals_case_value": true},
+        {"id": "repeat.no-duplicate-fixture-ids", "pointer": "/cases/8/expected/duplicate_fixture_ids", "equals_case_value": true},
+        {"id": "repeat.reseed-equals-baseline", "pointer": "/cases/8/expected/selected_time_graph_semantics_after_reseed", "equals_case_value": true},
+        {"id": "repeat.requires-fresh-client", "pointer": "/cases/8/expected/new_falkordb_client_required", "equals_case_value": true},
+        {"id": "repeat.reconnect-with-fresh-client-equals-baseline", "pointer": "/cases/8/expected/selected_time_graph_semantics_after_reconnect", "equals_case_value": true},
+        {"id": "repeat.browse-has-no-mutations-or-external-effects", "pointer": "/cases/8/expected/graph_browse_node_relationship_action_or_file_mutations", "equals_case_value": true},
+        {"id": "repeat.no-messages", "pointer": "/cases/8/expected/messages_sent", "equals_case_value": true},
+        {"id": "repeat.no-calls", "pointer": "/cases/8/expected/calls_made", "equals_case_value": true},
+        {"id": "repeat.no-tickets", "pointer": "/cases/8/expected/tickets_created", "equals_case_value": true},
+        {"id": "repeat.no-external-actions", "pointer": "/cases/8/expected/external_writes", "equals_case_value": true},
+        {"id": "repeat.desktop-mobile-api-agree", "pointer": "/cases/8/expected/desktop_mobile_and_api_semantics_agree", "equals_case_value": true},
+        {"id": "repeat.cleanup-deletes-owned-graph-only", "pointer": "/cases/8/expected/cleanup_deletes_only_unique_test_owned_graph", "equals_case_value": true},
+        {"id": "repeat.cleanup-stops-owned-processes-only", "pointer": "/cases/8/expected/cleanup_stops_only_test_owned_processes", "equals_case_value": true}
+      ],
+      "nonzero_assertion_count": 15,
+      "failure_detected": "Warm-cache dependence, duplicate fixture records, graph/action/file writes while browsing, external actions, or cleanup of a resource not owned by the check."
+    }
+  ]
+}
