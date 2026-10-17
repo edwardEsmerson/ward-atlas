@@ -7,6 +7,7 @@ import argparse
 import ast
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -343,9 +344,7 @@ class SourceLiveVerifier:
         return data
 
 
-def verify_status_documents() -> None:
-    status = MORNING_STATUS.read_text(encoding="utf-8") if MORNING_STATUS.is_file() else ""
-    features = FEATURE_MATRIX.read_text(encoding="utf-8") if FEATURE_MATRIX.is_file() else ""
+def validate_status_document_text(status: str, features: str) -> None:
     required_status = [
         "Source-change CLI-only increment",
         "python3 scripts/verify_source_change_oracle.py",
@@ -357,15 +356,28 @@ def verify_status_documents() -> None:
     required_features = [
         "Source revision / dependency review CLI",
         "CLI-only",
+        "not integrated into the current UI",
         "explicit_edges_only",
         "unknown",
-        "UI integration limitation",
     ]
+    combined = f"{status}\n{features}"
+    denial_patterns = (
+        r"\bno\s+(?:current\s+)?ui\s+integration\s+limitation\b",
+        r"\bui\s+integration\s+(?:is\s+)?not\s+(?:a\s+)?limitation\b",
+        r"\bno\s+ui\s+integration\s+gap\b",
+        r"\b(?:source[- ]change|source[- ]revision)\b.{0,120}\b(?<!not )integrated\s+into\s+(?:the\s+)?(?:current\s+)?ui\b",
+    )
+    if any(re.search(pattern, combined, re.IGNORECASE) for pattern in denial_patterns):
+        raise VerificationFailure("documentation denies or contradicts the remaining source-change UI integration limitation")
     missing = [item for item in required_status if item not in status] + [item for item in required_features if item not in features]
     if missing:
         raise VerificationFailure(f"MORNING-STATUS.md or FEATURE-MATRIX.md omits honest source-change status: {missing}")
-    if "integrated into the UI" in status or "integrated into the UI" in features:
-        raise VerificationFailure("CLI-only source-change behavior is incorrectly claimed as UI-integrated")
+
+
+def verify_status_documents() -> None:
+    status = MORNING_STATUS.read_text(encoding="utf-8") if MORNING_STATUS.is_file() else ""
+    features = FEATURE_MATRIX.read_text(encoding="utf-8") if FEATURE_MATRIX.is_file() else ""
+    validate_status_document_text(status, features)
 
 
 def lane_port_check(port: int) -> None:
