@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/service-coverage-expected-results.json",
+  "oracle_policy": "Every assertion resolves to a fixed candidate-independent expected field and one numbered packet outcome; candidate behavior never supplies expected values.",
+  "cases": [
+    {
+      "id": "cold-empty-unknown",
+      "scenario_id": "cold-empty-unknown",
+      "attack_or_edge_case": "An empty owned graph must not infer inventory, safety, availability, or a zero service count.",
+      "setup": "Create a unique empty actual-FalkorDB graph and read the coverage projection before seeding.",
+      "pinned_assertions": [
+        {
+          "id": "cold.no-service-rows",
+          "expected_pointer": "/cases/0/expected/rows"
+        },
+        {
+          "id": "cold.generic-unknown",
+          "expected_pointer": "/cases/0/expected/coverage_status"
+        },
+        {
+          "id": "cold.no-evidence-state",
+          "expected_pointer": "/cases/0/expected/evidence_state"
+        },
+        {
+          "id": "cold.no-count-or-existence-hint",
+          "expected_pointer": "/cases/0/expected/no_count_or_existence_hint"
+        },
+        {
+          "id": "cold.no-safety-or-completeness-inference",
+          "expected_pointer": "/cases/0/expected/no_completeness_safety_or_availability_inference"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Invented zero/count or safe/available/current conclusions from an empty graph violate the unknown contract.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:41"
+      ]
+    },
+    {
+      "id": "three-exact-tracked-services",
+      "scenario_id": "three-exact-tracked-services",
+      "attack_or_edge_case": "Return the entire portfolio and exact evidence-backed four-hop service coverage; reject extra services or property-only provenance.",
+      "setup": "Seed only the fixed synthetic PORTFOLIO-OPS-01 fixture and query the graph; compare every returned edge and evidence link with the pinned rows.",
+      "pinned_assertions": [
+        {
+          "id": "baseline.exact-root",
+          "expected_pointer": "/cases/1/expected/portfolio_id"
+        },
+        {
+          "id": "baseline.exact-three-service-rows",
+          "expected_pointer": "/cases/1/expected/rows"
+        },
+        {
+          "id": "baseline.exact-tracked-service-ids",
+          "expected_pointer": "/cases/1/expected/exact_service_ids"
+        },
+        {
+          "id": "baseline.no-fourth-service",
+          "expected_pointer": "/cases/1/expected/no_fourth_service"
+        },
+        {
+          "id": "baseline.relationship-order",
+          "expected_pointer": "/cases/1/expected/relationship_order"
+        },
+        {
+          "id": "baseline.require-matching-evidence-node-link",
+          "expected_pointer": "/cases/1/expected/each_returned_source_requires_accessible_evidence_node_and_link"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Missing/extra row, path, source identity/title/time/order, or accessible Evidence link violates the exact finite ledger.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:42"
+      ]
+    },
+    {
+      "id": "dependency-edge-removal",
+      "scenario_id": "dependency-edge-removal",
+      "attack_or_edge_case": "Remove only the materials DEPENDS_ON edge; unsupported equipment disappears while its tracked row and all unrelated rows remain exact.",
+      "setup": "On a uniquely owned seeded graph, remove only SVC-MATERIALS-01-[:DEPENDS_ON]->EQ-TUG-05 and query again.",
+      "pinned_assertions": [
+        {
+          "id": "dependency.only-pinned-edge-removed",
+          "expected_pointer": "/cases/2/expected/mutation"
+        },
+        {
+          "id": "dependency.materials-branch-suppressed",
+          "expected_pointer": "/cases/2/expected/materials_dependency_branch"
+        },
+        {
+          "id": "dependency.materials-unknown",
+          "expected_pointer": "/cases/2/expected/materials_status"
+        },
+        {
+          "id": "dependency.other-two-rows-byte-identical",
+          "expected_pointer": "/cases/2/expected/other_two_rows_byte_equivalent_to_baseline"
+        },
+        {
+          "id": "dependency.exact-three-rows-and-remaining-paths",
+          "expected_pointer": "/cases/2/expected/rows"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "A missing dependency edge is reconstructed, the row is silently dropped, or unrelated rows change.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:43"
+      ]
+    },
+    {
+      "id": "role-edge-removal",
+      "scenario_id": "role-edge-removal",
+      "attack_or_edge_case": "Remove only the materials department OWNED_BY edge; preserve supported equipment and never infer a role from labels.",
+      "setup": "On a uniquely owned seeded graph, remove only DEPT-CAMPUS-LOGISTICS-[:OWNED_BY]->ROLE-MATERIALS-DUTY and query again.",
+      "pinned_assertions": [
+        {
+          "id": "role.only-pinned-edge-removed",
+          "expected_pointer": "/cases/3/expected/mutation"
+        },
+        {
+          "id": "role.equipment-remains-supported",
+          "expected_pointer": "/cases/3/expected/materials_dependency_remains_supported"
+        },
+        {
+          "id": "role.omitted-not-inferred",
+          "expected_pointer": "/cases/3/expected/materials_role"
+        },
+        {
+          "id": "role.materials-unknown",
+          "expected_pointer": "/cases/3/expected/materials_status"
+        },
+        {
+          "id": "role.other-two-rows-byte-identical",
+          "expected_pointer": "/cases/3/expected/other_two_rows_byte_equivalent_to_baseline"
+        },
+        {
+          "id": "role.exact-remaining-paths",
+          "expected_pointer": "/cases/3/expected/rows"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "A role is guessed despite a missing OWNED_BY edge, or supported branches/other rows are altered.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:44"
+      ]
+    },
+    {
+      "id": "evidence-edge-removal",
+      "scenario_id": "evidence-edge-removal",
+      "attack_or_edge_case": "Remove only the equipment EVIDENCED_BY link while preserving DEPENDS_ON and its source properties; no branch can survive from citation text alone.",
+      "setup": "On a uniquely owned seeded graph, remove only EQ-TUG-05-[:EVIDENCED_BY]->SRC-SVC-EQUIPMENT; leave DEPENDS_ON and all its source-ID/title/time properties unchanged.",
+      "pinned_assertions": [
+        {
+          "id": "evidence.only-evidence-link-removed",
+          "expected_pointer": "/cases/4/expected/mutation"
+        },
+        {
+          "id": "evidence-dependency-edge-left-intact",
+          "expected_pointer": "/cases/4/expected/dependency_graph_edge_remains"
+        },
+        {
+          "id": "evidence-source-properties-left-intact",
+          "expected_pointer": "/cases/4/expected/dependency_relationship_source_id_properties_remain"
+        },
+        {
+          "id": "evidence-requires-matching-accessible-node-and-link",
+          "expected_pointer": "/cases/4/expected/matching_accessible_evidence_node_and_link_required"
+        },
+        {
+          "id": "evidence-materials-branch-suppressed",
+          "expected_pointer": "/cases/4/expected/materials_dependency_branch"
+        },
+        {
+          "id": "evidence-materials-supported-role-retained",
+          "expected_pointer": "/cases/4/expected/materials_department_and_role_branch"
+        },
+        {
+          "id": "evidence-materials-unknown-no-property-fallback",
+          "expected_pointer": "/cases/4/expected/materials_status"
+        },
+        {
+          "id": "evidence-no-property-only-reconstruction",
+          "expected_pointer": "/cases/4/expected/no_property_only_citation_reconstruction"
+        },
+        {
+          "id": "evidence-other-two-rows-byte-identical",
+          "expected_pointer": "/cases/4/expected/other_two_rows_byte_equivalent_to_baseline"
+        },
+        {
+          "id": "evidence-exact-materials-projection",
+          "expected_pointer": "/cases/4/expected/rows"
+        }
+      ],
+      "nonzero_assertion_count": 10,
+      "failure_detected": "Relationship properties alone reconstruct unsupported equipment provenance after its matching Evidence node/link is absent.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:45"
+      ]
+    },
+    {
+      "id": "untracked-decoy-exclusion",
+      "scenario_id": "untracked-decoy-exclusion",
+      "attack_or_edge_case": "Inject a plausible but untracked service component; only root-reachable TRACKS rows may appear.",
+      "setup": "Seed the fixed baseline plus a plausible disconnected service/equipment/department/role decoy with no PORTFOLIO-OPS-01 TRACKS path.",
+      "pinned_assertions": [
+        {
+          "id": "decoy-not-tracked-not-returned",
+          "expected_pointer": "/cases/5/expected/plausible_untracked_component_returned_as_service_row"
+        },
+        {
+          "id": "decoy-no-baseline-impact",
+          "expected_pointer": "/cases/5/expected/untracked_component_changes_baseline_response"
+        },
+        {
+          "id": "decoy-baseline-remains-exact",
+          "expected_pointer": "/cases/5/expected/tracked_rows_equal_exact_baseline"
+        },
+        {
+          "id": "decoy-baseline-rows",
+          "expected_pointer": "/cases/5/expected/rows"
+        }
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "An untracked component enters the portfolio despite lacking the root TRACKS edge.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:46"
+      ]
+    },
+    {
+      "id": "restricted-source-full-view-invariance",
+      "scenario_id": "restricted-source-full-view-invariance",
+      "attack_or_edge_case": "Add a distinctive connected restricted-only source/path; compare the full operations API, counts, browser text and accessibility tree.",
+      "setup": "Capture the complete operations-visible API/browser projection before and after adding a connected restricted-only branch; compare semantically including counts and accessible text.",
+      "pinned_assertions": [
+        {
+          "id": "acl-operations-scope",
+          "expected_pointer": "/cases/6/expected/viewer_scope"
+        },
+        {
+          "id": "acl-full-api-projection-invariant",
+          "expected_pointer": "/cases/6/expected/full_api_projection_unchanged"
+        },
+        {
+          "id": "acl-visible-counts-invariant",
+          "expected_pointer": "/cases/6/expected/visible_counts_unchanged"
+        },
+        {
+          "id": "acl-browser-text-invariant",
+          "expected_pointer": "/cases/6/expected/browser_text_unchanged"
+        },
+        {
+          "id": "acl-accessibility-tree-invariant",
+          "expected_pointer": "/cases/6/expected/accessibility_tree_semantically_unchanged"
+        },
+        {
+          "id": "acl-no-direct-or-indirect-disclosure",
+          "expected_pointer": "/cases/6/expected/hidden_identifier_title_fact_count_existence_or_paraphrase_disclosed"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Any hidden-source identifier, fact, count, existence signal, path or paraphrase changes operations-visible output.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:47"
+      ]
+    },
+    {
+      "id": "reseed-idempotence",
+      "scenario_id": "reseed-idempotence",
+      "attack_or_edge_case": "Seed twice into the same task-owned graph and compare full output plus fixed node/relationship counts.",
+      "setup": "Seed twice in one isolated graph and compare exact full response and graph cardinalities with the committed three-row baseline.",
+      "pinned_assertions": [
+        {
+          "id": "reseed-exact-three-row-baseline",
+          "expected_pointer": "/cases/7/expected/rows"
+        },
+        {
+          "id": "reseed-no-duplicate-fixed-nodes",
+          "expected_pointer": "/cases/7/expected/repeat_seed_duplicate_fixed_nodes"
+        },
+        {
+          "id": "reseed-no-duplicate-relationships",
+          "expected_pointer": "/cases/7/expected/repeat_seed_duplicate_relationships"
+        },
+        {
+          "id": "reseed-output-exactly-baseline",
+          "expected_pointer": "/cases/7/expected/full_output_matches_exact_baseline"
+        }
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Repeated seed duplicates fixed graph elements or changes the pinned output.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:48"
+      ]
+    },
+    {
+      "id": "fresh-client-read-only-cleanup",
+      "scenario_id": "fresh-client-read-only-cleanup",
+      "attack_or_edge_case": "Read through a fresh database client and API/browser, inspect all write counts, then prove cleanup is strictly owned.",
+      "setup": "Query the seeded graph using a fresh FalkorDB client and app/API/browser path; snapshot graph/action writes and cleanup ownership.",
+      "pinned_assertions": [
+        {
+          "id": "fresh-client-exact-baseline",
+          "expected_pointer": "/cases/8/expected/fresh_client_snapshot_matches_exact_baseline"
+        },
+        {
+          "id": "lifecycle-no-graph-write",
+          "expected_pointer": "/cases/8/expected/api_browser_reads_graph_writes"
+        },
+        {
+          "id": "lifecycle-no-local-action-write",
+          "expected_pointer": "/cases/8/expected/api_browser_reads_local_action_writes"
+        },
+        {
+          "id": "lifecycle-desktop-mobile-agree",
+          "expected_pointer": "/cases/8/expected/desktop_mobile_api_results_agree"
+        },
+        {
+          "id": "lifecycle-cleanup-only-owned-graph",
+          "expected_pointer": "/cases/8/expected/cleanup_deletes_only_test_owned_graph"
+        },
+        {
+          "id": "lifecycle-stop-only-owned-processes",
+          "expected_pointer": "/cases/8/expected/cleanup_stops_only_owned_app_and_database_processes"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Warm-client-only behavior, hidden writes or cleanup of another graph/process invalidates the workflow.",
+      "planner_refs": [
+        "planner-f3a45b2e499f44f6b202f14a16889105.md:49"
+      ]
+    }
+  ]
+}

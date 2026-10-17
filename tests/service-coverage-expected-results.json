@@ -1,0 +1,2343 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent expected outcomes for the finite synthetic service-coverage ledger, fixed before query behavior.",
+  "oracle_policy": "All expected values are pinned from the immutable decision packet and accepted synthetic scope. Candidate query, API, or browser output is never used to author or revise an expectation.",
+  "pinned_sources": [
+    {
+      "id": "service-coverage-packet",
+      "file": "planner-f3a45b2e499f44f6b202f14a16889105/plans/planner-f3a45b2e499f44f6b202f14a16889105.md",
+      "sha256": "d3e21b76131c124ca9c5d4cd82773adc876da39752b773ae24c104fc691a6e04",
+      "outcome_lines": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ]
+    },
+    {
+      "id": "tests-adversarial-matrix",
+      "file": "tests/adversarial-matrix.json",
+      "sha256": "6d0edbc69620da85b494185879565c8260c9d2d3fe6afdd5bf56c5acd92205ba"
+    },
+    {
+      "id": "tests-cascade-adversarial-matrix",
+      "file": "tests/cascade-adversarial-matrix.json",
+      "sha256": "c74431b0c2bebbdc25419bf58d39129d150779e1ef7418b64c80dee6979398db"
+    },
+    {
+      "id": "tests-cascade-expected-results",
+      "file": "tests/cascade-expected-results.json",
+      "sha256": "52fd4abe069e850e4ee070b8e6d0f9ed26fff5ad1e5e0c47efb28ad78227581b"
+    },
+    {
+      "id": "tests-conveyor-bitemporal-adversarial-matrix",
+      "file": "tests/conveyor-bitemporal-adversarial-matrix.json",
+      "sha256": "e036570a3db09c8b544cb339b2665beeee3d469416c4b5fe69e5be2b3597eb67"
+    },
+    {
+      "id": "tests-conveyor-bitemporal-expected-results",
+      "file": "tests/conveyor-bitemporal-expected-results.json",
+      "sha256": "8ffa7ee25a52219808656ead871fac4779625300f9eea0eaa9543e8b0c7740e6"
+    },
+    {
+      "id": "tests-dock-bitemporal-adversarial-matrix",
+      "file": "tests/dock-bitemporal-adversarial-matrix.json",
+      "sha256": "84127f273043a03299823905bbecc06a755f79cb9a3b34c44793815eda7f5318"
+    },
+    {
+      "id": "tests-dock-bitemporal-expected-results",
+      "file": "tests/dock-bitemporal-expected-results.json",
+      "sha256": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"
+    },
+    {
+      "id": "tests-escalation-adversarial-matrix",
+      "file": "tests/escalation-adversarial-matrix.json",
+      "sha256": "7e8e6c9813e88544dd61b78e208a48d3edfd48d7b4f3a3b6dbbb1a119c51af17"
+    },
+    {
+      "id": "tests-escalation-expected-results",
+      "file": "tests/escalation-expected-results.json",
+      "sha256": "b9db49c9398d76c063ac126b5234024ba32dbac1fb7806b443e4f6508868e929"
+    },
+    {
+      "id": "tests-expected-results",
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    },
+    {
+      "id": "tests-graph-explorer-adversarial-matrix",
+      "file": "tests/graph-explorer-adversarial-matrix.json",
+      "sha256": "e6559d172b671375be25cb7c6d39d47bb286e9fedd77eab9a1f213803ed2f500"
+    },
+    {
+      "id": "tests-graph-explorer-expected-results",
+      "file": "tests/graph-explorer-expected-results.json",
+      "sha256": "d3ecfd1d498a19d7355b09c424e4b0b00c8bb83975421b8ae235cc07ef92d1de"
+    },
+    {
+      "id": "tests-handover-brief-adversarial-matrix",
+      "file": "tests/handover-brief-adversarial-matrix.json",
+      "sha256": "d084f31a1b542670ab99818852cba8e1141bfb56688845c439b01f5ac1d89003"
+    },
+    {
+      "id": "tests-handover-brief-expected-results",
+      "file": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    },
+    {
+      "id": "tests-handover-drift-adversarial-matrix",
+      "file": "tests/handover-drift-adversarial-matrix.json",
+      "sha256": "439adc3ed2f32c4e310d397ddf671bfb835dbaf8086b4b940f7d7335d22582aa"
+    },
+    {
+      "id": "tests-handover-drift-expected-results",
+      "file": "tests/handover-drift-expected-results.json",
+      "sha256": "76121f6061fe6bec13d007b2dc3f9dadd737809b1be52e895674c7c39e156c1d"
+    },
+    {
+      "id": "tests-handover-known-time-adversarial-matrix",
+      "file": "tests/handover-known-time-adversarial-matrix.json",
+      "sha256": "7b8450947696e55af0dc48aaa6d27fd0231f458b0f527b3fc00f643ad1f64f67"
+    },
+    {
+      "id": "tests-handover-known-time-expected-results",
+      "file": "tests/handover-known-time-expected-results.json",
+      "sha256": "fd72df03c8e865cfe347839074ee8251bf57216deac33fcc9d5a4d1152513f93"
+    },
+    {
+      "id": "tests-review-receipt-adversarial-matrix",
+      "file": "tests/review-receipt-adversarial-matrix.json",
+      "sha256": "0d5f0832699daa2ba69a9a4d3cde2225e4d672830fc613070f015c0788302b9a"
+    },
+    {
+      "id": "tests-review-receipt-expected-results",
+      "file": "tests/review-receipt-expected-results.json",
+      "sha256": "382383b65ae8a9984550227c8ad9000d893bcd9e0171298ec3bf6adb7e170972"
+    },
+    {
+      "id": "tests-role-scope-adversarial-matrix",
+      "file": "tests/role-scope-adversarial-matrix.json",
+      "sha256": "2cc162e4f4a01daa81bbc0e8c57d9f7f2bc0a6167c603e8613afa3fbb8b02ee3"
+    },
+    {
+      "id": "tests-role-scope-expected-results",
+      "file": "tests/role-scope-expected-results.json",
+      "sha256": "fc83b36dd9cfea900a1885816c6b84ffe7a1ab3d5c62d45be87f97a7368a9867"
+    },
+    {
+      "id": "tests-shift-board-adversarial-matrix",
+      "file": "tests/shift-board-adversarial-matrix.json",
+      "sha256": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7"
+    },
+    {
+      "id": "tests-shift-board-expected-results",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "tests-sop-impact-adversarial-matrix",
+      "file": "tests/sop-impact-adversarial-matrix.json",
+      "sha256": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6"
+    },
+    {
+      "id": "tests-sop-impact-expected-results",
+      "file": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "id": "tests-source-change-adversarial-matrix",
+      "file": "tests/source-change-adversarial-matrix.json",
+      "sha256": "2afff10adb99964a821291d491169487600f37aa41d7b2d153dc98b463a0da84"
+    },
+    {
+      "id": "tests-source-change-expected-results",
+      "file": "tests/source-change-expected-results.json",
+      "sha256": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "candidate_output_is_oracle": false,
+    "external_writes": false,
+    "portfolio_is_finite_not_hospital_census": true,
+    "database_requirement": "Any later behavior verification must use actual FalkorDB; this artifact verifier reads no candidate behavior and makes no live-database claim."
+  },
+  "fixture": {
+    "portfolio_id": "PORTFOLIO-OPS-01",
+    "relationship_order": [
+      "TRACKS",
+      "DEPENDS_ON",
+      "SERVES",
+      "OWNED_BY"
+    ],
+    "sources": {
+      "catalog": {
+        "id": "SRC-SVC-CATALOG",
+        "title": "Synthetic Operations Service Catalog",
+        "observed_at": "2026-10-14T21:00:00Z"
+      },
+      "equipment": {
+        "id": "SRC-SVC-EQUIPMENT",
+        "title": "Synthetic Equipment Dependency Register",
+        "observed_at": "2026-10-14T21:02:00Z"
+      },
+      "department": {
+        "id": "SRC-SVC-DEPT-MAP",
+        "title": "Synthetic Service Department Coverage Register",
+        "observed_at": "2026-10-14T21:03:00Z"
+      },
+      "roster": {
+        "id": "SRC-SVC-ROSTER",
+        "title": "Synthetic Operations Role Roster",
+        "observed_at": "2026-10-14T21:04:00Z"
+      }
+    },
+    "services": [
+      {
+        "service_id": "SVC-STERILE-01",
+        "equipment_id": "EQ-AUTOCLAVE-17",
+        "department_id": "DEPT-STERILE-SERVICES",
+        "role_id": "ROLE-STERILE-OPS-DUTY"
+      },
+      {
+        "service_id": "SVC-MATERIALS-01",
+        "equipment_id": "EQ-TUG-05",
+        "department_id": "DEPT-CAMPUS-LOGISTICS",
+        "role_id": "ROLE-MATERIALS-DUTY"
+      },
+      {
+        "service_id": "SVC-LINEN-01",
+        "equipment_id": "EQ-LINEN-08",
+        "department_id": "DEPT-TEXTILE-SERVICES",
+        "role_id": "ROLE-LINEN-SHIFT-COORD"
+      }
+    ],
+    "baseline_rows": [
+      {
+        "service_id": "SVC-STERILE-01",
+        "coverage_status": "complete",
+        "branches": {
+          "tracking": {
+            "from": "PORTFOLIO-OPS-01",
+            "relationship": "TRACKS",
+            "to": "SVC-STERILE-01",
+            "source": {
+              "id": "SRC-SVC-CATALOG",
+              "title": "Synthetic Operations Service Catalog",
+              "observed_at": "2026-10-14T21:00:00Z"
+            },
+            "evidence_link": {
+              "from": "SVC-STERILE-01",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-CATALOG",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "dependency": {
+            "from": "SVC-STERILE-01",
+            "relationship": "DEPENDS_ON",
+            "to": "EQ-AUTOCLAVE-17",
+            "source": {
+              "id": "SRC-SVC-EQUIPMENT",
+              "title": "Synthetic Equipment Dependency Register",
+              "observed_at": "2026-10-14T21:02:00Z"
+            },
+            "evidence_link": {
+              "from": "EQ-AUTOCLAVE-17",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-EQUIPMENT",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "department": {
+            "from": "SVC-STERILE-01",
+            "relationship": "SERVES",
+            "to": "DEPT-STERILE-SERVICES",
+            "source": {
+              "id": "SRC-SVC-DEPT-MAP",
+              "title": "Synthetic Service Department Coverage Register",
+              "observed_at": "2026-10-14T21:03:00Z"
+            },
+            "evidence_link": {
+              "from": "DEPT-STERILE-SERVICES",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-DEPT-MAP",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "role": {
+            "from": "DEPT-STERILE-SERVICES",
+            "relationship": "OWNED_BY",
+            "to": "ROLE-STERILE-OPS-DUTY",
+            "source": {
+              "id": "SRC-SVC-ROSTER",
+              "title": "Synthetic Operations Role Roster",
+              "observed_at": "2026-10-14T21:04:00Z"
+            },
+            "evidence_link": {
+              "from": "ROLE-STERILE-OPS-DUTY",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-ROSTER",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          }
+        },
+        "source_provenance_in_relationship_order": [
+          {
+            "id": "SRC-SVC-CATALOG",
+            "title": "Synthetic Operations Service Catalog",
+            "observed_at": "2026-10-14T21:00:00Z"
+          },
+          {
+            "id": "SRC-SVC-EQUIPMENT",
+            "title": "Synthetic Equipment Dependency Register",
+            "observed_at": "2026-10-14T21:02:00Z"
+          },
+          {
+            "id": "SRC-SVC-DEPT-MAP",
+            "title": "Synthetic Service Department Coverage Register",
+            "observed_at": "2026-10-14T21:03:00Z"
+          },
+          {
+            "id": "SRC-SVC-ROSTER",
+            "title": "Synthetic Operations Role Roster",
+            "observed_at": "2026-10-14T21:04:00Z"
+          }
+        ]
+      },
+      {
+        "service_id": "SVC-MATERIALS-01",
+        "coverage_status": "complete",
+        "branches": {
+          "tracking": {
+            "from": "PORTFOLIO-OPS-01",
+            "relationship": "TRACKS",
+            "to": "SVC-MATERIALS-01",
+            "source": {
+              "id": "SRC-SVC-CATALOG",
+              "title": "Synthetic Operations Service Catalog",
+              "observed_at": "2026-10-14T21:00:00Z"
+            },
+            "evidence_link": {
+              "from": "SVC-MATERIALS-01",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-CATALOG",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "dependency": {
+            "from": "SVC-MATERIALS-01",
+            "relationship": "DEPENDS_ON",
+            "to": "EQ-TUG-05",
+            "source": {
+              "id": "SRC-SVC-EQUIPMENT",
+              "title": "Synthetic Equipment Dependency Register",
+              "observed_at": "2026-10-14T21:02:00Z"
+            },
+            "evidence_link": {
+              "from": "EQ-TUG-05",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-EQUIPMENT",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "department": {
+            "from": "SVC-MATERIALS-01",
+            "relationship": "SERVES",
+            "to": "DEPT-CAMPUS-LOGISTICS",
+            "source": {
+              "id": "SRC-SVC-DEPT-MAP",
+              "title": "Synthetic Service Department Coverage Register",
+              "observed_at": "2026-10-14T21:03:00Z"
+            },
+            "evidence_link": {
+              "from": "DEPT-CAMPUS-LOGISTICS",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-DEPT-MAP",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "role": {
+            "from": "DEPT-CAMPUS-LOGISTICS",
+            "relationship": "OWNED_BY",
+            "to": "ROLE-MATERIALS-DUTY",
+            "source": {
+              "id": "SRC-SVC-ROSTER",
+              "title": "Synthetic Operations Role Roster",
+              "observed_at": "2026-10-14T21:04:00Z"
+            },
+            "evidence_link": {
+              "from": "ROLE-MATERIALS-DUTY",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-ROSTER",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          }
+        },
+        "source_provenance_in_relationship_order": [
+          {
+            "id": "SRC-SVC-CATALOG",
+            "title": "Synthetic Operations Service Catalog",
+            "observed_at": "2026-10-14T21:00:00Z"
+          },
+          {
+            "id": "SRC-SVC-EQUIPMENT",
+            "title": "Synthetic Equipment Dependency Register",
+            "observed_at": "2026-10-14T21:02:00Z"
+          },
+          {
+            "id": "SRC-SVC-DEPT-MAP",
+            "title": "Synthetic Service Department Coverage Register",
+            "observed_at": "2026-10-14T21:03:00Z"
+          },
+          {
+            "id": "SRC-SVC-ROSTER",
+            "title": "Synthetic Operations Role Roster",
+            "observed_at": "2026-10-14T21:04:00Z"
+          }
+        ]
+      },
+      {
+        "service_id": "SVC-LINEN-01",
+        "coverage_status": "complete",
+        "branches": {
+          "tracking": {
+            "from": "PORTFOLIO-OPS-01",
+            "relationship": "TRACKS",
+            "to": "SVC-LINEN-01",
+            "source": {
+              "id": "SRC-SVC-CATALOG",
+              "title": "Synthetic Operations Service Catalog",
+              "observed_at": "2026-10-14T21:00:00Z"
+            },
+            "evidence_link": {
+              "from": "SVC-LINEN-01",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-CATALOG",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "dependency": {
+            "from": "SVC-LINEN-01",
+            "relationship": "DEPENDS_ON",
+            "to": "EQ-LINEN-08",
+            "source": {
+              "id": "SRC-SVC-EQUIPMENT",
+              "title": "Synthetic Equipment Dependency Register",
+              "observed_at": "2026-10-14T21:02:00Z"
+            },
+            "evidence_link": {
+              "from": "EQ-LINEN-08",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-EQUIPMENT",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "department": {
+            "from": "SVC-LINEN-01",
+            "relationship": "SERVES",
+            "to": "DEPT-TEXTILE-SERVICES",
+            "source": {
+              "id": "SRC-SVC-DEPT-MAP",
+              "title": "Synthetic Service Department Coverage Register",
+              "observed_at": "2026-10-14T21:03:00Z"
+            },
+            "evidence_link": {
+              "from": "DEPT-TEXTILE-SERVICES",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-DEPT-MAP",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          },
+          "role": {
+            "from": "DEPT-TEXTILE-SERVICES",
+            "relationship": "OWNED_BY",
+            "to": "ROLE-LINEN-SHIFT-COORD",
+            "source": {
+              "id": "SRC-SVC-ROSTER",
+              "title": "Synthetic Operations Role Roster",
+              "observed_at": "2026-10-14T21:04:00Z"
+            },
+            "evidence_link": {
+              "from": "ROLE-LINEN-SHIFT-COORD",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SVC-ROSTER",
+              "evidence_node_type": "Evidence",
+              "accessible": true
+            }
+          }
+        },
+        "source_provenance_in_relationship_order": [
+          {
+            "id": "SRC-SVC-CATALOG",
+            "title": "Synthetic Operations Service Catalog",
+            "observed_at": "2026-10-14T21:00:00Z"
+          },
+          {
+            "id": "SRC-SVC-EQUIPMENT",
+            "title": "Synthetic Equipment Dependency Register",
+            "observed_at": "2026-10-14T21:02:00Z"
+          },
+          {
+            "id": "SRC-SVC-DEPT-MAP",
+            "title": "Synthetic Service Department Coverage Register",
+            "observed_at": "2026-10-14T21:03:00Z"
+          },
+          {
+            "id": "SRC-SVC-ROSTER",
+            "title": "Synthetic Operations Role Roster",
+            "observed_at": "2026-10-14T21:04:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "cold-empty-unknown",
+      "expected": {
+        "rows": [],
+        "coverage_status": "unknown",
+        "evidence_state": "no_evidence",
+        "no_count_or_existence_hint": true,
+        "no_completeness_safety_or_availability_inference": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-1"
+      ]
+    },
+    {
+      "id": "three-exact-tracked-services",
+      "expected": {
+        "portfolio_id": "PORTFOLIO-OPS-01",
+        "rows": [
+          {
+            "service_id": "SVC-STERILE-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-STERILE-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-STERILE-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-STERILE-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-AUTOCLAVE-17",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-AUTOCLAVE-17",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-STERILE-01",
+                "relationship": "SERVES",
+                "to": "DEPT-STERILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-STERILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-STERILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-STERILE-OPS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-STERILE-OPS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-MATERIALS-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-MATERIALS-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-MATERIALS-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-TUG-05",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-TUG-05",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "SERVES",
+                "to": "DEPT-CAMPUS-LOGISTICS",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-CAMPUS-LOGISTICS",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-CAMPUS-LOGISTICS",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-MATERIALS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-MATERIALS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-LINEN-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-LINEN-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-LINEN-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-LINEN-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-LINEN-08",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-LINEN-08",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-LINEN-01",
+                "relationship": "SERVES",
+                "to": "DEPT-TEXTILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-TEXTILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-TEXTILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-LINEN-SHIFT-COORD",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-LINEN-SHIFT-COORD",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          }
+        ],
+        "exact_service_ids": [
+          "SVC-STERILE-01",
+          "SVC-MATERIALS-01",
+          "SVC-LINEN-01"
+        ],
+        "no_fourth_service": true,
+        "relationship_order": [
+          "TRACKS",
+          "DEPENDS_ON",
+          "SERVES",
+          "OWNED_BY"
+        ],
+        "each_returned_source_requires_accessible_evidence_node_and_link": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-2"
+      ]
+    },
+    {
+      "id": "dependency-edge-removal",
+      "expected": {
+        "mutation": {
+          "from": "SVC-MATERIALS-01",
+          "relationship": "DEPENDS_ON",
+          "to": "EQ-TUG-05",
+          "remove_only_this_edge": true
+        },
+        "rows": [
+          {
+            "service_id": "SVC-STERILE-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-STERILE-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-STERILE-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-STERILE-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-AUTOCLAVE-17",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-AUTOCLAVE-17",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-STERILE-01",
+                "relationship": "SERVES",
+                "to": "DEPT-STERILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-STERILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-STERILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-STERILE-OPS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-STERILE-OPS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-MATERIALS-01",
+            "coverage_status": "incomplete/unknown",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-MATERIALS-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-MATERIALS-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": null,
+              "department": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "SERVES",
+                "to": "DEPT-CAMPUS-LOGISTICS",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-CAMPUS-LOGISTICS",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-CAMPUS-LOGISTICS",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-MATERIALS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-MATERIALS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-LINEN-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-LINEN-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-LINEN-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-LINEN-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-LINEN-08",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-LINEN-08",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-LINEN-01",
+                "relationship": "SERVES",
+                "to": "DEPT-TEXTILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-TEXTILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-TEXTILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-LINEN-SHIFT-COORD",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-LINEN-SHIFT-COORD",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          }
+        ],
+        "materials_dependency_branch": "suppressed",
+        "materials_status": "incomplete/unknown",
+        "other_two_rows_byte_equivalent_to_baseline": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-3"
+      ]
+    },
+    {
+      "id": "role-edge-removal",
+      "expected": {
+        "mutation": {
+          "from": "DEPT-CAMPUS-LOGISTICS",
+          "relationship": "OWNED_BY",
+          "to": "ROLE-MATERIALS-DUTY",
+          "remove_only_this_edge": true
+        },
+        "rows": [
+          {
+            "service_id": "SVC-STERILE-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-STERILE-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-STERILE-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-STERILE-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-AUTOCLAVE-17",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-AUTOCLAVE-17",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-STERILE-01",
+                "relationship": "SERVES",
+                "to": "DEPT-STERILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-STERILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-STERILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-STERILE-OPS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-STERILE-OPS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-MATERIALS-01",
+            "coverage_status": "incomplete/unknown",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-MATERIALS-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-MATERIALS-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-TUG-05",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-TUG-05",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "SERVES",
+                "to": "DEPT-CAMPUS-LOGISTICS",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-CAMPUS-LOGISTICS",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": null
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-LINEN-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-LINEN-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-LINEN-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-LINEN-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-LINEN-08",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-LINEN-08",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-LINEN-01",
+                "relationship": "SERVES",
+                "to": "DEPT-TEXTILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-TEXTILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-TEXTILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-LINEN-SHIFT-COORD",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-LINEN-SHIFT-COORD",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          }
+        ],
+        "materials_dependency_remains_supported": true,
+        "materials_role": "omitted",
+        "materials_status": "incomplete/unknown",
+        "other_two_rows_byte_equivalent_to_baseline": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-4"
+      ]
+    },
+    {
+      "id": "evidence-edge-removal",
+      "expected": {
+        "mutation": {
+          "from": "EQ-TUG-05",
+          "relationship": "EVIDENCED_BY",
+          "to": "SRC-SVC-EQUIPMENT",
+          "remove_only_this_edge": true
+        },
+        "dependency_graph_edge_remains": {
+          "from": "SVC-MATERIALS-01",
+          "relationship": "DEPENDS_ON",
+          "to": "EQ-TUG-05"
+        },
+        "dependency_relationship_source_id_properties_remain": {
+          "source_id": "SRC-SVC-EQUIPMENT",
+          "title": "Synthetic Equipment Dependency Register",
+          "observed_at": "2026-10-14T21:02:00Z"
+        },
+        "matching_accessible_evidence_node_and_link_required": true,
+        "rows": [
+          {
+            "service_id": "SVC-STERILE-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-STERILE-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-STERILE-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-STERILE-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-AUTOCLAVE-17",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-AUTOCLAVE-17",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-STERILE-01",
+                "relationship": "SERVES",
+                "to": "DEPT-STERILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-STERILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-STERILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-STERILE-OPS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-STERILE-OPS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-MATERIALS-01",
+            "coverage_status": "incomplete/unknown",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-MATERIALS-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-MATERIALS-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": null,
+              "department": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "SERVES",
+                "to": "DEPT-CAMPUS-LOGISTICS",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-CAMPUS-LOGISTICS",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-CAMPUS-LOGISTICS",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-MATERIALS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-MATERIALS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-LINEN-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-LINEN-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-LINEN-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-LINEN-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-LINEN-08",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-LINEN-08",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-LINEN-01",
+                "relationship": "SERVES",
+                "to": "DEPT-TEXTILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-TEXTILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-TEXTILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-LINEN-SHIFT-COORD",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-LINEN-SHIFT-COORD",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          }
+        ],
+        "materials_dependency_branch": "suppressed",
+        "materials_department_and_role_branch": "retained",
+        "materials_status": "incomplete/unknown",
+        "no_property_only_citation_reconstruction": true,
+        "other_two_rows_byte_equivalent_to_baseline": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-5"
+      ]
+    },
+    {
+      "id": "untracked-decoy-exclusion",
+      "expected": {
+        "portfolio_id": "PORTFOLIO-OPS-01",
+        "rows": [
+          {
+            "service_id": "SVC-STERILE-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-STERILE-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-STERILE-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-STERILE-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-AUTOCLAVE-17",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-AUTOCLAVE-17",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-STERILE-01",
+                "relationship": "SERVES",
+                "to": "DEPT-STERILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-STERILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-STERILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-STERILE-OPS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-STERILE-OPS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-MATERIALS-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-MATERIALS-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-MATERIALS-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-TUG-05",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-TUG-05",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "SERVES",
+                "to": "DEPT-CAMPUS-LOGISTICS",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-CAMPUS-LOGISTICS",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-CAMPUS-LOGISTICS",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-MATERIALS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-MATERIALS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-LINEN-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-LINEN-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-LINEN-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-LINEN-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-LINEN-08",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-LINEN-08",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-LINEN-01",
+                "relationship": "SERVES",
+                "to": "DEPT-TEXTILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-TEXTILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-TEXTILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-LINEN-SHIFT-COORD",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-LINEN-SHIFT-COORD",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          }
+        ],
+        "plausible_untracked_component_returned_as_service_row": false,
+        "untracked_component_changes_baseline_response": false,
+        "tracked_rows_equal_exact_baseline": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-6"
+      ]
+    },
+    {
+      "id": "restricted-source-full-view-invariance",
+      "expected": {
+        "viewer_scope": "operations",
+        "full_api_projection_unchanged": true,
+        "visible_counts_unchanged": true,
+        "browser_text_unchanged": true,
+        "accessibility_tree_semantically_unchanged": true,
+        "hidden_identifier_title_fact_count_existence_or_paraphrase_disclosed": false
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-7"
+      ]
+    },
+    {
+      "id": "reseed-idempotence",
+      "expected": {
+        "rows": [
+          {
+            "service_id": "SVC-STERILE-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-STERILE-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-STERILE-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-STERILE-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-AUTOCLAVE-17",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-AUTOCLAVE-17",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-STERILE-01",
+                "relationship": "SERVES",
+                "to": "DEPT-STERILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-STERILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-STERILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-STERILE-OPS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-STERILE-OPS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-MATERIALS-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-MATERIALS-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-MATERIALS-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-TUG-05",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-TUG-05",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-MATERIALS-01",
+                "relationship": "SERVES",
+                "to": "DEPT-CAMPUS-LOGISTICS",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-CAMPUS-LOGISTICS",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-CAMPUS-LOGISTICS",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-MATERIALS-DUTY",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-MATERIALS-DUTY",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          },
+          {
+            "service_id": "SVC-LINEN-01",
+            "coverage_status": "complete",
+            "branches": {
+              "tracking": {
+                "from": "PORTFOLIO-OPS-01",
+                "relationship": "TRACKS",
+                "to": "SVC-LINEN-01",
+                "source": {
+                  "id": "SRC-SVC-CATALOG",
+                  "title": "Synthetic Operations Service Catalog",
+                  "observed_at": "2026-10-14T21:00:00Z"
+                },
+                "evidence_link": {
+                  "from": "SVC-LINEN-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-CATALOG",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "dependency": {
+                "from": "SVC-LINEN-01",
+                "relationship": "DEPENDS_ON",
+                "to": "EQ-LINEN-08",
+                "source": {
+                  "id": "SRC-SVC-EQUIPMENT",
+                  "title": "Synthetic Equipment Dependency Register",
+                  "observed_at": "2026-10-14T21:02:00Z"
+                },
+                "evidence_link": {
+                  "from": "EQ-LINEN-08",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-EQUIPMENT",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "department": {
+                "from": "SVC-LINEN-01",
+                "relationship": "SERVES",
+                "to": "DEPT-TEXTILE-SERVICES",
+                "source": {
+                  "id": "SRC-SVC-DEPT-MAP",
+                  "title": "Synthetic Service Department Coverage Register",
+                  "observed_at": "2026-10-14T21:03:00Z"
+                },
+                "evidence_link": {
+                  "from": "DEPT-TEXTILE-SERVICES",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-DEPT-MAP",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              },
+              "role": {
+                "from": "DEPT-TEXTILE-SERVICES",
+                "relationship": "OWNED_BY",
+                "to": "ROLE-LINEN-SHIFT-COORD",
+                "source": {
+                  "id": "SRC-SVC-ROSTER",
+                  "title": "Synthetic Operations Role Roster",
+                  "observed_at": "2026-10-14T21:04:00Z"
+                },
+                "evidence_link": {
+                  "from": "ROLE-LINEN-SHIFT-COORD",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SVC-ROSTER",
+                  "evidence_node_type": "Evidence",
+                  "accessible": true
+                }
+              }
+            },
+            "source_provenance_in_relationship_order": [
+              {
+                "id": "SRC-SVC-CATALOG",
+                "title": "Synthetic Operations Service Catalog",
+                "observed_at": "2026-10-14T21:00:00Z"
+              },
+              {
+                "id": "SRC-SVC-EQUIPMENT",
+                "title": "Synthetic Equipment Dependency Register",
+                "observed_at": "2026-10-14T21:02:00Z"
+              },
+              {
+                "id": "SRC-SVC-DEPT-MAP",
+                "title": "Synthetic Service Department Coverage Register",
+                "observed_at": "2026-10-14T21:03:00Z"
+              },
+              {
+                "id": "SRC-SVC-ROSTER",
+                "title": "Synthetic Operations Role Roster",
+                "observed_at": "2026-10-14T21:04:00Z"
+              }
+            ]
+          }
+        ],
+        "repeat_seed_duplicate_fixed_nodes": 0,
+        "repeat_seed_duplicate_relationships": 0,
+        "full_output_matches_exact_baseline": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-8"
+      ]
+    },
+    {
+      "id": "fresh-client-read-only-cleanup",
+      "expected": {
+        "fresh_client_snapshot_matches_exact_baseline": true,
+        "api_browser_reads_graph_writes": 0,
+        "api_browser_reads_local_action_writes": 0,
+        "desktop_mobile_api_results_agree": true,
+        "cleanup_deletes_only_test_owned_graph": true,
+        "cleanup_stops_only_owned_app_and_database_processes": true
+      },
+      "planner_refs": [
+        "service-coverage-packet#outcome-9"
+      ]
+    }
+  ]
+}
