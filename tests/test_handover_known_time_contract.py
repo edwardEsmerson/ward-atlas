@@ -58,6 +58,8 @@ class HandoverKnownTimeContractTests(unittest.TestCase):
             ("event title", lambda value: value["cases"][2]["expected"]["event"]["source"].__setitem__("title", "wrong title")),
             ("known time", lambda value: value["cases"][1]["expected"].__setitem__("known_at", "2026-10-14T19:15:00Z")),
             ("source cutoff", lambda value: value["cases"][4]["expected"]["path_evidence"][0]["observed_at"].__setitem__(-1, "2026-10-14T18:05:00Z")),
+            ("branch valid time", lambda value: value["cases"][8]["expected"].__setitem__("valid_at", "2026-10-14T18:51:00Z")),
+            ("branch knowledge time", lambda value: value["cases"][8]["expected"].__setitem__("known_at", "2026-10-14T18:05:00Z")),
             ("unknown state", lambda value: value["cases"][3]["expected"].__setitem__("event_state", "available")),
             ("unknown leak", lambda value: value["cases"][3]["expected"].__setitem__("event_existence_or_count_hint_disclosed", True)),
             ("confirmation", lambda value: value["cases"][9]["expected"]["confirmation"].__setitem__("required", False)),
