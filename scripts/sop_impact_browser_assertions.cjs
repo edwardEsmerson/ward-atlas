@@ -79,6 +79,13 @@ const equal = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonica
     });
     check('rendered desktop path rows and each source ID/title/time match the live API snapshot',
       equal(visiblePathRows, expectedVisiblePathRows), { rendered: visiblePathRows, expected: expectedVisiblePathRows });
+    const apiVisiblePathRows = desktopApi.body.impact_paths.map((path, index) => {
+      const evidence = desktopApi.body.path_evidence[index];
+      const trail = evidence.source_ids.map((id, sourceIndex) => `${id} · ${evidence.source_titles[sourceIndex]} · observed ${evidence.observed_at[sourceIndex]}`).join(' → ');
+      return normalizeText(`${path.join(' → ')} CURRENT OWNER PATH · ${trail}`);
+    });
+    check('rendered desktop path/provenance rows equal the direct API projection',
+      equal(visiblePathRows, apiVisiblePathRows), { rendered: visiblePathRows, api: apiVisiblePathRows });
     check('desktop trace labels role IDs as unverified SOP claims, separate from owner paths',
       await page.locator('.sop-impact-claim strong').allInnerTexts().then(rows => rows.join('|')) ===
         'SOP-OPS-9-V2 · unverified SOP claim → ROLE-FACILITIES-DUTY|SOP-OPS-9-V3 · unverified SOP claim → ROLE-MATERIALS-LEAD',
