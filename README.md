@@ -101,3 +101,23 @@ The live check uses a run-unique lane-named graph, binds only loopback, mutates 
 - **Review candidates:** `Handover/Ticket -[:CITES_SOURCE]-> R1 <-[:SUPERSEDES]- R2`. The query requires both edges, so `HND-DOCK-2020` and `TKT-DOCK-88` are returned but the lexical-only handover is not. Historical role/source properties remain on the handover; missing links are reported as unknown rather than current.
 - **Conveyor replay:** observed `StateEvent` nodes connect from INC-204 through `HAS_STATE_EVENT` and to their `Evidence` via `EVIDENCED_BY`. The API selects the latest source-backed event at or before the requested UTC time; the separate multi-hop impact query returns connected service/department/current-role paths only while that event says unavailable. The `ScenarioBranch(BR-C4-RESTORE-DRILL)` relation points only to its hypothetical 18:45Z event, leaving the observed event history unchanged. Branch reset deletes only that event/branch overlay.
 - **Access and side effects:** all traversed nodes, relationships and source records are filtered to `operations`; the restricted fixtures are deliberately connected adversarially but do not change operations results. `/api/shift-board?scope=operations&dock_at=...&conveyor_at=...&branch_at=...` is read-only. Reset and handover confirmation remain separate local endpoints; confirmation writes one synthetic JSON action only after an explicit click.
+
+## Dock ownership: effective time × knowledge time
+
+The dock board keeps the original `/api/shift-board?dock_at=...` projection byte-shape compatible when `known_at` is omitted. For a bitemporal request, use `effective_at` for the ownership interval and `known_at` for source observation and explicit review-edge visibility, for example:
+
+```text
+/api/shift-board?scope=operations&effective_at=2026-10-14T20:29:00Z&known_at=2026-10-14T20:17:59Z
+```
+
+At the same effective instant, advancing knowledge to 20:19Z reveals R2 provenance and its two explicit review candidates but leaves R1's duty path in place. At effective 20:30Z with only 20:17:59Z knowledge, R1 has expired and R2 is not visible, so ownership is unknown rather than guessed with hindsight. UTC-offset inputs normalize on both axes; malformed or timezone-naive values reject before graph or action-state mutation. The board offers independent controls for both times and labels an observed R2 as pending review, not an invalidated artifact.
+
+Run the pinned artifact and mutation checks, then the actual-FalkorDB/API/browser suite (ports come from this lane's private range):
+
+```sh
+python3 scripts/verify_dock_bitemporal_contract.py --expected tests/dock-bitemporal-expected-results.json --matrix tests/dock-bitemporal-adversarial-matrix.json --pinned-plan /workspace/worktrees/planner-280b00074097409f80433898c7dcdac8/plans/planner-280b00074097409f80433898c7dcdac8.md --require-ten-groups --check-frozen-oracle-hashes
+python3 -m unittest discover -s tests -p test_dock_bitemporal_contract.py
+python3 scripts/verify_dock_bitemporal_live.py --require-live --all-ten-groups --desktop-mobile --assert-permissions --assert-reconnect
+```
+
+The live report checks all 60 mapped assertions from the ten fixed groups, cold/empty, edge removal and reseed, denied-source invariance, reconnection, and desktop/mobile API agreement. It starts an owned loopback FalkorDB/app and removes only its own graph/process/state directory. The expected-results and adversarial matrix remain candidate-independent and frozen.

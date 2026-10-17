@@ -50,7 +50,10 @@ from wardatlas_shift_board import (
     DOCK_REVIEW_QUERY,
     DOCK_SOURCE_QUERY,
     DOCK_SUPERSESSION_QUERY,
+    dock_review_query,
     dock_role_query,
+    dock_source_query,
+    dock_supersession_query,
     normalize_timestamp,
     seed_shift_board_queries,
 )
@@ -237,12 +240,13 @@ APP_HTML = r'''<!doctype html>
       </section>
       <section class="card shift-board" aria-labelledby="shift-board-title">
         <div class="card-head"><div><div class="eyebrow">Integrated board · two separate synthetic cases</div><h2 id="shift-board-title">Shift changes, with provenance</h2></div><span id="shift-board-badge" class="tag blue">Loading live graph…</span></div>
-        <p class="shift-intro">The dock roster is selected by its effective time, not when the revision was observed. Conveyor status is replayed from observed state events; the drill branch is labeled hypothetical and never rewrites the mainline.</p>
+  <p class="shift-intro">Dock ownership has two independent clocks: when a role is effective and when its source was known. Advancing knowledge never applies a future assignment early; unavailable historical knowledge stays unknown. Conveyor status is replayed from observed state events; the drill branch is hypothetical.</p>
         <div id="shift-board-empty" class="empty" hidden>Board empty / unknown. No incident, source, role, or review item is inferred from a blank graph. Reset the synthetic scenario to load the two pinned cases.</div>
         <div class="shift-cases">
           <article id="dock-case" class="shift-case" hidden aria-labelledby="dock-case-title">
             <header><div><div class="shift-kicker">Ownership revision · source change</div><h3 id="dock-case-title">INC-207 · Receiving dock</h3></div><span id="dock-role-badge" class="tag">Role unknown</span></header>
-            <div class="shift-controls"><label for="dock-time">Evaluate ownership at</label><select id="dock-time"><option value="2026-10-14T20:29:00Z">20:29Z · before effective boundary</option><option value="2026-10-14T20:30:00Z" selected>20:30Z · R2 effective</option></select></div>
+            <div class="shift-controls"><label for="dock-time">Effective at</label><select id="dock-time" aria-label="Dock ownership effective time"><option value="2026-10-14T20:29:00Z">20:29Z · before boundary</option><option value="2026-10-14T20:30:00Z" selected>20:30Z · boundary</option></select><label for="dock-known-time">Sources known by</label><select id="dock-known-time" aria-label="Dock source knowledge time"><option value="">Current knowledge · legacy view</option><option value="2026-10-14T20:17:59Z">20:17:59Z · earlier knowledge cutoff</option><option value="2026-10-14T20:19:00Z">20:19Z · later knowledge cutoff</option></select></div>
+            <p id="dock-time-context" class="subtle" aria-live="polite"></p>
             <div id="dock-path" class="shift-result" aria-live="polite"></div>
             <div class="shift-evidence"><h4>Observed roster sources</h4><div id="dock-sources"></div></div>
             <div class="shift-evidence"><h4>Explicit-edge review queue</h4><div id="dock-review"></div><p id="dock-coverage" class="subtle"></p></div>
@@ -320,6 +324,7 @@ APP_HTML = r'''<!doctype html>
     let briefing = null;
     let conveyorAt = '2026-10-14T18:30:00Z';
     const branchAt = '2026-10-14T18:50:00Z';
+    let shiftRequestSequence = 0;
     function element(tag, cls, text) { const node=document.createElement(tag); if(cls) node.className=cls; if(text!==undefined) node.textContent=text; return node; }
     async function api(path, options={}) { const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}}); const data=await response.json(); if(!response.ok) throw new Error(data.error||`HTTP ${response.status}`); return data; }
     function sourceName(id,title,observed) { const box=element('div','evidence-item'); box.append(element('strong','',title)); box.append(element('span','evidence-id',id)); box.append(element('span','',`Observed ${observed}`)); return box; }
@@ -329,18 +334,21 @@ APP_HTML = r'''<!doctype html>
       $('shift-board-empty').hidden=!empty;
       $('dock-case').hidden=!data.dock; $('conveyor-case').hidden=!data.conveyor;
       if(!data.dock && !data.conveyor) return;
-      if(data.dock) {
-        const dock=data.dock; $('dock-role-badge').textContent=dock.role_id||'Role unknown';
+     if(data.dock) {
+       const dock=data.dock; $('dock-role-badge').textContent=dock.role_id||'Role unknown';
+        $('dock-time-context').textContent=dock.known_at
+          ? `Effective at ${dock.effective_at} · knowledge limited to sources observed by ${dock.known_at}.`
+          : `Effective at ${dock.as_of} · current knowledge (legacy single-axis view).`;
         const rolePath=$('dock-path'); rolePath.replaceChildren();
         if(dock.role_path.length) { rolePath.append(element('div','shift-path',dock.role_path.join('  →  '))); }
         else rolePath.append(element('div','shift-unknown','Ownership path is missing / unknown at this time.'));
         const sources=$('dock-sources'); sources.replaceChildren();
-        for(const source of dock.source_versions) { const row=element('div','shift-source'); row.append(element('strong','',`${source.source_id} · ${source.title}`)); row.append(element('span','',`Observed ${source.observed_at}${source.effective_at?` · effective ${source.effective_at}`:''}`)); sources.append(row); }
+        for(const source of dock.source_versions) { const row=element('div','shift-source'); row.append(element('strong','',`${source.source_id} · ${source.title}`)); row.append(element('span','',`Observed ${source.observed_at}${source.effective_at?` · effective ${source.effective_at}`:''}${source.status?` · ${source.status}`:''}`)); sources.append(row); }
         const queue=$('dock-review'); queue.replaceChildren();
         if(!dock.review_candidates.length) queue.append(element('div','subtle','No explicitly linked review candidate is available.'));
         for(const item of dock.review_candidates) { const row=element('div','review-item',`${item.artifact_id} · cites ${item.cited_source_id}`); queue.append(row); }
         if(dock.unchanged_handover) queue.append(element('p','subtle',`Historical handover unchanged: ${dock.unchanged_handover.role_id} · ${dock.unchanged_handover.source_id}.`));
-        $('dock-coverage').textContent=`Coverage: ${dock.coverage_status}. Unlinked artifact status: ${dock.unlinked_artifact_status}; no link is not evidence of currentness.`;
+        $('dock-coverage').textContent=`Coverage: ${dock.coverage_status}. Unlinked artifact status: ${dock.unlinked_artifact_status}; no link is not evidence of currentness.${dock.candidate_disposition?` Review candidates remain ${dock.candidate_disposition}.`:''}`;
       }
       if(data.conveyor) {
         const conveyor=data.conveyor; $('conveyor-status-badge').textContent=conveyor.status;
@@ -397,8 +405,13 @@ APP_HTML = r'''<!doctype html>
       const unknown=$('sop-impact-unknown'); unknown.hidden=Boolean(data.complete_conflict_witness_returned); unknown.textContent=data.complete_conflict_witness_returned?'':`No complete conflict-to-impact witness is available. Status remains ${data.conflict_linkage_status}; no “no conflict” or “resolved” conclusion is asserted.`;
     }
     async function loadShiftBoard() {
-      const params=new URLSearchParams({scope:'operations',dock_at:$('dock-time').value,conveyor_at:conveyorAt,branch_at:branchAt});
-      const board=await api(`/api/shift-board?${params.toString()}`); renderShiftBoard(board);
+      const sequence=++shiftRequestSequence;
+      const knownAt=$('dock-known-time').value;
+      const dockAxis=knownAt?{effective_at:$('dock-time').value,known_at:knownAt}:{dock_at:$('dock-time').value};
+      const params=new URLSearchParams({scope:'operations',...dockAxis,conveyor_at:conveyorAt,branch_at:branchAt});
+      const board=await api(`/api/shift-board?${params.toString()}`);
+      if(sequence!==shiftRequestSequence) return board;
+      renderShiftBoard(board);
       const impactParams=new URLSearchParams({scope:'operations',as_of:conveyorAt});
       loadSopImpact(impactParams.toString()); return board;
     }
@@ -577,7 +590,7 @@ APP_HTML = r'''<!doctype html>
       }
     }
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
-    $('dock-time').addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
+    for(const input of [$('dock-time'),$('dock-known-time')]) input.addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
     for(const button of document.querySelectorAll('[data-conveyor-at]')) button.addEventListener('click',()=>{ conveyorAt=button.dataset.conveyorAt; loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`); });
     $('branch-reset').addEventListener('click',async()=>{ const button=$('branch-reset'); button.disabled=true; try { await api('/api/shift-board/branch/reset',{method:'POST',body:'{}'}); $('shift-board-notice').textContent='Only the named hypothetical overlay was reset; observed events were preserved.'; await loadShiftBoard(); } catch(e) { $('shift-board-notice').textContent=`Branch reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('prepare').addEventListener('click',async()=>{ const button=$('prepare'); button.disabled=true; $('notice').textContent='Preparing a source-linked draft…'; try {
@@ -819,18 +832,24 @@ class WardAtlasService:
         dock_at: str = DOCK_EFFECTIVE,
         conveyor_at: str = CONVEYOR_OUTAGE_AT,
         branch_at: str = BRANCH_AT,
+        known_at: str | None = None,
     ) -> dict:
-        """Query both separately-pinned cases and their graph-derived evidence."""
+        """Query the board with independent valid/knowledge time for dock ownership.
+
+        Omitting ``known_at`` deliberately preserves the pre-existing
+        historical-effective/current-knowledge response shape.
+        """
         dock_at = normalize_timestamp(dock_at)
         conveyor_at = normalize_timestamp(conveyor_at)
         branch_at = normalize_timestamp(branch_at)
+        known_at = normalize_timestamp(known_at) if known_at is not None else None
         with self.graph_lock:
             connection = self._connection()
             try:
-                dock_paths = self._rows(connection, dock_role_query(dock_at))
-                dock_sources = self._rows(connection, DOCK_SOURCE_QUERY)
-                supersession_rows = self._rows(connection, DOCK_SUPERSESSION_QUERY)
-                review_rows = self._rows(connection, DOCK_REVIEW_QUERY)
+                dock_paths = self._rows(connection, dock_role_query(dock_at, known_at))
+                dock_sources = self._rows(connection, dock_source_query(known_at))
+                supersession_rows = self._rows(connection, dock_supersession_query(known_at))
+                review_rows = self._rows(connection, dock_review_query(known_at))
                 handover_rows = self._rows(connection, DOCK_HANDOVER_SNAPSHOT_QUERY)
                 observed_events = self._rows(connection, CONVEYOR_EVENT_QUERY)
                 branch_events = self._rows(connection, BRANCH_EVENT_QUERY)
@@ -853,6 +872,8 @@ class WardAtlasService:
                     source["effective_at"] = row["effective_at"]
                 if row["source_id"] in supersedes:
                     source["supersedes"] = supersedes[row["source_id"]]
+                if known_at is not None and row["source_id"] == "SRC-DOCK-ROSTER-R2":
+                    source["status"] = "recorded/pending"
                 source_versions.append(source)
             handover = handover_rows[0] if handover_rows else None
             role_path = []
@@ -873,6 +894,22 @@ class WardAtlasService:
                 "unchanged_handover": ({"artifact_id": handover["artifact_id"], "role_id": handover["role_id"], "source_id": handover["source_id"]} if handover else None),
                 "role_evidence": ([{"source_id": row["source_id"], "title": row["source_title"], "observed_at": row["source_observed_at"], **({"effective_at": row["source_effective_at"]} if row.get("source_effective_at") else {})} for row in dock_paths]),
             }
+            if known_at is not None:
+                dock_case.update({
+                    "effective_at": dock_at,
+                    "known_at": known_at,
+                    "knowledge_mode": "as_known_at",
+                    "role_status": "known" if role_id is not None else "unknown",
+                    "linkage_status": "linked" if "SRC-DOCK-ROSTER-R2" in supersedes else "unknown",
+                    "currentness_conclusion": False,
+                })
+                if any(source["source_id"] == "SRC-DOCK-ROSTER-R2" for source in source_versions):
+                    dock_case["candidate_disposition"] = "pending review; not declared-invalid artifacts"
+                if role_id == "ROLE-DOCK-SWING":
+                    dock_case["interpretation"] = (
+                        "ROLE-DOCK-SWING is valid at effective_at and known by known_at; "
+                        "this does not claim swing was effective at known_at"
+                    )
 
         observed_before_main = [row for row in observed_events if row["event_at"] <= conveyor_at]
         main_event_row = max(observed_before_main, key=self._event_order) if observed_before_main else None
@@ -1189,13 +1226,17 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, service.graph_view())
             elif parsed.path == "/api/shift-board":
                 values = parse_qs(parsed.query, keep_blank_values=True)
-                for key in ("dock_at", "conveyor_at", "branch_at"):
+                for key in ("dock_at", "effective_at", "known_at", "conveyor_at", "branch_at"):
                     if key in values and len(values[key]) != 1:
                         raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
+                if "dock_at" in values and "effective_at" in values:
+                    raise ValueError("Specify only one dock effective-time parameter.")
+                dock_at = values.get("effective_at", values.get("dock_at", [DOCK_EFFECTIVE]))[0]
                 data = service.shift_board(
-                    values.get("dock_at", [DOCK_EFFECTIVE])[0],
+                    dock_at,
                     values.get("conveyor_at", [CONVEYOR_OUTAGE_AT])[0],
                     values.get("branch_at", [BRANCH_AT])[0],
+                    values.get("known_at", [None])[0],
                 )
                 self._send(200, data)
             elif parsed.path == "/api/sop-impact":
