@@ -1,0 +1,1545 @@
+{
+  "schema_version": 1,
+  "review_result": "PASS",
+  "reviewed_before_candidate_behavior": true,
+  "candidate_behavior_inspected": false,
+  "reviewer": {
+    "reviewer_id": "opencode-subagent-ses_eb462a828ffeunty1oOo4sBy1o",
+    "role": "independent source reviewer",
+    "identity": "GPT-6 Luna OpenCode subagent (separate reviewer session)",
+    "different_from_oracle_author": true,
+    "same_model_as_builder": true,
+    "independence_basis": "A separate reviewer inspected every cited immutable source value and matrix assertion, compared the fixed packet literals before behavior work, and recorded per-assertion mappings/hashes; session novelty alone was not treated as independence."
+  },
+  "frozen_hashes": {
+    "planner": "0d5f5851e24fda62120f904ce539fe450da354a9b805e8e7589f17275642fa64",
+    "tests/shift-board-expected-results.json": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428",
+    "tests/shift-board-adversarial-matrix.json": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7",
+    "tests/dock-bitemporal-expected-results.json": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205",
+    "tests/dock-bitemporal-adversarial-matrix.json": "84127f273043a03299823905bbecc06a755f79cb9a3b34c44793815eda7f5318",
+    "tests/evidence-watch-expected-results.json": "1ee83f8ad7f9ad52b08b3759b20b590343c44eb09a7aeb2b18f1cd9d79027e1c",
+    "tests/evidence-watch-adversarial-matrix.json": "e7bdee4b56611d13fd7ad00195b4ec5ffb50d265503f04083d48854e96c13279"
+  },
+  "comparison_counts": {
+    "groups": 9,
+    "assertions": 86,
+    "source_mappings": 69,
+    "exact_value_matches": 47,
+    "support_mappings": 22
+  },
+  "source_limitations": [
+    "The accepted source oracles do not establish watch-only status labels, saved-watch visibility/count, or a distinct watch-state file; these remain planner-pinned requirements.",
+    "The accepted handover confirmation oracle covers one local handover action, not a watch record or confirmed-actions.json separation; watch-specific confirmation semantics remain planner-only.",
+    "The accepted dock oracle tests R2 edge removal but not deletion of R2 source evidence or watch metadata suppression after source deletion.",
+    "The accepted ACL oracle tests operations-visible source/query invariance, not complete watch storage/API counters/errors or desktop/mobile DOM invariance.",
+    "The planner requires duplicate-axis rejection but does not prescribe transport encoding; the expected-results artifact explicitly chooses repeated effective_at/known_at query parameters, including equal repeated values.",
+    "Prior reconnect oracles establish query-result reconnect, not watch-token idempotency, saved-watch baseline persistence/recomputation, or watch-state cleanup."
+  ],
+  "case_reviews": [
+    {
+      "case_id": "watch-cold-unknown-without-confirmation",
+      "plan_line": 70,
+      "plan_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+      "result": "PASS",
+      "comparison_summary": "Cold empty source literals pin no role/path/source/candidate and unknown-not-safe. No confirmed watch and historical configuration visibility are planner-only.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "cold.no-confirmed-watch",
+          "expected_pointer": "/cases/0/expected/no_confirmed_watch/watch_record_count",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "cold.no-fabricated-watch",
+          "expected_pointer": "/cases/0/expected/no_confirmed_watch/fabricated_watch",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "cold.saved-config-visible",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/configuration_visible",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "cold.current-result-unknown",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/current_result/status",
+          "expected_value_sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/role_status",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.role-is-unknown",
+              "relation": "supports",
+              "source_value_sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+              "matrix_value_sha256": "bdf4e3cdd642088778c70642c27b38c6ba74de411cb0ae438eb543a062091226"
+            }
+          ]
+        },
+        {
+          "assertion_id": "cold.no-role-path-or-sources",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/current_result/role_path",
+          "expected_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.no-role-path",
+              "relation": "exact",
+              "source_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "matrix_value_sha256": "c24b819b5174f19b4eb3948cb7158d5001e0e620a02b23d712f0268fc9757b07"
+            },
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.no-source-rows",
+              "relation": "supports",
+              "source_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "matrix_value_sha256": "f1135a2d7eca1818cb14529cd9a1c19c0f881748e7b969cc79c0b93e7e360b5c"
+            }
+          ]
+        },
+        {
+          "assertion_id": "cold.unknown-not-safe-or-no-owner",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/unknown_not_no_owner_or_safe",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/risk_or_currentness_conclusion",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.absence-is-not-safety",
+              "relation": "supports",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "d83e58b0f08875625e161ad06db8e2cc9b2754cdf4f45d5d37b4ca37c1241044"
+            }
+          ]
+        },
+        {
+          "assertion_id": "cold.no-r2-hint",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/current_result/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "3c56381ceb761e582b0b03c6cd5fc95a93069a67011af2214658de35e07bf29a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.no-source-rows",
+              "relation": "supports",
+              "source_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "matrix_value_sha256": "f1135a2d7eca1818cb14529cd9a1c19c0f881748e7b969cc79c0b93e7e360b5c"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "watch-preview-explicit-local-confirmation",
+      "plan_line": 71,
+      "plan_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+      "result": "PASS",
+      "comparison_summary": "The R1 path/source pair is exact. Prior confirmation tests concern handover actions only; watch preview, separate watch-state storage and one-watch confirmation remain planner-only.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "preview.fixed-effective-time",
+          "expected_pointer": "/cases/1/expected/preview/effective_at",
+          "expected_value_sha256": "bfecabab2d141ccbfe77b454393d5f0fdec9442adc0c3defa0da17443daec18e",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.exact-effective-axis",
+              "relation": "exact",
+              "source_value_sha256": "bfecabab2d141ccbfe77b454393d5f0fdec9442adc0c3defa0da17443daec18e",
+              "matrix_value_sha256": "9671d47c46d2cd495a240bca8e71a8834ea5a5563d22b3643f197768ad576a51"
+            }
+          ]
+        },
+        {
+          "assertion_id": "preview.fixed-r1-path",
+          "expected_pointer": "/cases/1/expected/preview/role_path",
+          "expected_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.duty-role-path",
+              "relation": "exact",
+              "source_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+              "matrix_value_sha256": "ea79160b1ac96491d7514b1a60b191f1745bbb16b317e98225363d11b7a57d8f"
+            }
+          ]
+        },
+        {
+          "assertion_id": "preview.fixed-r1-source",
+          "expected_pointer": "/cases/1/expected/preview/source_versions",
+          "expected_value_sha256": "af4da6b3ad37ef98a991b786a94e4d86b9507acdd3d2896a8d5045e96919a2ba",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.only-r1-known",
+              "relation": "exact",
+              "source_value_sha256": "af4da6b3ad37ef98a991b786a94e4d86b9507acdd3d2896a8d5045e96919a2ba",
+              "matrix_value_sha256": "eb936071c12d2a00acc9296157dc7b8b12d54036d2798f2ba9d35d0b5aa66b70"
+            }
+          ]
+        },
+        {
+          "assertion_id": "preview.no-watch-write",
+          "expected_pointer": "/cases/1/expected/preview/watch_state_records_written",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "confirm.explicit-and-separate-store",
+          "expected_pointer": "/cases/1/expected/confirmation/watch_state_is_separate_from_confirmed_actions_json",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "confirm.one-watch-only",
+          "expected_pointer": "/cases/1/expected/confirmation/watch_state_records_written",
+          "expected_value_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "confirm.no-action-file-write",
+          "expected_pointer": "/cases/1/expected/confirmation/confirmed_actions_file_changed",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "confirm.no-graph-or-external-effects",
+          "expected_pointer": "/cases/1/expected/confirmation/external_writes",
+          "expected_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_pointer": "/cases/6/expected/external_writes",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_assertion_text": "no external writes occur",
+              "relation": "exact",
+              "source_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "matrix_value_sha256": "a3033349bfb7be9e53b3ea6382f804e637a6773e61b10de366d53e7c7c62bf3c"
+            }
+          ]
+        },
+        {
+          "assertion_id": "preview.fixed-known-time",
+          "expected_pointer": "/cases/1/expected/preview/known_at",
+          "expected_value_sha256": "25117981ab3d4fd8750e56df61d956d1b1c3b5468e65606a7dcd952a78108e39",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.exact-knowledge-axis",
+              "relation": "exact",
+              "source_value_sha256": "25117981ab3d4fd8750e56df61d956d1b1c3b5468e65606a7dcd952a78108e39",
+              "matrix_value_sha256": "ed0a5028d52d2271e9f3e5bb1bda27aedb3a47b4fe09cf578dc5c67d99aa7ceb"
+            }
+          ]
+        },
+        {
+          "assertion_id": "preview.no-r2-existence-hint",
+          "expected_pointer": "/cases/1/expected/preview/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.no-r2-or-existence-hint",
+              "relation": "exact",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "388b543035060ade322c19397925d3de85e360ca902aadf05fe10327858770f7"
+            }
+          ]
+        },
+        {
+          "assertion_id": "preview.graph-not-written",
+          "expected_pointer": "/cases/1/expected/preview/graph_writes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "confirm.explicit-confirmation-required",
+          "expected_pointer": "/cases/1/expected/confirmation/explicit_in_app_confirmation_required",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "confirm.no-graph-write",
+          "expected_pointer": "/cases/1/expected/confirmation/graph_writes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "17fda0cd7e8e36774306c05e38545170f102e04f8058b52dd24c3232f00cdee3",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_graph_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.time-selection-read-only",
+              "relation": "supports",
+              "source_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "matrix_value_sha256": "768fbc829098f458d44bf0867e237f4726eb954f970f795199be507c6c86d2fd"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "watch-new-source-known-still-r1",
+      "plan_line": 72,
+      "plan_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+      "result": "PASS",
+      "comparison_summary": "R1 remains effective at 20:29Z after R2 is known; R2 provenance/status and exact explicit review candidates match the frozen dock and shift-board values. The watch label is planner-only.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "known.baseline-r1-path",
+          "expected_pointer": "/cases/2/expected/saved_baseline/role_path",
+          "expected_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.duty-role-path",
+              "relation": "exact",
+              "source_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+              "matrix_value_sha256": "ea79160b1ac96491d7514b1a60b191f1745bbb16b317e98225363d11b7a57d8f"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.baseline-r1-only-no-hint",
+          "expected_pointer": "/cases/2/expected/saved_baseline/source_versions",
+          "expected_value_sha256": "af4da6b3ad37ef98a991b786a94e4d86b9507acdd3d2896a8d5045e96919a2ba",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.only-r1-known",
+              "relation": "exact",
+              "source_value_sha256": "af4da6b3ad37ef98a991b786a94e4d86b9507acdd3d2896a8d5045e96919a2ba",
+              "matrix_value_sha256": "eb936071c12d2a00acc9296157dc7b8b12d54036d2798f2ba9d35d0b5aa66b70"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.exact-later-knowledge",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/known_at",
+          "expected_value_sha256": "3ecc3b2275479e8bcc59b73484d81f30a6a5ece9b0439fe7a1f0357edc020b8d",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-knowledge-axis",
+              "relation": "exact",
+              "source_value_sha256": "3ecc3b2275479e8bcc59b73484d81f30a6a5ece9b0439fe7a1f0357edc020b8d",
+              "matrix_value_sha256": "a79eb4770f0a62ca5a0bb5931268e8d44a32eee001e4f851600c5f6e3df4005b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.r1-remains-effective",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/role_path",
+          "expected_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.r2-does-not-change-duty-path",
+              "relation": "exact",
+              "source_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+              "matrix_value_sha256": "d88c0e46e4c0cef3f422b47c726227211ac9642b6547f9607eb8fc2c45a72338"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.r2-recorded-pending-source",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/source_versions",
+          "expected_value_sha256": "6e5de092dcc61652ae378fcbcb3c47aee55a83b71e6001b55316c0640686c33c",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-r2-provenance-and-status",
+              "relation": "exact",
+              "source_value_sha256": "6e5de092dcc61652ae378fcbcb3c47aee55a83b71e6001b55316c0640686c33c",
+              "matrix_value_sha256": "b05a2e5f08a56be571ba5ded2d5e77e22cd3937825e37ac63a945170dc2451b0"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.exact-two-review-candidates",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/review_candidates",
+          "expected_value_sha256": "f073d640a096b73009c711e8d267ef89a1c2d45cc0181c1227476d504a22ea74",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/review_candidates",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-two-review-candidates",
+              "relation": "exact",
+              "source_value_sha256": "f073d640a096b73009c711e8d267ef89a1c2d45cc0181c1227476d504a22ea74",
+              "matrix_value_sha256": "3d5da1f06988123841e47bd391e0ed9ceada03dc41b3893e4af007e58c1d4606"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "explicit-edge-review-queue",
+              "source_pointer": "/cases/2/expected/review_candidates",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "explicit-edge-review-queue",
+              "source_assertion_text": "queue is exactly HND-DOCK-2020 and TKT-DOCK-88",
+              "relation": "exact",
+              "source_value_sha256": "f073d640a096b73009c711e8d267ef89a1c2d45cc0181c1227476d504a22ea74",
+              "matrix_value_sha256": "640a622622a697e93f04856235c10d6cb408823c7fd43397fd9c06cecdee8d3f"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.new-source-known-status",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/status",
+          "expected_value_sha256": "f3d0e1cfbd77a803975472be1320b6e84bb21b7c6ec8a95e24923966cf898f62",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "known.baseline-no-r2-hint",
+          "expected_pointer": "/cases/2/expected/saved_baseline/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.no-r2-or-existence-hint",
+              "relation": "exact",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "388b543035060ade322c19397925d3de85e360ca902aadf05fe10327858770f7"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.exact-effective-time",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/effective_at",
+          "expected_value_sha256": "bfecabab2d141ccbfe77b454393d5f0fdec9442adc0c3defa0da17443daec18e",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-effective-axis",
+              "relation": "exact",
+              "source_value_sha256": "bfecabab2d141ccbfe77b454393d5f0fdec9442adc0c3defa0da17443daec18e",
+              "matrix_value_sha256": "fced2e616b883e8ba6a7a252e9c80066bd164d03de699b4c0612e2c8322b61aa"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.pending-not-invalid-disposition",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/candidate_disposition",
+          "expected_value_sha256": "1bbd124c37b9dc36212dc99165056ade1d859a8a011bc3d109e8a50122ef13ed",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/candidate_disposition",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.candidates-remain-pending-review",
+              "relation": "exact",
+              "source_value_sha256": "1bbd124c37b9dc36212dc99165056ade1d859a8a011bc3d109e8a50122ef13ed",
+              "matrix_value_sha256": "7d7ecd602397076473dccd040291e92ca33b7f67d625449162a1709b9537db01"
+            }
+          ]
+        },
+        {
+          "assertion_id": "known.handover-not-invalidated",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/HND-DOCK-2020_invalidated",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "746e4a9c65cd7e5ae805be9b768387bca46fd9c71ed8a6bba6e491fa27f0f8db",
+          "reviewed_source_mappings": []
+        }
+      ]
+    },
+    {
+      "case_id": "watch-crossed-axes-unknown-and-effective-r2-changed",
+      "plan_line": 73,
+      "plan_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+      "result": "PASS",
+      "comparison_summary": "The crossed pair is unknown with no R2 hint; at the known R2 effective boundary the exact SWING path and effective/knowledge-time caveat match. Watch-level changed/unknown labels remain planner-only.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "crossed.exact-early-pair",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/known_at",
+          "expected_value_sha256": "25117981ab3d4fd8750e56df61d956d1b1c3b5468e65606a7dcd952a78108e39",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.exact-axis-pair",
+              "relation": "exact",
+              "source_value_sha256": "25117981ab3d4fd8750e56df61d956d1b1c3b5468e65606a7dcd952a78108e39",
+              "matrix_value_sha256": "c3df8473276fc99a88a105d004a935380547ae91d338f56688595e110bef9599"
+            }
+          ]
+        },
+        {
+          "assertion_id": "crossed.role-unknown",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/role_status",
+          "expected_value_sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/unknown_not_guessed_as_duty_or_swing",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.unknown-not-duty-or-swing",
+              "relation": "supports",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "a7b4406089c35e4d8754b56bd382ee6ec7195893d66e6a90118a98c975271be8"
+            }
+          ]
+        },
+        {
+          "assertion_id": "crossed.no-r2-hint",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/r2_identifier_title_effective_time_count_or_existence_hint_visible",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/r2_identifier_title_effective_time_count_or_existence_hint_visible",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.no-r2-existence-hint",
+              "relation": "exact",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "176b524fd11368357f51cfd075fa4df9c087714a3c89663e4574deb81b79cb0c"
+            }
+          ]
+        },
+        {
+          "assertion_id": "crossed.watch-status-unknown",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/status",
+          "expected_value_sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "future.exact-swing-path",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/role_path",
+          "expected_value_sha256": "b7f9f78940732dee701f62ebad77edd8565608d0bf4e89531a50cf43b26f0a1e",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.swing-role-path",
+              "relation": "exact",
+              "source_value_sha256": "b7f9f78940732dee701f62ebad77edd8565608d0bf4e89531a50cf43b26f0a1e",
+              "matrix_value_sha256": "83005941bded7e1915611418a0f7df02269e741851b0ef9260969f1bebece7d0"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "dock-role-time-and-source-evidence",
+              "source_pointer": "/cases/1/expected/at_effective_time/role_path",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "dock-role-time-and-source-evidence",
+              "source_assertion_text": "20:30Z is the exact ROLE-DOCK-SWING five-node path",
+              "relation": "exact",
+              "source_value_sha256": "b7f9f78940732dee701f62ebad77edd8565608d0bf4e89531a50cf43b26f0a1e",
+              "matrix_value_sha256": "87687d4bea97082a82e1e3c6d72c1e7ea7aefdd40f6f1a96977d48d4efb1f0fc"
+            }
+          ]
+        },
+        {
+          "assertion_id": "future.r2-observed-and-effective-provenance",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/source_versions",
+          "expected_value_sha256": "6e5de092dcc61652ae378fcbcb3c47aee55a83b71e6001b55316c0640686c33c",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.r2-evidence-known-by-cutoff",
+              "relation": "exact",
+              "source_value_sha256": "6e5de092dcc61652ae378fcbcb3c47aee55a83b71e6001b55316c0640686c33c",
+              "matrix_value_sha256": "b4f47009333634dd8121c152022b61b6d9fd957d291ecae05b0586dedde80b1a"
+            }
+          ]
+        },
+        {
+          "assertion_id": "future.axes-not-conflated",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/interpretation",
+          "expected_value_sha256": "c2827155b7cd88e357fe57a91be49c0cf86adfd0e9f37ad5b43983052783074f",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/interpretation",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.not-effective-at-knowledge-time-claim",
+              "relation": "exact",
+              "source_value_sha256": "c2827155b7cd88e357fe57a91be49c0cf86adfd0e9f37ad5b43983052783074f",
+              "matrix_value_sha256": "955a832d3b8a79ee7fd98f098f05a32b037c97f1ab64f9a61fcd946959c2a625"
+            }
+          ]
+        },
+        {
+          "assertion_id": "future.changed-relative-to-saved-r1",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/status_relative_to_saved_r1",
+          "expected_value_sha256": "9abf9994927acc503ec87e4433239aee75bb937357616bf8cca0290a1f3aa60a",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "future.no-action-or-work-item-change",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/action_or_work_item_change",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "crossed.exact-effective-time",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/effective_at",
+          "expected_value_sha256": "e664be4aef2bad7bcfb8eda1eaa2a5738e88620164674c7a9e35c8e36599ade2",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.exact-effective-axis",
+              "relation": "exact",
+              "source_value_sha256": "e664be4aef2bad7bcfb8eda1eaa2a5738e88620164674c7a9e35c8e36599ade2",
+              "matrix_value_sha256": "82c0f4ee1742525a68942b212f22680730e850c86f4333aa7e257a4822b8d61b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "future.exact-time-pair",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/effective_at",
+          "expected_value_sha256": "e664be4aef2bad7bcfb8eda1eaa2a5738e88620164674c7a9e35c8e36599ade2",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.exact-axis-pair",
+              "relation": "exact",
+              "source_value_sha256": "e664be4aef2bad7bcfb8eda1eaa2a5738e88620164674c7a9e35c8e36599ade2",
+              "matrix_value_sha256": "9a376dd7d7bfcdcc74bb43671b43a9dc19548e542dc9e7662c0c5af2b98e4703"
+            }
+          ]
+        },
+        {
+          "assertion_id": "future.exact-known-time",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/known_at",
+          "expected_value_sha256": "3ecc3b2275479e8bcc59b73484d81f30a6a5ece9b0439fe7a1f0357edc020b8d",
+          "planner_line_sha256": "ef701fa2d262f0d7906642140ee8e920013df1dd02ec611307a8d88bd5311470",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.exact-knowledge-axis",
+              "relation": "exact",
+              "source_value_sha256": "3ecc3b2275479e8bcc59b73484d81f30a6a5ece9b0439fe7a1f0357edc020b8d",
+              "matrix_value_sha256": "a8e840b746d618d226b5947c8626eaf34dedfdfa3a16c0e0c23346ce5b28156a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "watch-four-status-comparison-semantics",
+      "plan_line": 74,
+      "plan_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+      "result": "PASS",
+      "comparison_summary": "All four time pairs and labels match planner/source facts. Existing edge-removal unknown semantics support, but do not define, watch comparison behavior.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "compare.pair1-unchanged",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/0",
+          "expected_value_sha256": "8d448e67e50bfe8311ef903b6e78c477a9b74f86151f5855aa26a5bda3314cdc",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.duty-role-path",
+              "relation": "supports",
+              "source_value_sha256": "9fb963c663d3bb7dba1290b391a16ba45bb7134244dbabbfe474d36867d5196c",
+              "matrix_value_sha256": "ea79160b1ac96491d7514b1a60b191f1745bbb16b317e98225363d11b7a57d8f"
+            }
+          ]
+        },
+        {
+          "assertion_id": "compare.pair2-new-source-known",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/1",
+          "expected_value_sha256": "e7e469cb3cdbc86b0c384b47a8cd101c6a4f158d082be6f0e9369fd1b111425e",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-r2-provenance-and-status",
+              "relation": "supports",
+              "source_value_sha256": "6e5de092dcc61652ae378fcbcb3c47aee55a83b71e6001b55316c0640686c33c",
+              "matrix_value_sha256": "b05a2e5f08a56be571ba5ded2d5e77e22cd3937825e37ac63a945170dc2451b0"
+            }
+          ]
+        },
+        {
+          "assertion_id": "compare.pair3-unknown",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/2",
+          "expected_value_sha256": "1b84ab7f3623ada9f2d1ad4ace93cba93839f93565027146598071975571800f",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/unknown_not_guessed_as_duty_or_swing",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.unknown-not-duty-or-swing",
+              "relation": "supports",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "a7b4406089c35e4d8754b56bd382ee6ec7195893d66e6a90118a98c975271be8"
+            }
+          ]
+        },
+        {
+          "assertion_id": "compare.pair4-changed",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/3",
+          "expected_value_sha256": "239a5416e43c8c0501cc23f597b90b9bb3ba853546dce7313280dbdf42e637d3",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.swing-role-path",
+              "relation": "supports",
+              "source_value_sha256": "b7f9f78940732dee701f62ebad77edd8565608d0bf4e89531a50cf43b26f0a1e",
+              "matrix_value_sha256": "83005941bded7e1915611418a0f7df02269e741851b0ef9260969f1bebece7d0"
+            }
+          ]
+        },
+        {
+          "assertion_id": "compare.saved-vs-live-ordered-path-source",
+          "expected_pointer": "/cases/4/expected/comparison_basis",
+          "expected_value_sha256": "fdc6da979e7e128c5f2ffe553545d5512af72ec2f40dc5520d57c4d1e1c99a72",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "dock-role-time-and-source-evidence",
+              "source_pointer": "/cases/1/expected/source_versions",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "dock-role-time-and-source-evidence",
+              "source_assertion_text": "R1 and R2 identifiers/titles/observed timestamps remain visible",
+              "relation": "supports",
+              "source_value_sha256": "7f12c33b41e2a84cd10c030f73da5e38eb4a1e91e3ba57ed7fcb16e63eb8d479",
+              "matrix_value_sha256": "85ff85a08381778ba9b477e70a9fa8cdf33229b1c22aa9353db158ecba56766b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "compare.missing-support-always-unknown",
+          "expected_pointer": "/cases/4/expected/missing_required_edge_or_source_status",
+          "expected_value_sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_supersedes_edge/linkage_status",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.missing-linkage-is-unknown-not-current",
+              "relation": "supports",
+              "source_value_sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+              "matrix_value_sha256": "5719d542dbfc837d6499e2f3a0e21281b171a2a6656c82c8e68f49ce2f8127b9"
+            },
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_r2_ownership_edge",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.ownership-removal-makes-role-unknown",
+              "relation": "supports",
+              "source_value_sha256": "3e01bbe6abe81ecab652c121ea2a6f2da940508669fe85044a0e4d1dc47b9b9d",
+              "matrix_value_sha256": "c0e704170d6b3eca8a3a539f34da12cf59b47ddb23cfe647850a8feee6e2109a"
+            }
+          ]
+        },
+        {
+          "assertion_id": "compare.no-promotion-risk-contact-or-coverage",
+          "expected_pointer": "/cases/4/expected/forbidden_conclusions",
+          "expected_value_sha256": "7c003fbbf4a263ac9621e3819db3095cc8e47306cef05569feb175dbcdd06592",
+          "planner_line_sha256": "d4de32a7183ccf7c3ff0d316b25489b475e8e58c4baa08c85320cc615c11c663",
+          "reviewed_source_mappings": []
+        }
+      ]
+    },
+    {
+      "case_id": "watch-owned-edge-source-sensitivity",
+      "plan_line": 75,
+      "plan_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+      "result": "PASS",
+      "comparison_summary": "The two edge counterfactuals and reseed match the accepted dock outcome. Deleting R2 source evidence and its watch-specific suppression semantics are planner-only; no prior oracle establishes them.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "edges.baseline-path-and-candidates",
+          "expected_pointer": "/cases/5/expected/baseline",
+          "expected_value_sha256": "4cbbb3b247e2602840e6eedd0562c6b042871e1930455ca274ed39ff26820e71",
+          "planner_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/baseline",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.baseline-exact-path-and-candidates",
+              "relation": "exact",
+              "source_value_sha256": "4cbbb3b247e2602840e6eedd0562c6b042871e1930455ca274ed39ff26820e71",
+              "matrix_value_sha256": "baf7526ad67e3ba328aeab2b9a74082f9068c81a828d1926249a4d90b95dbd43"
+            }
+          ]
+        },
+        {
+          "assertion_id": "edges.supersedes-removal-linkage-unknown",
+          "expected_pointer": "/cases/5/expected/remove_only_r2_supersedes_edge",
+          "expected_value_sha256": "5423b080760bb7dbba1b8fb1b7091a4dfc21eacf3ffa205eb75e60d0e5f1936d",
+          "planner_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_supersedes_edge",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.supersedes-removal-removes-candidates",
+              "relation": "exact",
+              "source_value_sha256": "5423b080760bb7dbba1b8fb1b7091a4dfc21eacf3ffa205eb75e60d0e5f1936d",
+              "matrix_value_sha256": "7bb0e4eb22490bf4a3e0c7e6d573d522f9070e5153cd93783ee94507f24c8969"
+            }
+          ]
+        },
+        {
+          "assertion_id": "edges.ownership-removal-role-unknown",
+          "expected_pointer": "/cases/5/expected/remove_only_r2_ownership_edge",
+          "expected_value_sha256": "3e01bbe6abe81ecab652c121ea2a6f2da940508669fe85044a0e4d1dc47b9b9d",
+          "planner_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_r2_ownership_edge",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.ownership-removal-makes-role-unknown",
+              "relation": "exact",
+              "source_value_sha256": "3e01bbe6abe81ecab652c121ea2a6f2da940508669fe85044a0e4d1dc47b9b9d",
+              "matrix_value_sha256": "c0e704170d6b3eca8a3a539f34da12cf59b47ddb23cfe647850a8feee6e2109a"
+            }
+          ]
+        },
+        {
+          "assertion_id": "edges.source-removal-suppresses-metadata",
+          "expected_pointer": "/cases/5/expected/delete_only_r2_source_evidence",
+          "expected_value_sha256": "a4d7556bf2abef73efb86cfa50116186f0fdb4dfbfc17360b6d037568a3f0332",
+          "planner_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "edges.reseed-restores-baseline",
+          "expected_pointer": "/cases/5/expected/reseed",
+          "expected_value_sha256": "94b9e8d5aebf973b2a88074d10af0c974adfc3c8971f7011987f2a1cdc1d2bc8",
+          "planner_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/reseed",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.reseed-restores-exact-baseline",
+              "relation": "exact",
+              "source_value_sha256": "94b9e8d5aebf973b2a88074d10af0c974adfc3c8971f7011987f2a1cdc1d2bc8",
+              "matrix_value_sha256": "b4f51a3c1220378acc404bb869c5f6c3646595d7cebe14e13ef42f1983e44078"
+            }
+          ]
+        },
+        {
+          "assertion_id": "edges.unaffected-output-unchanged",
+          "expected_pointer": "/cases/5/expected/unaffected_case_or_source_output_unchanged",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "a8c0cd3739e14e89a6b4630c1fac39d7da33cdb7a58a321016a8742dd154194d",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "no-cross-case-path-or-causal-contamination",
+              "source_pointer": "/cases/4/expected/removing_owned_dependency_changes_only_its_recorded_path",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "no-cross-case-path-or-causal-contamination",
+              "source_assertion_text": "removing an owned dependency changes only its corresponding recorded path",
+              "relation": "exact",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "4bc5958077a6c9037eff3817e8eac733869119dabb1660ee9ed0bda8800973eb"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "watch-denied-source-full-view-invariance",
+      "plan_line": 76,
+      "plan_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+      "result": "PASS",
+      "comparison_summary": "Operations scope, exact restricted fixture references, four axis pairs, and old query-level invariance are source-backed. Complete watch storage/API/error-count/desktop/mobile invariance is planner-only.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "acl.operations-scope",
+          "expected_pointer": "/cases/6/expected/viewer_scope",
+          "expected_value_sha256": "765048ed0db16ac64e75dfcbe5127de5aad7817c1c5ce81a5961973322e5c4ae",
+          "planner_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/viewer_scope",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.operations-scope",
+              "relation": "exact",
+              "source_value_sha256": "765048ed0db16ac64e75dfcbe5127de5aad7817c1c5ce81a5961973322e5c4ae",
+              "matrix_value_sha256": "91787ad356b423fd6e2cdafa3706ed7aaa9a36a616a50dcd8990a148f61b0e23"
+            }
+          ]
+        },
+        {
+          "assertion_id": "acl.all-four-axis-pairs",
+          "expected_pointer": "/cases/6/expected/axis_pairs",
+          "expected_value_sha256": "a77a4089b69d26a3474515807e588a5f7e2a6848b9a971b2e1319afa67d58559",
+          "planner_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/axis_pairs",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.all-axis-pairs-covered",
+              "relation": "exact",
+              "source_value_sha256": "a77a4089b69d26a3474515807e588a5f7e2a6848b9a971b2e1319afa67d58559",
+              "matrix_value_sha256": "97fe2c9f35e62b2c20725cf87476d765cef6af0b128ad167e266d9ee58ba6854"
+            }
+          ]
+        },
+        {
+          "assertion_id": "acl.full-response-invariant",
+          "expected_pointer": "/cases/6/expected/full_watch_api_stored_status_counts_errors_and_accessible_desktop_mobile_dom_unchanged_before_after",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/full_visible_response_unchanged_before_after_for_each_axis_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.full-response-is-invariant",
+              "relation": "supports",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "3800e93e0e713b950d8628af56dbbfe6745090982179db9e68f3282ccac1638f"
+            }
+          ]
+        },
+        {
+          "assertion_id": "acl.no-hidden-or-derived-disclosure",
+          "expected_pointer": "/cases/6/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.no-hidden-or-derived-disclosure",
+              "relation": "exact",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "646b8ea2fc3c4ad575f1a9bce619817bdc77c06f571bdc71eeb0745e5fa52f99"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "denied-source-nondisclosure",
+              "source_pointer": "/cases/5/expected/denied_identifier_title_fact_count_existence_path_or_paraphrase_disclosed",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "denied-source-nondisclosure",
+              "source_assertion_text": "no path or inferred/paraphrased fact through denied evidence leaks",
+              "relation": "exact",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "a0f3bade73217f2a7e555c781155d86588a044a888ae98da1d85388ee1794d5b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "acl.restricted-fixture-source-pinned",
+          "expected_pointer": "/cases/6/expected/restricted_fixture_source",
+          "expected_value_sha256": "b474222c7d328b748f819440068ea1545b1a4abd125594318cc43187073137f3",
+          "planner_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "denied-source-nondisclosure",
+              "source_pointer": "/cases/5/expected/dock_restricted_literals",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "denied-source-nondisclosure",
+              "source_assertion_text": "no dock restricted ID/title/fact/equipment/department/role leaks",
+              "relation": "supports",
+              "source_value_sha256": "b158bdf3897d073c11d5a02b6c5e34827ee09d507fc2a0f4108f9d82d64428ec",
+              "matrix_value_sha256": "a64bad12ef5c919413b8c41a9411a4d455b2998aadd5d9a0bee6a6b2cb95f8ac"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "denied-source-nondisclosure",
+              "source_pointer": "/cases/5/expected/conveyor_restricted_fixture",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "denied-source-nondisclosure",
+              "source_assertion_text": "no conveyor restricted event/source ID, title, fact, or restricted-source-dependent time/value leaks",
+              "relation": "supports",
+              "source_value_sha256": "5246b09ccb93f6a4c906ea17c58e8c08877e42dec0ee9616e65f07b2ab766139",
+              "matrix_value_sha256": "df2d6d64603650de8771d9115b38c5e6b90bb2dbba2d24da7f8e9b98a938954b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "acl.hidden-count-and-path-covered",
+          "expected_pointer": "/cases/6/expected/forbidden_disclosure_categories",
+          "expected_value_sha256": "c30b885254e0f98900df592cffc35ccdc1bc6e6e4b5e6ebdef3011353c7efa89",
+          "planner_line_sha256": "ca8f3746a7af912c35e8a2270d95b476400c2c2f3787de4996582ba692ea6b9a",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.no-hidden-or-derived-disclosure",
+              "relation": "supports",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "646b8ea2fc3c4ad575f1a9bce619817bdc77c06f571bdc71eeb0745e5fa52f99"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "watch-time-validation-read-only-refresh",
+      "plan_line": 77,
+      "plan_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+      "result": "PASS",
+      "comparison_summary": "Offset, canonical normalized UTC, malformed probes and non-naive time semantics match. Repeated query-parameter duplicate-axis shape is a documented contract assumption; watch refresh read-only remains planner-level.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "time.offset-input-pair",
+          "expected_pointer": "/cases/7/expected/offset_pair",
+          "expected_value_sha256": "4ea9dfe1fd67afc0c466eb4da1afd2066888675cde70fcb855041bddca0fe92b",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/offset_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.offset-input-pair",
+              "relation": "exact",
+              "source_value_sha256": "4ea9dfe1fd67afc0c466eb4da1afd2066888675cde70fcb855041bddca0fe92b",
+              "matrix_value_sha256": "909d2756d71144d4c02f0938f770c293bf0aa907e3e4ad935e3c37c68896941f"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.utc-normalized-pair",
+          "expected_pointer": "/cases/7/expected/normalized_pair",
+          "expected_value_sha256": "a1e2d3e91d5c72a79a4224aa24f2dfad223821941bbadb412f31535080701880",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/normalized_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.normalizes-both-axes",
+              "relation": "exact",
+              "source_value_sha256": "a1e2d3e91d5c72a79a4224aa24f2dfad223821941bbadb412f31535080701880",
+              "matrix_value_sha256": "f483639d1adc3ddbfd847e4bbec6ab1d74ae0f7b5ac01c51e1543c4c2abbc0e7"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.offset-matches-known-r2-outcome",
+          "expected_pointer": "/cases/7/expected/offset_result_matches_case",
+          "expected_value_sha256": "f79ae12c47dd8830d1d66c29ee12f3799b220a1ab99f17438300bed3033d5149",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/offset_result_matches_case",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.offset-result-equals-fixed-r2-pair",
+              "relation": "exact",
+              "source_value_sha256": "f79ae12c47dd8830d1d66c29ee12f3799b220a1ab99f17438300bed3033d5149",
+              "matrix_value_sha256": "4ab2fa7d53248507132c842de64d6cb7f0f79e6b7f0c223c0fde4720e1bd6f2b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.malformed-inputs-rejected-before-mutation",
+          "expected_pointer": "/cases/7/expected/invalid_axes_rejected_before_graph_output_or_local_state_mutation",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/each_malformed_axis_rejected_before_graph_or_output_mutation",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.reject-before-mutation",
+              "relation": "supports",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "b5497318fa5ae49a4806299a3628b516f0dcaf096f577e7310128c9d1221ec76"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.duplicate-effective-and-known-axes-rejected",
+          "expected_pointer": "/cases/7/expected/duplicate_axis_probes",
+          "expected_value_sha256": "07f5d38e8d3158fcb13f1e32cc60d145a54a3f9d2e2fd0da03d7c8904a316d4f",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "time.no-naive-local-fallback",
+          "expected_pointer": "/cases/7/expected/naive_local_time_fallback",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/naive_local_time_fallback",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.no-local-fallback",
+              "relation": "exact",
+              "source_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+              "matrix_value_sha256": "65638365c248e05d69ba5ff769269547bdf5689bc2e35d6f5a09ad69f7353305"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.refresh-read-only",
+          "expected_pointer": "/cases/7/expected/refresh_graph_writes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_graph_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.time-selection-read-only",
+              "relation": "supports",
+              "source_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "matrix_value_sha256": "768fbc829098f458d44bf0867e237f4726eb954f970f795199be507c6c86d2fd"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.canonical-pair",
+          "expected_pointer": "/cases/7/expected/canonical_pair",
+          "expected_value_sha256": "a1e2d3e91d5c72a79a4224aa24f2dfad223821941bbadb412f31535080701880",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/normalized_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.normalizes-both-axes",
+              "relation": "supports",
+              "source_value_sha256": "a1e2d3e91d5c72a79a4224aa24f2dfad223821941bbadb412f31535080701880",
+              "matrix_value_sha256": "f483639d1adc3ddbfd847e4bbec6ab1d74ae0f7b5ac01c51e1543c4c2abbc0e7"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.malformed-effective-probe",
+          "expected_pointer": "/cases/7/expected/malformed_effective_at",
+          "expected_value_sha256": "81a0bfc91e2caec229d875a696e2cab9b2a7b01353cc3a4dd5339c7ca75e642b",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/malformed_effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.malformed-effective-and-known-probes",
+              "relation": "exact",
+              "source_value_sha256": "81a0bfc91e2caec229d875a696e2cab9b2a7b01353cc3a4dd5339c7ca75e642b",
+              "matrix_value_sha256": "e328e8396148838658bed743422443dcde132f01f64a149f100144c5c1148fac"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.malformed-known-probe",
+          "expected_pointer": "/cases/7/expected/malformed_known_at",
+          "expected_value_sha256": "05eaef59b03473277dadab75532e0755da31475eab8cd983e6446a7b5a347d1b",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/malformed_known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.malformed-known-probe",
+              "relation": "exact",
+              "source_value_sha256": "05eaef59b03473277dadab75532e0755da31475eab8cd983e6446a7b5a347d1b",
+              "matrix_value_sha256": "a5d7d12f11da499ec001fd845a685eb19657f2151ecb49b8e20e047101b0a8d5"
+            }
+          ]
+        },
+        {
+          "assertion_id": "time.refresh-no-watch-state-write",
+          "expected_pointer": "/cases/7/expected/refresh_watch_state_writes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "time.watch-settings-unchanged",
+          "expected_pointer": "/cases/7/expected/watch_settings_changed",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "time.no-query-definition-change",
+          "expected_pointer": "/cases/7/expected/graph_or_query_definitions_changed",
+          "expected_value_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "planner_line_sha256": "9a6ee1ba6916eb4c05cf66b9ed2d994079720d7a8c91d70f6a2f2383725ee53b",
+          "reviewed_source_mappings": []
+        }
+      ]
+    },
+    {
+      "case_id": "watch-persistence-reconnect-idempotence-cleanup",
+      "plan_line": 78,
+      "plan_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+      "result": "PASS",
+      "comparison_summary": "Reconnect query result, reseed idempotence, API/browser agreement and owned cleanup are tied to source values. Watch-token idempotency, saved-baseline persistence/recomputation, and watch-state cleanup remain planner-only.",
+      "assertion_mappings": [
+        {
+          "assertion_id": "lifecycle.explicit-token-idempotent",
+          "expected_pointer": "/cases/8/expected/confirmation_token_is_idempotent",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "lifecycle.saved-baseline-persists",
+          "expected_pointer": "/cases/8/expected/after_restart_or_reconnect/saved_baseline_preserved_exactly",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "lifecycle.live-result-recomputed-from-graph",
+          "expected_pointer": "/cases/8/expected/after_restart_or_reconnect/live_result_recomputed_from_actual_falkordb",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": []
+        },
+        {
+          "assertion_id": "lifecycle.reconnect-result-matches-fixed-r2",
+          "expected_pointer": "/cases/8/expected/after_restart_or_reconnect/result_matches",
+          "expected_value_sha256": "f79ae12c47dd8830d1d66c29ee12f3799b220a1ab99f17438300bed3033d5149",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/after_reconnect_result_matches",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.fresh-client-result-is-exact",
+              "relation": "exact",
+              "source_value_sha256": "f79ae12c47dd8830d1d66c29ee12f3799b220a1ab99f17438300bed3033d5149",
+              "matrix_value_sha256": "66e011e126026515090f0d9840840b9f1a9a3efb7e0b0703c65ace5b8fae7e6b"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.repeat-seed-idempotent",
+          "expected_pointer": "/cases/8/expected/repeat_seed_duplicate_nodes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/repeat_seed_duplicate_nodes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.repeat-seed-is-idempotent",
+              "relation": "exact",
+              "source_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "matrix_value_sha256": "a13029eeb8b1d44d29a5bbe0fc4a85685054711e05798dcb45c399dd04e06d66"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.api-browser-agreement",
+          "expected_pointer": "/cases/8/expected/api_and_desktop_mobile_browser_agree",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/desktop_and_mobile_api_results_agree",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.api-desktop-mobile-agree",
+              "relation": "supports",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "5b97d8631771dc7358d2644009d20767105222e3e7b04895b764c305d1bc5456"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.no-graph-or-action-writes",
+          "expected_pointer": "/cases/8/expected/time_selection_graph_writes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_graph_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.time-selection-read-only",
+              "relation": "exact",
+              "source_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "matrix_value_sha256": "768fbc829098f458d44bf0867e237f4726eb954f970f795199be507c6c86d2fd"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.cleanup-owned-resources-only",
+          "expected_pointer": "/cases/8/expected/cleanup_deletes_only_task_owned_graph_process_and_watch_state",
+          "expected_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/cleanup_deletes_only_task_owned_graph_and_stops_only_owned_process",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.cleanup-only-owned-resources",
+              "relation": "supports",
+              "source_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+              "matrix_value_sha256": "8df2e44f602f537a5e5fb5d1ec05442da47a3b0c4dab0dfb0c48f6af3a87ef54"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.repeat-seed-no-duplicate-relationships",
+          "expected_pointer": "/cases/8/expected/repeat_seed_duplicate_relationships",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/repeat_seed_duplicate_relationships",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.no-duplicate-relationships",
+              "relation": "exact",
+              "source_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "matrix_value_sha256": "c28128e6c3d71ead45b66d1b90b574f843a6cc22b43ac1e0c248ad77fdc77668"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.no-action-file-writes",
+          "expected_pointer": "/cases/8/expected/time_selection_action_writes",
+          "expected_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_action_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.no-action-file-write",
+              "relation": "exact",
+              "source_value_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "matrix_value_sha256": "b9f5523f0076123737aed2d2e6cceb132d4b7b912c953a15ceb4e9c172979892"
+            }
+          ]
+        },
+        {
+          "assertion_id": "lifecycle.no-external-actions",
+          "expected_pointer": "/cases/8/expected/external_write_boundary",
+          "expected_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "planner_line_sha256": "fff400666b0623e7ee725480e864c1c7f52c178df9f9b19451545658d6caf662",
+          "reviewed_source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_pointer": "/cases/6/expected/external_writes",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_assertion_text": "no external writes occur",
+              "relation": "exact",
+              "source_value_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "matrix_value_sha256": "a3033349bfb7be9e53b3ea6382f804e637a6773e61b10de366d53e7c7c62bf3c"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

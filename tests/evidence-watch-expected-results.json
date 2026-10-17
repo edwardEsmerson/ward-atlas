@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent expected results for one explicitly confirmed, read-only, synthetic INC-207 dock evidence watch. These expectations precede watch behavior and are derived only from the pinned planner and accepted shift-board/dock-bitemporal oracle literals.",
+  "oracle_policy": "Candidate output is never read, copied, or used to amend an expectation. Watch-only labels and persistence boundaries are planner requirements; graph facts and temporal outcomes are cross-pinned to accepted immutable oracles.",
+  "pinned_sources": [
+    {
+      "id": "evidence-watch-planner-packet",
+      "file": "planner-3bfe3e5297d44e829f1f958a41c6c772/plans/planner-3bfe3e5297d44e829f1f958a41c6c772.md",
+      "sha256": "0d5f5851e24fda62120f904ce539fe450da354a9b805e8e7589f17275642fa64",
+      "outcome_lines": [
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78
+      ]
+    },
+    {
+      "id": "shift-expected",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "shift-matrix",
+      "file": "tests/shift-board-adversarial-matrix.json",
+      "sha256": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7"
+    },
+    {
+      "id": "dock-expected",
+      "file": "tests/dock-bitemporal-expected-results.json",
+      "sha256": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"
+    },
+    {
+      "id": "dock-matrix",
+      "file": "tests/dock-bitemporal-adversarial-matrix.json",
+      "sha256": "84127f273043a03299823905bbecc06a755f79cb9a3b34c44793815eda7f5318"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "candidate_output_is_oracle": false,
+    "later_behavior_must_use_actual_falkordb": true,
+    "watch_is_local_only": true,
+    "external_writes": false,
+    "watch_state_is_separate_from_confirmed_actions": true
+  },
+  "contract_assumptions": {
+    "duplicate_axis_input": "A repeated query parameter for either effective_at or known_at is duplicate input and rejects even if values agree; probe each axis independently.",
+    "watch_source_cutoff": "The watch is a local snapshot of one graph-derived, operations-visible path; it does not create a graph fact, infer missing ownership, or assert complete source coverage."
+  },
+  "cases": [
+    {
+      "id": "watch-cold-unknown-without-confirmation",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:70",
+      "expected": {
+        "no_confirmed_watch": {
+          "watch_record_count": 0,
+          "fabricated_watch": false
+        },
+        "saved_watch_on_cold_graph": {
+          "configuration_visible": true,
+          "current_result": {
+            "effective_at": "2026-10-14T20:29:00Z",
+            "known_at": "2026-10-14T20:17:59Z",
+            "status": "unknown",
+            "role_path": [],
+            "role_id": null,
+            "source_versions": [],
+            "review_candidates": [],
+            "r2_identifier_title_effective_time_count_or_future_revision_wording_visible": false
+          },
+          "forbidden_statuses": [
+            "unchanged",
+            "no owner",
+            "safe"
+          ],
+          "unknown_not_no_owner_or_safe": true
+        }
+      }
+    },
+    {
+      "id": "watch-preview-explicit-local-confirmation",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:71",
+      "expected": {
+        "preview": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T20:17:59Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-DUTY"
+          ],
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "watch_state_records_written": 0,
+          "graph_writes": 0,
+          "confirmed_actions_file_changed": false,
+          "r2_identifier_title_effective_time_count_or_future_revision_wording_visible": false
+        },
+        "confirmation": {
+          "explicit_in_app_confirmation_required": true,
+          "watch_state_records_written": 1,
+          "watch_state_is_separate_from_confirmed_actions_json": true,
+          "graph_writes": 0,
+          "confirmed_actions_file_changed": false,
+          "acknowledgements_created": 0,
+          "handover_actions_created": 0,
+          "notifications_sent": 0,
+          "messages_sent": 0,
+          "calls_made": 0,
+          "tickets_created": 0,
+          "external_writes": []
+        }
+      }
+    },
+    {
+      "id": "watch-new-source-known-still-r1",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:72",
+      "expected": {
+        "saved_baseline": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T20:17:59Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-DUTY"
+          ],
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "review_candidates": [],
+          "status": "unchanged",
+          "r2_identifier_title_effective_time_count_or_future_revision_wording_visible": false
+        },
+        "same_effective_later_knowledge": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T20:19:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-DUTY"
+          ],
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            },
+            {
+              "source_id": "SRC-DOCK-ROSTER-R2",
+              "title": "Synthetic Dock Operations Roster Revision 2",
+              "observed_at": "2026-10-14T20:18:00Z",
+              "effective_at": "2026-10-14T20:30:00Z",
+              "supersedes": "SRC-DOCK-ROSTER-R1",
+              "status": "recorded/pending"
+            }
+          ],
+          "review_candidates": [
+            "HND-DOCK-2020",
+            "TKT-DOCK-88"
+          ],
+          "candidate_disposition": "pending review; not declared-invalid artifacts",
+          "status": "new-source-known",
+          "status_message": "new source observed; selected role unchanged",
+          "HND-DOCK-2020_invalidated": false
+        }
+      }
+    },
+    {
+      "id": "watch-crossed-axes-unknown-and-effective-r2-changed",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:73",
+      "expected": {
+        "early_knowledge_at_effective_boundary": {
+          "effective_at": "2026-10-14T20:30:00Z",
+          "known_at": "2026-10-14T20:17:59Z",
+          "role_path": [],
+          "role_id": null,
+          "role_status": "unknown",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "review_candidates": [],
+          "r2_identifier_title_effective_time_count_or_existence_hint_visible": false,
+          "status": "unknown"
+        },
+        "known_r2_at_effective_boundary": {
+          "effective_at": "2026-10-14T20:30:00Z",
+          "known_at": "2026-10-14T20:19:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-SWING"
+          ],
+          "role_id": "ROLE-DOCK-SWING",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            },
+            {
+              "source_id": "SRC-DOCK-ROSTER-R2",
+              "title": "Synthetic Dock Operations Roster Revision 2",
+              "observed_at": "2026-10-14T20:18:00Z",
+              "effective_at": "2026-10-14T20:30:00Z",
+              "supersedes": "SRC-DOCK-ROSTER-R1",
+              "status": "recorded/pending"
+            }
+          ],
+          "review_candidates": [
+            "HND-DOCK-2020",
+            "TKT-DOCK-88"
+          ],
+          "interpretation": "ROLE-DOCK-SWING is valid at effective_at and known by known_at; this does not claim swing was effective at known_at",
+          "status_relative_to_saved_r1": "changed",
+          "current_real_world_assignment_claimed": false,
+          "action_or_work_item_change": false
+        }
+      }
+    },
+    {
+      "id": "watch-four-status-comparison-semantics",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:74",
+      "expected": {
+        "comparison_basis": "Compare ordered saved role_path and source_versions with the fresh live graph result independently; preserve saved baseline and live result as separate values.",
+        "statuses_by_pair": [
+          {
+            "effective_at": "2026-10-14T20:29:00Z",
+            "known_at": "2026-10-14T20:17:59Z",
+            "status": "unchanged"
+          },
+          {
+            "effective_at": "2026-10-14T20:29:00Z",
+            "known_at": "2026-10-14T20:19:00Z",
+            "status": "new-source-known"
+          },
+          {
+            "effective_at": "2026-10-14T20:30:00Z",
+            "known_at": "2026-10-14T20:17:59Z",
+            "status": "unknown"
+          },
+          {
+            "effective_at": "2026-10-14T20:30:00Z",
+            "known_at": "2026-10-14T20:19:00Z",
+            "status": "changed"
+          }
+        ],
+        "missing_required_edge_or_source_status": "unknown",
+        "forbidden_conclusions": [
+          "invalid artifact",
+          "task reviewed",
+          "contact inferred",
+          "complete graph coverage",
+          "risk/severity score"
+        ]
+      }
+    },
+    {
+      "id": "watch-owned-edge-source-sensitivity",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:75",
+      "expected": {
+        "baseline": {
+          "effective_at": "2026-10-14T20:30:00Z",
+          "known_at": "2026-10-14T20:19:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-SWING"
+          ],
+          "review_candidates": [
+            "HND-DOCK-2020",
+            "TKT-DOCK-88"
+          ]
+        },
+        "remove_only_r2_supersedes_edge": {
+          "edge": {
+            "from": "SRC-DOCK-ROSTER-R2",
+            "relationship": "SUPERSEDES",
+            "to": "SRC-DOCK-ROSTER-R1"
+          },
+          "review_candidates": [],
+          "linkage_status": "unknown",
+          "currentness_conclusion": false
+        },
+        "remove_only_r2_ownership_edge": {
+          "edge": {
+            "from": "DEPT-RECEIVING-DOCK",
+            "relationship": "OWNED_BY",
+            "to": "ROLE-DOCK-SWING",
+            "source_id": "SRC-DOCK-ROSTER-R2"
+          },
+          "role_path": [],
+          "role_id": null,
+          "role_status": "unknown"
+        },
+        "delete_only_r2_source_evidence": {
+          "r2_source_metadata_visible": false,
+          "future_role_exposed": false,
+          "dependent_live_status": "unknown"
+        },
+        "reseed": {
+          "restores_exact_baseline": true
+        },
+        "unaffected_case_or_source_output_unchanged": true
+      }
+    },
+    {
+      "id": "watch-denied-source-full-view-invariance",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:76",
+      "expected": {
+        "viewer_scope": "operations",
+        "restricted_fixture_source": "tests/shift-board-expected-results.json#denied-source-nondisclosure.expected",
+        "axis_pairs": [
+          [
+            "2026-10-14T20:29:00Z",
+            "2026-10-14T20:17:59Z"
+          ],
+          [
+            "2026-10-14T20:29:00Z",
+            "2026-10-14T20:19:00Z"
+          ],
+          [
+            "2026-10-14T20:30:00Z",
+            "2026-10-14T20:19:00Z"
+          ],
+          [
+            "2026-10-14T20:30:00Z",
+            "2026-10-14T20:17:59Z"
+          ]
+        ],
+        "full_watch_api_stored_status_counts_errors_and_accessible_desktop_mobile_dom_unchanged_before_after": true,
+        "hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed": false,
+        "forbidden_disclosure_categories": [
+          "hidden identifier",
+          "hidden title",
+          "hidden fact",
+          "hidden count",
+          "hidden existence",
+          "relationship/path",
+          "dependent paraphrase"
+        ]
+      }
+    },
+    {
+      "id": "watch-time-validation-read-only-refresh",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:77",
+      "expected": {
+        "canonical_pair": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T20:19:00Z"
+        },
+        "offset_pair": {
+          "effective_at": "2026-10-14T22:29:00+02:00",
+          "known_at": "2026-10-14T22:19:00+02:00"
+        },
+        "normalized_pair": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T20:19:00Z"
+        },
+        "offset_result_matches_case": "dock-bitemporal-known-r2-pending-review",
+        "malformed_effective_at": "not-a-timestamp",
+        "malformed_known_at": "2026-10-14T20:19:00",
+        "duplicate_axis_probes": [
+          {
+            "query_parameter": "effective_at",
+            "values": [
+              "2026-10-14T20:29:00Z",
+              "2026-10-14T20:29:00Z"
+            ],
+            "rejected_before_mutation": true
+          },
+          {
+            "query_parameter": "known_at",
+            "values": [
+              "2026-10-14T20:19:00Z",
+              "2026-10-14T20:19:00Z"
+            ],
+            "rejected_before_mutation": true
+          }
+        ],
+        "invalid_axes_rejected_before_graph_output_or_local_state_mutation": true,
+        "naive_local_time_fallback": false,
+        "refresh_graph_writes": 0,
+        "refresh_watch_state_writes": 0,
+        "watch_settings_changed": false,
+        "graph_or_query_definitions_changed": false
+      }
+    },
+    {
+      "id": "watch-persistence-reconnect-idempotence-cleanup",
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:78",
+      "expected": {
+        "confirmation_token_is_idempotent": true,
+        "after_restart_or_reconnect": {
+          "saved_baseline_preserved_exactly": true,
+          "live_result_recomputed_from_actual_falkordb": true,
+          "result_matches": "dock-bitemporal-known-r2-pending-review"
+        },
+        "repeat_seed_duplicate_nodes": 0,
+        "repeat_seed_duplicate_relationships": 0,
+        "api_and_desktop_mobile_browser_agree": true,
+        "time_selection_graph_writes": 0,
+        "time_selection_action_writes": 0,
+        "messages_sent": 0,
+        "calls_made": 0,
+        "tickets_created": 0,
+        "cleanup_deletes_only_task_owned_graph_process_and_watch_state": true,
+        "external_write_boundary": []
+      }
+    }
+  ]
+}

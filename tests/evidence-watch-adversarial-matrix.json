@@ -1,0 +1,1315 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/evidence-watch-expected-results.json",
+  "oracle_policy": "Each watch assertion has a nonzero fixed expected pointer and explicit planner/source mapping; source facts are pinned independently and planner-only watch semantics are not falsely attributed to prior oracles. Candidate output never creates or amends expectations.",
+  "cases": [
+    {
+      "id": "watch-cold-unknown-without-confirmation",
+      "scenario_id": "watch-cold-unknown-without-confirmation",
+      "planner_line": 70,
+      "attack_or_edge_case": "Check no fabricated watch before confirmation and keep saved configuration separate from an unknown cold-graph result.",
+      "setup": "Query before local confirmation, then read saved configuration against a newly owned empty graph.",
+      "failure_detected": "Fabricated watch/data or unknown promoted to unchanged, no-owner, or safe.",
+      "pinned_assertions": [
+        {
+          "id": "cold.no-confirmed-watch",
+          "expected_pointer": "/cases/0/expected/no_confirmed_watch/watch_record_count",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "cold.no-fabricated-watch",
+          "expected_pointer": "/cases/0/expected/no_confirmed_watch/fabricated_watch",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "cold.saved-config-visible",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/configuration_visible",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "cold.current-result-unknown",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/current_result/status",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/role_status",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.role-is-unknown",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "cold.no-role-path-or-sources",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/current_result/role_path",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.no-role-path",
+              "relation": "exact"
+            },
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.no-source-rows",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "cold.unknown-not-safe-or-no-owner",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/unknown_not_no_owner_or_safe",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/risk_or_currentness_conclusion",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.absence-is-not-safety",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "cold.no-r2-hint",
+          "expected_pointer": "/cases/0/expected/saved_watch_on_cold_graph/current_result/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-cold-empty",
+              "source_pointer": "/cases/0/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-cold-empty",
+              "source_assertion_id": "cold.no-source-rows",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:70"
+    },
+    {
+      "id": "watch-preview-explicit-local-confirmation",
+      "scenario_id": "watch-preview-explicit-local-confirmation",
+      "planner_line": 71,
+      "attack_or_edge_case": "Preview then explicitly confirm one local watch while checking graph and action-file side effects.",
+      "setup": "Preview R1 at 20:29Z × 20:17:59Z; inspect state; confirm once and inspect local/graph/external writes.",
+      "failure_detected": "Preview writes state, the separate store boundary is violated, graph/actions change, or external effects occur.",
+      "pinned_assertions": [
+        {
+          "id": "preview.fixed-effective-time",
+          "expected_pointer": "/cases/1/expected/preview/effective_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.exact-effective-axis",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "preview.fixed-r1-path",
+          "expected_pointer": "/cases/1/expected/preview/role_path",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.duty-role-path",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "preview.fixed-r1-source",
+          "expected_pointer": "/cases/1/expected/preview/source_versions",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.only-r1-known",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "preview.no-watch-write",
+          "expected_pointer": "/cases/1/expected/preview/watch_state_records_written",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "confirm.explicit-and-separate-store",
+          "expected_pointer": "/cases/1/expected/confirmation/watch_state_is_separate_from_confirmed_actions_json",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "confirm.one-watch-only",
+          "expected_pointer": "/cases/1/expected/confirmation/watch_state_records_written",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "confirm.no-action-file-write",
+          "expected_pointer": "/cases/1/expected/confirmation/confirmed_actions_file_changed",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "confirm.no-graph-or-external-effects",
+          "expected_pointer": "/cases/1/expected/confirmation/external_writes",
+          "source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_pointer": "/cases/6/expected/external_writes",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_assertion_text": "no external writes occur",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "preview.fixed-known-time",
+          "expected_pointer": "/cases/1/expected/preview/known_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.exact-knowledge-axis",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "preview.no-r2-existence-hint",
+          "expected_pointer": "/cases/1/expected/preview/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.no-r2-or-existence-hint",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "preview.graph-not-written",
+          "expected_pointer": "/cases/1/expected/preview/graph_writes",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "confirm.explicit-confirmation-required",
+          "expected_pointer": "/cases/1/expected/confirmation/explicit_in_app_confirmation_required",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "confirm.no-graph-write",
+          "expected_pointer": "/cases/1/expected/confirmation/graph_writes",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_graph_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.time-selection-read-only",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 13,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:71"
+    },
+    {
+      "id": "watch-new-source-known-still-r1",
+      "scenario_id": "watch-new-source-known-still-r1",
+      "planner_line": 72,
+      "attack_or_edge_case": "Hold valid time at 20:29Z and advance only source knowledge past R2 observation.",
+      "setup": "Compare baseline at 20:29Z × 20:17:59Z with current result at 20:29Z × 20:19Z.",
+      "failure_detected": "R2 missing, applied early, or promoted from pending review; selected role incorrectly changes.",
+      "pinned_assertions": [
+        {
+          "id": "known.baseline-r1-path",
+          "expected_pointer": "/cases/2/expected/saved_baseline/role_path",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.duty-role-path",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.baseline-r1-only-no-hint",
+          "expected_pointer": "/cases/2/expected/saved_baseline/source_versions",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.only-r1-known",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.exact-later-knowledge",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/known_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-knowledge-axis",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.r1-remains-effective",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/role_path",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.r2-does-not-change-duty-path",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.r2-recorded-pending-source",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/source_versions",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-r2-provenance-and-status",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.exact-two-review-candidates",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/review_candidates",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/review_candidates",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-two-review-candidates",
+              "relation": "exact"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "explicit-edge-review-queue",
+              "source_pointer": "/cases/2/expected/review_candidates",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "explicit-edge-review-queue",
+              "source_assertion_text": "queue is exactly HND-DOCK-2020 and TKT-DOCK-88",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.new-source-known-status",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/status",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "known.baseline-no-r2-hint",
+          "expected_pointer": "/cases/2/expected/saved_baseline/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/r2_identifier_title_effective_time_count_or_future_revision_wording_visible",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.no-r2-or-existence-hint",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.exact-effective-time",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/effective_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-effective-axis",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.pending-not-invalid-disposition",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/candidate_disposition",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/candidate_disposition",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.candidates-remain-pending-review",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "known.handover-not-invalidated",
+          "expected_pointer": "/cases/2/expected/same_effective_later_knowledge/HND-DOCK-2020_invalidated",
+          "source_mappings": [],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 11,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:72"
+    },
+    {
+      "id": "watch-crossed-axes-unknown-and-effective-r2-changed",
+      "scenario_id": "watch-crossed-axes-unknown-and-effective-r2-changed",
+      "planner_line": 73,
+      "attack_or_edge_case": "Cross valid/knowledge boundaries without hindsight or early effective ownership.",
+      "setup": "Compare 20:30Z × 20:17:59Z with 20:30Z × 20:19Z relative to saved R1.",
+      "failure_detected": "R2 leaks early, unknown is guessed, or known future-effective R2 is described as already effective at known_at.",
+      "pinned_assertions": [
+        {
+          "id": "crossed.exact-early-pair",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/known_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.exact-axis-pair",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "crossed.role-unknown",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/role_status",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/unknown_not_guessed_as_duty_or_swing",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.unknown-not-duty-or-swing",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "crossed.no-r2-hint",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/r2_identifier_title_effective_time_count_or_existence_hint_visible",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/r2_identifier_title_effective_time_count_or_existence_hint_visible",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.no-r2-existence-hint",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "crossed.watch-status-unknown",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/status",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "future.exact-swing-path",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/role_path",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.swing-role-path",
+              "relation": "exact"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "dock-role-time-and-source-evidence",
+              "source_pointer": "/cases/1/expected/at_effective_time/role_path",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "dock-role-time-and-source-evidence",
+              "source_assertion_text": "20:30Z is the exact ROLE-DOCK-SWING five-node path",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "future.r2-observed-and-effective-provenance",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/source_versions",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.r2-evidence-known-by-cutoff",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "future.axes-not-conflated",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/interpretation",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/interpretation",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.not-effective-at-knowledge-time-claim",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "future.changed-relative-to-saved-r1",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/status_relative_to_saved_r1",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "future.no-action-or-work-item-change",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/action_or_work_item_change",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "crossed.exact-effective-time",
+          "expected_pointer": "/cases/3/expected/early_knowledge_at_effective_boundary/effective_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.exact-effective-axis",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "future.exact-time-pair",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/effective_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.exact-axis-pair",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "future.exact-known-time",
+          "expected_pointer": "/cases/3/expected/known_r2_at_effective_boundary/known_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.exact-knowledge-axis",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        }
+      ],
+      "nonzero_assertion_count": 12,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:73"
+    },
+    {
+      "id": "watch-four-status-comparison-semantics",
+      "scenario_id": "watch-four-status-comparison-semantics",
+      "planner_line": 74,
+      "attack_or_edge_case": "Compare the ordered saved path/source pair with each live bitemporal result and missing support.",
+      "setup": "Exercise all four fixed pairs against the same saved R1 baseline; remove test-owned required evidence in an isolated graph.",
+      "failure_detected": "Status promotion, missing-source resolution, risk score, contact, or completeness is inferred.",
+      "pinned_assertions": [
+        {
+          "id": "compare.pair1-unchanged",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/0",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_pointer": "/cases/2/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-early-known-r1-duty",
+              "source_assertion_id": "early.duty-role-path",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "compare.pair2-new-source-known",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/1",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_pointer": "/cases/3/expected/source_versions",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-r2-pending-review",
+              "source_assertion_id": "known.exact-r2-provenance-and-status",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "compare.pair3-unknown",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/2",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_pointer": "/cases/5/expected/unknown_not_guessed_as_duty_or_swing",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-crossed-axes-unknown",
+              "source_assertion_id": "crossed.unknown-not-duty-or-swing",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "compare.pair4-changed",
+          "expected_pointer": "/cases/4/expected/statuses_by_pair/3",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_pointer": "/cases/4/expected/role_path",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-known-future-effective-swing",
+              "source_assertion_id": "future.swing-role-path",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "compare.saved-vs-live-ordered-path-source",
+          "expected_pointer": "/cases/4/expected/comparison_basis",
+          "source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "dock-role-time-and-source-evidence",
+              "source_pointer": "/cases/1/expected/source_versions",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "dock-role-time-and-source-evidence",
+              "source_assertion_text": "R1 and R2 identifiers/titles/observed timestamps remain visible",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "compare.missing-support-always-unknown",
+          "expected_pointer": "/cases/4/expected/missing_required_edge_or_source_status",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_supersedes_edge/linkage_status",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.missing-linkage-is-unknown-not-current",
+              "relation": "supports"
+            },
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_r2_ownership_edge",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.ownership-removal-makes-role-unknown",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "compare.no-promotion-risk-contact-or-coverage",
+          "expected_pointer": "/cases/4/expected/forbidden_conclusions",
+          "source_mappings": [],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:74"
+    },
+    {
+      "id": "watch-owned-edge-source-sensitivity",
+      "scenario_id": "watch-owned-edge-source-sensitivity",
+      "planner_line": 75,
+      "attack_or_edge_case": "Remove each test-owned R2 dependency independently and reseed exact evidence.",
+      "setup": "On the owned graph remove only SUPERSEDES, only R2 OWNED_BY, and only R2 source evidence; compare unaffected output.",
+      "failure_detected": "Static/lexical fallback survives removal, unrelated result changes, or R2 metadata/future role remains without evidence.",
+      "pinned_assertions": [
+        {
+          "id": "edges.baseline-path-and-candidates",
+          "expected_pointer": "/cases/5/expected/baseline",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/baseline",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.baseline-exact-path-and-candidates",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "edges.supersedes-removal-linkage-unknown",
+          "expected_pointer": "/cases/5/expected/remove_only_r2_supersedes_edge",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_supersedes_edge",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.supersedes-removal-removes-candidates",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "edges.ownership-removal-role-unknown",
+          "expected_pointer": "/cases/5/expected/remove_only_r2_ownership_edge",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/remove_only_r2_ownership_edge",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.ownership-removal-makes-role-unknown",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "edges.source-removal-suppresses-metadata",
+          "expected_pointer": "/cases/5/expected/delete_only_r2_source_evidence",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "edges.reseed-restores-baseline",
+          "expected_pointer": "/cases/5/expected/reseed",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_pointer": "/cases/6/expected/reseed",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-edge-removal-reseed",
+              "source_assertion_id": "edges.reseed-restores-exact-baseline",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "edges.unaffected-output-unchanged",
+          "expected_pointer": "/cases/5/expected/unaffected_case_or_source_output_unchanged",
+          "source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "no-cross-case-path-or-causal-contamination",
+              "source_pointer": "/cases/4/expected/removing_owned_dependency_changes_only_its_recorded_path",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "no-cross-case-path-or-causal-contamination",
+              "source_assertion_text": "removing an owned dependency changes only its corresponding recorded path",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:75"
+    },
+    {
+      "id": "watch-denied-source-full-view-invariance",
+      "scenario_id": "watch-denied-source-full-view-invariance",
+      "planner_line": 76,
+      "attack_or_edge_case": "Inject the accepted restricted fixture and compare complete operations-visible watch results.",
+      "setup": "At all four axis pairs, compare API, stored-visible status, counts/errors and accessible desktop/mobile DOM before/after using source-pinned tripwires.",
+      "failure_detected": "Direct/derived hidden source disclosure or any semantically visible response delta occurs.",
+      "pinned_assertions": [
+        {
+          "id": "acl.operations-scope",
+          "expected_pointer": "/cases/6/expected/viewer_scope",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/viewer_scope",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.operations-scope",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "acl.all-four-axis-pairs",
+          "expected_pointer": "/cases/6/expected/axis_pairs",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/axis_pairs",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.all-axis-pairs-covered",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "acl.full-response-invariant",
+          "expected_pointer": "/cases/6/expected/full_watch_api_stored_status_counts_errors_and_accessible_desktop_mobile_dom_unchanged_before_after",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/full_visible_response_unchanged_before_after_for_each_axis_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.full-response-is-invariant",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "acl.no-hidden-or-derived-disclosure",
+          "expected_pointer": "/cases/6/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.no-hidden-or-derived-disclosure",
+              "relation": "exact"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "denied-source-nondisclosure",
+              "source_pointer": "/cases/5/expected/denied_identifier_title_fact_count_existence_path_or_paraphrase_disclosed",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "denied-source-nondisclosure",
+              "source_assertion_text": "no path or inferred/paraphrased fact through denied evidence leaks",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "acl.restricted-fixture-source-pinned",
+          "expected_pointer": "/cases/6/expected/restricted_fixture_source",
+          "source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "denied-source-nondisclosure",
+              "source_pointer": "/cases/5/expected/dock_restricted_literals",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "denied-source-nondisclosure",
+              "source_assertion_text": "no dock restricted ID/title/fact/equipment/department/role leaks",
+              "relation": "supports"
+            },
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "denied-source-nondisclosure",
+              "source_pointer": "/cases/5/expected/conveyor_restricted_fixture",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "denied-source-nondisclosure",
+              "source_assertion_text": "no conveyor restricted event/source ID, title, fact, or restricted-source-dependent time/value leaks",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "acl.hidden-count-and-path-covered",
+          "expected_pointer": "/cases/6/expected/forbidden_disclosure_categories",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_pointer": "/cases/7/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-denied-source-invariance",
+              "source_assertion_id": "acl.no-hidden-or-derived-disclosure",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:76"
+    },
+    {
+      "id": "watch-time-validation-read-only-refresh",
+      "scenario_id": "watch-time-validation-read-only-refresh",
+      "planner_line": 77,
+      "attack_or_edge_case": "Normalize offset timestamps; reject malformed and duplicate time-axis inputs before mutation; keep refresh read-only.",
+      "setup": "Probe canonical/+02:00 pairs, malformed effective_at/known_at and duplicated query parameters for each axis; snapshot graph/local state.",
+      "failure_detected": "Time axes diverge, duplicate axis is accepted, invalid input mutates state or refresh writes data.",
+      "pinned_assertions": [
+        {
+          "id": "time.offset-input-pair",
+          "expected_pointer": "/cases/7/expected/offset_pair",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/offset_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.offset-input-pair",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "time.utc-normalized-pair",
+          "expected_pointer": "/cases/7/expected/normalized_pair",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/normalized_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.normalizes-both-axes",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "time.offset-matches-known-r2-outcome",
+          "expected_pointer": "/cases/7/expected/offset_result_matches_case",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/offset_result_matches_case",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.offset-result-equals-fixed-r2-pair",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "time.malformed-inputs-rejected-before-mutation",
+          "expected_pointer": "/cases/7/expected/invalid_axes_rejected_before_graph_output_or_local_state_mutation",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/each_malformed_axis_rejected_before_graph_or_output_mutation",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.reject-before-mutation",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "time.duplicate-effective-and-known-axes-rejected",
+          "expected_pointer": "/cases/7/expected/duplicate_axis_probes",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "time.no-naive-local-fallback",
+          "expected_pointer": "/cases/7/expected/naive_local_time_fallback",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/naive_local_time_fallback",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.no-local-fallback",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "time.refresh-read-only",
+          "expected_pointer": "/cases/7/expected/refresh_graph_writes",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_graph_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.time-selection-read-only",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "time.canonical-pair",
+          "expected_pointer": "/cases/7/expected/canonical_pair",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/normalized_pair",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.normalizes-both-axes",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "time.malformed-effective-probe",
+          "expected_pointer": "/cases/7/expected/malformed_effective_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/malformed_effective_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.malformed-effective-and-known-probes",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "time.malformed-known-probe",
+          "expected_pointer": "/cases/7/expected/malformed_known_at",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-time-validation",
+              "source_pointer": "/cases/8/expected/malformed_known_at",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-time-validation",
+              "source_assertion_id": "time.malformed-known-probe",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "time.refresh-no-watch-state-write",
+          "expected_pointer": "/cases/7/expected/refresh_watch_state_writes",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "time.watch-settings-unchanged",
+          "expected_pointer": "/cases/7/expected/watch_settings_changed",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "time.no-query-definition-change",
+          "expected_pointer": "/cases/7/expected/graph_or_query_definitions_changed",
+          "source_mappings": [],
+          "planner_only": true
+        }
+      ],
+      "nonzero_assertion_count": 13,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:77"
+    },
+    {
+      "id": "watch-persistence-reconnect-idempotence-cleanup",
+      "scenario_id": "watch-persistence-reconnect-idempotence-cleanup",
+      "planner_line": 78,
+      "attack_or_edge_case": "Repeat confirmation with one explicit token, reconnect, recompute live query and clean only owned resources.",
+      "setup": "Cold start, seed twice, confirm twice with same token, reconnect fresh client after restart, compare API/browser and remove only this run’s graph/process/watch state.",
+      "failure_detected": "Duplicate watch, lost baseline, stale cached result, cross-lane cleanup or external write.",
+      "pinned_assertions": [
+        {
+          "id": "lifecycle.explicit-token-idempotent",
+          "expected_pointer": "/cases/8/expected/confirmation_token_is_idempotent",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "lifecycle.saved-baseline-persists",
+          "expected_pointer": "/cases/8/expected/after_restart_or_reconnect/saved_baseline_preserved_exactly",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "lifecycle.live-result-recomputed-from-graph",
+          "expected_pointer": "/cases/8/expected/after_restart_or_reconnect/live_result_recomputed_from_actual_falkordb",
+          "source_mappings": [],
+          "planner_only": true
+        },
+        {
+          "id": "lifecycle.reconnect-result-matches-fixed-r2",
+          "expected_pointer": "/cases/8/expected/after_restart_or_reconnect/result_matches",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/after_reconnect_result_matches",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.fresh-client-result-is-exact",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "lifecycle.repeat-seed-idempotent",
+          "expected_pointer": "/cases/8/expected/repeat_seed_duplicate_nodes",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/repeat_seed_duplicate_nodes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.repeat-seed-is-idempotent",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "lifecycle.api-browser-agreement",
+          "expected_pointer": "/cases/8/expected/api_and_desktop_mobile_browser_agree",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/desktop_and_mobile_api_results_agree",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.api-desktop-mobile-agree",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "lifecycle.no-graph-or-action-writes",
+          "expected_pointer": "/cases/8/expected/time_selection_graph_writes",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_graph_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.time-selection-read-only",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "lifecycle.cleanup-owned-resources-only",
+          "expected_pointer": "/cases/8/expected/cleanup_deletes_only_task_owned_graph_process_and_watch_state",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/cleanup_deletes_only_task_owned_graph_and_stops_only_owned_process",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.cleanup-only-owned-resources",
+              "relation": "supports"
+            }
+          ],
+          "planner_only": true
+        },
+        {
+          "id": "lifecycle.repeat-seed-no-duplicate-relationships",
+          "expected_pointer": "/cases/8/expected/repeat_seed_duplicate_relationships",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/repeat_seed_duplicate_relationships",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.no-duplicate-relationships",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "lifecycle.no-action-file-writes",
+          "expected_pointer": "/cases/8/expected/time_selection_action_writes",
+          "source_mappings": [
+            {
+              "source_id": "dock-expected",
+              "source_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_pointer": "/cases/9/expected/time_selection_action_writes",
+              "source_matrix_id": "dock-matrix",
+              "source_matrix_case_id": "dock-bitemporal-reseed-reconnect-read-only",
+              "source_assertion_id": "lifecycle.no-action-file-write",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        },
+        {
+          "id": "lifecycle.no-external-actions",
+          "expected_pointer": "/cases/8/expected/external_write_boundary",
+          "source_mappings": [
+            {
+              "source_id": "shift-expected",
+              "source_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_pointer": "/cases/6/expected/external_writes",
+              "source_matrix_id": "shift-matrix",
+              "source_matrix_case_id": "explicit-local-confirmation-no-external-writes",
+              "source_assertion_text": "no external writes occur",
+              "relation": "exact"
+            }
+          ],
+          "planner_only": false
+        }
+      ],
+      "nonzero_assertion_count": 11,
+      "planner_ref": "planner-3bfe3e5297d44e829f1f958a41c6c772.md:78"
+    }
+  ]
+}
