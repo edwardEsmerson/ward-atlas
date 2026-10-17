@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent fixed outcomes for an explicitly linked synthetic SOP conflict and INC-204 impact path.",
+  "oracle_policy": "Every expected value is fixed by the pinned SOP-impact packet and unchanged baseline oracles; candidate responses never supply or amend expectations.",
+  "pinned_sources": [
+    {
+      "id": "sop-impact-packet",
+      "file": "planner-3bfcb0d8abbc45bc82e0fab8d715c2da/plans/planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md",
+      "sha256": "4eed6fb7cb2b709a67278bff5b291f57647aaa7470ad968bae92b1620280a9c7",
+      "outcome_lines": [43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
+    },
+    {
+      "id": "original-expected-results",
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    },
+    {
+      "id": "shift-board-expected-results",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "source-change-expected-results",
+      "file": "tests/source-change-expected-results.json",
+      "sha256": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097"
+    },
+    {
+      "id": "review-receipt-expected-results",
+      "file": "tests/review-receipt-expected-results.json",
+      "sha256": "382383b65ae8a9984550227c8ad9000d893bcd9e0171298ec3bf6adb7e170972"
+    },
+    {
+      "id": "role-scope-expected-results",
+      "file": "tests/role-scope-expected-results.json",
+      "sha256": "fc83b36dd9cfea900a1885816c6b84ffe7a1ab3d5c62d45be87f97a7368a9867"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "Actual FalkorDB; Redis-only or in-memory behavior is not a passing substitute.",
+    "graph_ownership": "Each behavior check uses a unique lane-owned graph and may delete only that graph; stop only processes started by that check.",
+    "viewer_scope": "operations",
+    "denied_acl": "restricted",
+    "external_writes": false,
+    "candidate_output_is_oracle": false
+  },
+  "fixture": {
+    "test_setup_note": "malformed_time_probe and restricted_probe values are deterministic synthetic adversarial inputs selected by this oracle because the packet specifies their types, not literal strings; they are setup tripwires, never expected visible output",
+    "incident_id": "INC-204",
+    "equipment_id": "CONVEYOR-C4",
+    "service_id": "SVC-MATERIAL-TRANSFER",
+    "observed_impact_as_of": "2026-10-14T18:30:00Z",
+    "restoration_as_of": "2026-10-14T19:30:00Z",
+    "offset_input": "2026-10-14T20:30:00+02:00",
+    "offset_normalized_as_of": "2026-10-14T18:30:00Z",
+    "malformed_time_probe": "not-a-timestamp",
+    "restricted_probe": {
+      "version_id": "SOP-RESTRICTED-PROBE-91",
+      "claimed_role_id": "ROLE-RESTRICTED-PROBE-91",
+      "source_id": "SRC-RESTRICTED-SOP-PROBE-91",
+      "source_title": "Restricted synthetic SOP-impact probe 91",
+      "source_text": "Restricted synthetic SOP claim: role probe 91.",
+      "department_id": "DEPT-RESTRICTED-PROBE-91",
+      "relationship_id": "REL-RESTRICTED-SOP-PROBE-91",
+      "path": [
+        "INC-204",
+        "CONVEYOR-C4",
+        "SVC-MATERIAL-TRANSFER",
+        "DEPT-RESTRICTED-PROBE-91",
+        "ROLE-RESTRICTED-PROBE-91"
+      ],
+      "acl": "restricted"
+    }
+  },
+  "cases": [
+    {
+      "id": "sop-impact-cold-empty",
+      "expected": {
+        "impact_paths": [],
+        "sop_versions": [],
+        "role_claims": [],
+        "source_rows": [],
+        "exposed_count_fields": [],
+        "conflict_conclusion": null,
+        "board_state": "empty/unknown"
+      },
+      "evidence_semantics": "A cold owned graph yields no facts; empty is not evidence that a conflict is absent or resolved.",
+      "planner_refs": ["sop-impact-packet#outcome-1"]
+    },
+    {
+      "id": "sop-impact-observed-outage-paths",
+      "expected": {
+        "as_of": "2026-10-14T18:30:00Z",
+        "impact_paths": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "path_evidence": [
+          {
+            "path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+            "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+            "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+            "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"]
+          },
+          {
+            "path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"],
+            "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+            "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+            "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]
+          }
+        ],
+        "current_ownership_source_ids": ["SRC-OPS-ROSTER", "SRC-OPS-ROSTER"]
+      },
+      "evidence_semantics": "The two ordered five-node paths are graph-derived; all source IDs, titles, and observation times remain the original pinned current-ownership provenance.",
+      "planner_refs": ["sop-impact-packet#outcome-2"]
+    },
+    {
+      "id": "sop-impact-conflict-provenance",
+      "expected": {
+        "applicability_edges": [
+          {"from": "SOP-OPS-9-V2", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4"},
+          {"from": "SOP-OPS-9-V3", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4"}
+        ],
+        "conflict_edge": {
+          "from": "SOP-OPS-9-V2",
+          "relationship": "SOP_CONFLICT",
+          "to": "SOP-OPS-9-V3",
+          "status": "unresolved"
+        },
+        "claim_evidence": [
+          {
+            "sop_version_id": "SOP-OPS-9-V2",
+            "claim_relationship": "CLAIMS_ROLE",
+            "role_id": "ROLE-FACILITIES-DUTY",
+            "claim_label": "unverified SOP claim",
+            "source_evidence_linked": true,
+            "source_id": "SRC-SOP-CURRENT-V2",
+            "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+            "observed_at": "2026-10-14T16:00:00Z"
+          },
+          {
+            "sop_version_id": "SOP-OPS-9-V3",
+            "claim_relationship": "CLAIMS_ROLE",
+            "role_id": "ROLE-MATERIALS-LEAD",
+            "claim_label": "unverified SOP claim",
+            "source_evidence_linked": true,
+            "source_id": "SRC-SOP-CURRENT-V3",
+            "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+            "observed_at": "2026-10-14T16:04:00Z"
+          }
+        ],
+        "returned_claim_count": 2,
+        "conflict_status": "unresolved",
+        "claims_are_unverified": true,
+        "claims_are_current_owner_facts": false,
+        "winner_selected": false
+      },
+      "evidence_semantics": "An explicit source-backed graph witness links both C4-applicable versions and exactly two typed role claims; claims are not roster-derived current owners.",
+      "planner_refs": ["sop-impact-packet#outcome-3"]
+    },
+    {
+      "id": "sop-impact-stale-v1-excluded",
+      "expected": {
+        "stale_version_id": "SOP-OPS-9-V1",
+        "stale_source_id": "SRC-SOP-ARCHIVE-9",
+        "stale_source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+        "stale_observed_at": "2026-01-10T12:00:00Z",
+        "stale_referenced_equipment_id": "CONVEYOR-C3",
+        "stale_artifact_hidden": false,
+        "stale_is_applicable_to_c4": false,
+        "stale_is_joined_to_inc204_conflict_witness": false,
+        "c4_conflict_version_ids": ["SOP-OPS-9-V2", "SOP-OPS-9-V3"]
+      },
+      "evidence_semantics": "Keep an operations-visible archived version inspectable, but do not connect its retired C3 reference to the C4 impact witness.",
+      "planner_refs": ["sop-impact-packet#outcome-4"]
+    },
+    {
+      "id": "sop-impact-applicability-edge-counterfactual",
+      "expected": {
+        "removed_edge": {"from": "SOP-OPS-9-V2", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4", "ownership": "test-owned relation only"},
+        "complete_conflict_witness_returned": false,
+        "impact_linkage_status": "incomplete/unknown",
+        "conflict_not_reported_as_resolved_or_absent": true,
+        "outage_paths_after_removal": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "outage_paths_unchanged": true
+      },
+      "evidence_semantics": "Removing only the owned V2 applicability relationship breaks the complete conflict-to-impact witness; it does not alter the original outage paths or establish resolution/absence.",
+      "planner_refs": ["sop-impact-packet#outcome-5"]
+    },
+    {
+      "id": "sop-impact-conflict-edge-counterfactual",
+      "expected": {
+        "removed_edge": {"from": "SOP-OPS-9-V2", "relationship": "SOP_CONFLICT", "to": "SOP-OPS-9-V3", "status": "unresolved", "ownership": "test-owned relation only"},
+        "complete_conflict_witness_returned": false,
+        "conflict_linkage_status": "unknown",
+        "no_no-conflict_or_resolved_conclusion": true,
+        "source_claims_preserved": true,
+        "outage_paths_after_removal": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "outage_paths_unchanged": true,
+        "reseed_restores_exact_conflict_witness": true
+      },
+      "evidence_semantics": "Removing only the explicit V2-to-V3 edge hides the linked witness, not source claims; reseeding restores the exact pinned witness.",
+      "planner_refs": ["sop-impact-packet#outcome-6"]
+    },
+    {
+      "id": "sop-impact-restoration-snapshot",
+      "expected": {
+        "as_of": "2026-10-14T19:30:00Z",
+        "active_impact_paths": [],
+        "sop_conflict_status": "unresolved",
+        "source_backed_conflict_witness_matches": "sop-impact-conflict-provenance",
+        "event_state_and_sop_conflict_are_distinct": true,
+        "sop_safe_conclusion_asserted": false,
+        "no_operational_risk_conclusion_asserted": false
+      },
+      "evidence_semantics": "Observed restoration removes active paths only; it neither removes nor resolves the separately source-backed SOP disagreement.",
+      "planner_refs": ["sop-impact-packet#outcome-7"]
+    },
+    {
+      "id": "sop-impact-denied-source-invariance",
+      "expected": {
+        "viewer_scope": "operations",
+        "injected_probe_acl": "restricted",
+        "operations_response_semantically_identical_before_after": true,
+        "restricted_probe_literals_disclosed": [],
+        "hidden_count_or_existence_disclosed": false,
+        "hidden_relation_or_dependent_paraphrase_disclosed": false,
+        "hidden_path_disclosed": false
+      },
+      "evidence_semantics": "The fixed distinct synthetic probe in fixture.restricted_probe is hidden; operations output stays semantically invariant and leaks no literal, count, existence, relation, path, or dependent paraphrase.",
+      "planner_refs": ["sop-impact-packet#outcome-8"]
+    },
+    {
+      "id": "sop-impact-reseed-reconnect",
+      "expected": {
+        "seed_runs": 2,
+        "node_delta_on_second_seed": 0,
+        "relationship_delta_on_second_seed": 0,
+        "removed_test_owned_relation_reseeded": true,
+        "exact_outage_paths_restored": true,
+        "exact_conflict_claims_sources_and_timestamps_restored": true,
+        "new_falkordb_client_required": true,
+        "complete_ordered_path_claim_source_timestamp_snapshot_preserved": true,
+        "unique_lane_owned_graph_required": true,
+        "cleanup_only_owned_graph_and_process": true
+      },
+      "evidence_semantics": "Deterministic seeding is idempotent; owned-edge reseed and a fresh FalkorDB client restore the complete fixed semantic snapshot.",
+      "planner_refs": ["sop-impact-packet#outcome-9"]
+    },
+    {
+      "id": "sop-impact-time-browser-local-boundary",
+      "expected": {
+        "offset_input": "2026-10-14T20:30:00+02:00",
+        "normalized_as_of": "2026-10-14T18:30:00Z",
+        "normalized_result_matches": "sop-impact-observed-outage-paths",
+        "malformed_timestamp_probe": "not-a-timestamp",
+        "malformed_timestamp_rejected_before_graph_mutation": true,
+        "desktop_mobile_api_and_browser_semantics_agree": true,
+        "clinical_inference": false,
+        "procedure_selected": false,
+        "person_assigned": false,
+        "messages_sent": false,
+        "calls_made": false,
+        "tickets_created": false,
+        "external_writes": [],
+        "automatically_confirmed": false
+      },
+      "evidence_semantics": "Normalize the pinned offset to the exact UTC observation, reject malformed input before writes, keep desktop/mobile presentation semantically consistent, and remain local/non-clinical with no automatic or external action.",
+      "planner_refs": ["sop-impact-packet#outcome-10"]
+    }
+  ]
+}

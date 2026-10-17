@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/sop-impact-expected-results.json",
+  "oracle_policy": "Every case maps to exactly one fixed outcome in the pinned planner packet; assertions are specified independently of candidate output.",
+  "cases": [
+    {
+      "id": "sop-impact-cold-empty",
+      "scenario_id": "sop-impact-cold-empty",
+      "attack_or_edge_case": "Query a newly owned graph before any SOP or incident fixture is seeded.",
+      "setup": "Create one unique owned graph and leave it cold/empty.",
+      "pinned_assertions": ["zero impact paths", "zero SOP versions", "zero role claims", "zero source rows", "no exposed counts or invented no-conflict conclusion; state is empty/unknown"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Phantom fixture defaults, count/existence leakage, or empty graph falsely presented as proof of no conflict.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:43"]
+    },
+    {
+      "id": "sop-impact-observed-outage-paths",
+      "scenario_id": "sop-impact-observed-outage-paths",
+      "attack_or_edge_case": "At the pinned observed outage instant, require exact path order and existing source provenance.",
+      "setup": "Use actual FalkorDB with the synthetic INC-204/C4 graph at 2026-10-14T18:30:00Z.",
+      "pinned_assertions": ["exact ordered INC-204 -> C4 -> service -> central-sterile -> ROLE-STERILE-OPS-COORD path", "exact ordered INC-204 -> C4 -> service -> materials-logistics -> ROLE-MATERIALS-DUTY path", "path source IDs and titles equal the unchanged original oracle", "all per-path observed_at values equal the unchanged original oracle", "current ownership provenance is unchanged"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "A text/property join, reordered/extra path, or provenance/timestamp drift from the original oracle.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:44"]
+    },
+    {
+      "id": "sop-impact-conflict-provenance",
+      "scenario_id": "sop-impact-conflict-provenance",
+      "attack_or_edge_case": "Demand the explicit two-version unresolved conflict, applicability edges, typed claims, and source evidence.",
+      "setup": "Join both C4 APPLIES_TO edges and the V2-to-V3 SOP_CONFLICT edge to each typed CLAIMS_ROLE link and its explicitly linked source-evidence record.",
+      "pinned_assertions": ["V2 APPLIES_TO CONVEYOR-C4 and V3 APPLIES_TO CONVEYOR-C4", "V2 SOP_CONFLICT V3 has status unresolved", "V2 CLAIMS_ROLE is ROLE-FACILITIES-DUTY and V3 CLAIMS_ROLE is ROLE-MATERIALS-LEAD", "both labels are exactly unverified SOP claim, not current owner", "V2 source ID/title/time are SRC-SOP-CURRENT-V2 / Synthetic SOP-OPS-9 Current Text v2 / 2026-10-14T16:00:00Z", "V3 source ID/title/time are SRC-SOP-CURRENT-V3 / Synthetic SOP-OPS-9 Current Text v3 / 2026-10-14T16:04:00Z", "exactly two claims are returned", "conflict remains unresolved", "neither claim is selected as winner"],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "Unproven property-only association, dropped provenance, role claim presented as ownership, or fabricated conflict resolution.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:45"]
+    },
+    {
+      "id": "sop-impact-stale-v1-excluded",
+      "scenario_id": "sop-impact-stale-v1-excluded",
+      "attack_or_edge_case": "Ensure archived SOP-OPS-9 V1 remains visible without joining its retired C3 reference to C4.",
+      "setup": "Seed the operations-visible V1/archive source and the current C4 conflict witness.",
+      "pinned_assertions": ["stale ID is SOP-OPS-9-V1 and source is SRC-SOP-ARCHIVE-9", "archive title and observed time are exact", "V1 references CONVEYOR-C3", "V1 is not hidden", "V1 is not a C4/INC-204 conflict witness"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Stale C3 reference silently treated as current C4 applicability, or visible history concealed.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:46"]
+    },
+    {
+      "id": "sop-impact-applicability-edge-counterfactual",
+      "scenario_id": "sop-impact-applicability-edge-counterfactual",
+      "attack_or_edge_case": "Remove only the owned V2 APPLIES_TO C4 edge.",
+      "setup": "Capture baseline paths/witness; remove the test-owned V2-to-C4 APPLIES_TO relation only; query again.",
+      "pinned_assertions": ["the removed relation is V2 APPLIES_TO C4", "complete V2/V3 conflict witness disappears", "impact linkage is incomplete/unknown rather than resolved/absent", "both exact outage paths remain", "outage paths are unchanged"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Static/precomputed conflict-to-impact mapping, broad mutation, lost outage paths, or unknown evidence rendered as resolution/absence.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:47"]
+    },
+    {
+      "id": "sop-impact-conflict-edge-counterfactual",
+      "scenario_id": "sop-impact-conflict-edge-counterfactual",
+      "attack_or_edge_case": "Remove only the explicit V2-to-V3 SOP_CONFLICT edge and then reseed it.",
+      "setup": "Remove the test-owned V2 SOP_CONFLICT V3 relation; verify claims and outage paths; reseed and compare the exact baseline witness.",
+      "pinned_assertions": ["only V2 SOP_CONFLICT V3 is removed", "complete linked witness disappears", "missing conflict linkage reports unknown, never no-conflict or resolved", "source-backed role claims remain", "both exact outage paths remain unchanged", "reseed restores exact pinned conflict witness", "conflict edge status before removal is unresolved"],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "Query ignores graph edge removal, source facts are deleted with an edge, outage paths change, or reseed changes the witness.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:48"]
+    },
+    {
+      "id": "sop-impact-restoration-snapshot",
+      "scenario_id": "sop-impact-restoration-snapshot",
+      "attack_or_edge_case": "Query after the observed C4 restoration while retaining the SOP source records.",
+      "setup": "Query the unchanged actual graph at 2026-10-14T19:30:00Z.",
+      "pinned_assertions": ["as-of is 2026-10-14T19:30:00Z", "active impact path list is empty", "SOP-OPS-9 conflict remains source-backed and unresolved", "conflict is separate from outage event state", "no SOP-safe conclusion is inferred", "no no-operational-risk conclusion is inferred"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Restoration incorrectly removes/resolves SOP disagreement or is misrepresented as proof of safety/no risk.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:49"]
+    },
+    {
+      "id": "sop-impact-denied-source-invariance",
+      "scenario_id": "sop-impact-denied-source-invariance",
+      "attack_or_edge_case": "Inject the fixed distinctive restricted SOP/role claim/evidence/path probe.",
+      "setup": "Capture operations response, add only fixture.restricted_probe nodes/relations with restricted ACL, then compare the semantic response and scan every probe literal.",
+      "pinned_assertions": ["viewer scope is operations and probe ACL is restricted", "operations result is semantically identical before/after", "no hidden ID/title/text is disclosed", "no hidden count or existence is disclosed", "no hidden relation/path is disclosed", "no dependent paraphrase is disclosed"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Direct, count/existence, relationship, path, or derived-language disclosure from denied evidence.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:50"]
+    },
+    {
+      "id": "sop-impact-reseed-reconnect",
+      "scenario_id": "sop-impact-reseed-reconnect",
+      "attack_or_edge_case": "Repeat deterministic seeding, remove/reseed an owned relation, and compare a fresh client snapshot.",
+      "setup": "Use one unique lane-owned FalkorDB graph; seed twice, remove/reseed only a test-owned relationship, reconnect with a new client, and clean up only the graph/process started by this check.",
+      "pinned_assertions": ["second seed creates zero nodes", "second seed creates zero relationships", "test-owned relation reseed restores exact ordered outage paths", "reseed restores exact role claims, source IDs/titles, and timestamps", "new FalkorDB client returns the complete same semantic snapshot", "graph name is unique/lane-owned and cleanup removes only owned graph/process"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Non-idempotent fixture, incomplete restoration, warm-client cache dependency, cross-lane graph collision, or cleanup of another resource.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:51"]
+    },
+    {
+      "id": "sop-impact-time-browser-local-boundary",
+      "scenario_id": "sop-impact-time-browser-local-boundary",
+      "attack_or_edge_case": "Normalize an explicit offset, reject malformed time, compare desktop/mobile and verify the local-only boundary.",
+      "setup": "Query 2026-10-14T20:30:00+02:00; submit not-a-timestamp to pre-write validation; compare API/browser semantics at desktop and mobile; inspect action/network effects.",
+      "pinned_assertions": ["offset input is exactly 2026-10-14T20:30:00+02:00", "normalizes to 2026-10-14T18:30:00Z and the exact two outage paths", "not-a-timestamp is rejected before graph mutation", "desktop/mobile API and browser results agree semantically", "no clinical inference, chosen procedure, or person assignment", "no message, call, ticket, external write, or automatic confirmation"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Timezone confusion, partial write on malformed time, responsive view disagreement, clinical/operational action invention, or external side effect.",
+      "planner_refs": ["planner-3bfcb0d8abbc45bc82e0fab8d715c2da.md:52"]
+    }
+  ]
+}
