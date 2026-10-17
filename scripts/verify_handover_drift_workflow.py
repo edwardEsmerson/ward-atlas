@@ -552,15 +552,16 @@ def verify_accepted_suites(args: argparse.Namespace, base: int, evidence_dir: Pa
     for label, command in static:
         suite_command(label, command, evidence_dir / "static", reports)
 
-    run_ports = (base + 182, base + 183, base + 184, base + 185, base + 186, base + 187, base + 188, base + 189, base + 190)
+    run_ports = (base + 182, base + 183, base + 184, base + 185, base + 186, base + 187, base + 188, base + 189, base + 190, base + 191, base + 192)
     if max(run_ports) >= base + int(os.environ["WORKSHOP_PORT_SPAN"]):
         raise VerificationFailure("allocated private range is too small for all accepted isolated suite ports")
-    original_db, _unused, ui_app, ui_db, handover_app, handover_db, sop_app, sop_db, source_db = run_ports
+    original_db, _unused, ui_app, ui_db, handover_app, handover_db, sop_app, sop_db, source_db, dock_db, dock_app = run_ports
     suite_command("original-live-graph", [py, "scripts/verify_falkordb_live.py", "--require-live", "--fail-on-zero", "--fresh-owned-graph", "--db-port", str(original_db), "--empty-reseed-idempotence-reconnect", "--report", str(evidence_dir / "original-falkordb.json"), "--verify-morning-status"], evidence_dir / "live", reports, timeout=900)
     suite_command("integrated-core-ui", [py, "scripts/verify_hospital_workflow.py", "--launch-owned-app", "--loopback-only", "--app-port", str(ui_app), "--require-live-falkordb", "--db-port", str(ui_db), "--fail-on-zero", "--assert-api", "--assert-browser", "--assert-provenance", "--assert-permissions", "--assert-confirmation", "--browser-smoke-tool", "/tools/browser-smoke.py", "--desktop-mobile", "--verify-morning-status-and-feature-matrix", "--evidence-dir", str(evidence_dir / "integrated-ui")], evidence_dir / "live", reports, timeout=900)
     suite_command("handover-witness-live", [py, "scripts/verify_handover_brief_live.py", "--db-port", str(handover_db), "--app-port", str(handover_app), "--report", str(evidence_dir / "handover-witness-live.json"), "--evidence-dir", str(evidence_dir / "handover-witness-browser")], evidence_dir / "live", reports, timeout=900)
     suite_command("sop-impact-live", [py, "scripts/verify_sop_impact_live.py", "--pinned-plan", str(SOP_PLAN), "--db-port", str(sop_db), "--app-port", str(sop_app), "--report", str(evidence_dir / "sop-impact-live.json"), "--evidence-dir", str(evidence_dir / "sop-impact-browser")], evidence_dir / "live", reports, timeout=900)
     suite_command("source-change-live", [py, "scripts/verify_source_change_live.py", "--require-live", "--fail-on-zero", "--fresh-owned-graph", "--db-port", str(source_db), "--verify-morning-status-and-feature-matrix", "--evidence-dir", str(evidence_dir / "source-change")], evidence_dir / "live", reports, timeout=900)
+    suite_command("dock-bitemporal-live", [py, "scripts/verify_dock_bitemporal_live.py", "--require-live", "--all-ten-groups", "--desktop-mobile", "--assert-permissions", "--assert-reconnect", "--db-port", str(dock_db), "--app-port", str(dock_app), "--evidence-dir", str(evidence_dir / "dock-bitemporal")], evidence_dir / "live", reports, timeout=900)
     return reports
 
 
