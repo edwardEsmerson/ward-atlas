@@ -60,6 +60,23 @@ python3 scripts/verify_decision_provenance_live.py --require-live-falkordb --req
 
 The live check exercises all nine frozen packet groups and their 54 mapped assertions, including the three exact edge counterfactuals, idempotent restoration, fresh-client reads, restricted-view invariance, and desktop/mobile browser evidence. It is synthetic behavior evidence only, not real-hospital validation.
 
+## Source-observation-time decision replay
+
+The additive read-only `GET /api/decision-timeline?scope=operations&known_at=2026-10-14T16:04:00Z` reconstructs what the operations graph could support at an explicit UTC cutoff. Claims are queried only through the accepted SOP-impact path (`INC-204 → CONVEYOR-C4 → SOPVersion -[:APPLIES_TO]-> C4`, then source-linked `CLAIMS_ROLE` and `EVIDENCED_BY` edges), with each source's `observed_at` filtered in FalkorDB before projection. The graph-derived `SOP_CONFLICT` edge appears only when both independently evidenced claims are visible; it is not a source quotation or authoritative procedure.
+
+Decision state has a separate register-rooted query (`DecisionRegister -[:TRACKS]-> DecisionRecord -[:EVIDENCED_BY]-> Evidence`). Before that record's own source cutoff the result contains no record/`CONSIDERS` details or existence claim, and the record path never discovers pre-boundary claims. After the boundary, a `CONSIDERS` edge is returned only when its target is also present in the independently source-known SOP-impact claims. A moved V3 observation time or removed evidence edge therefore suppresses V3-dependent output without erasing the record's separately evidenced `open-unresolved` state or promoting V2. Unknown/incomplete means only that the requested cutoff lacks sufficient source evidence; it does not mean absent, resolved, safe, or current.
+
+The cutoff accepts explicit ISO-8601 offsets and normalizes to UTC; malformed or timezone-naive inputs reject before graph/action state changes. Omitting `known_at` returns a generic unknown projection (no local-clock fallback). The responsive replay controls default to the record boundary for a useful initial view; selecting an earlier/incomplete cutoff clears the separate docket card while retaining the read-only `/api/decision-docket` endpoint. The feature adds no fixture facts, writes, ingestion, model route, contact, or clinical inference.
+
+Run the unit checks and the actual-FalkorDB/API/desktop-mobile browser verification (ports are selected from this lane's private `WORKSHOP_PORT_BASE` range; every graph/state/process is task-owned):
+
+```sh
+python3 -m unittest tests.test_decision_knowledge_timeline tests.test_decision_knowledge_timeline_contract
+python3 scripts/verify_decision_knowledge_timeline_live.py --require-live-falkordb --all-twelve-groups --assert-api --desktop-mobile --assert-no-future-leak --assert-reconnect --assert-owned-cleanup
+```
+
+The frozen candidate-independent oracle maps 12 groups to 120 assertions. The live run covers cold/empty and all source boundaries, V3 timestamp shift (including a desktop/mobile browser replay at 16:05), both evidence-edge removals, decoy/restricted invariance, offset/rejection behavior, reseed, fresh-client reads, read-only API/browser output, and owned cleanup. Builder evidence: `/workspace/evidence/decision-knowledge-timeline/lane-2/live-d126ea36313045ca97c526dfee0b0879.json` with screenshots and browser reports beside it. This is implementation evidence; an independent clean-source reverify remains a separate gate.
+
 Check the candidate-independent nine-case packet, unit tests, actual FalkorDB/API behavior, and desktop/mobile browser from this worker's allocated ports:
 
 ```sh
