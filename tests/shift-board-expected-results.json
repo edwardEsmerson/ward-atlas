@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Independent, candidate-free oracle for the integrated synthetic shift board; fixes eight outcome groups before integration behavior is implemented.",
+  "oracle_policy": "Every expected value is fixed from the committed shift-board packet and the cited source, temporal, and legacy planner oracles. No query, API, UI, or candidate response may supply or amend an expected value.",
+  "pinned_sources": [
+    {
+      "id": "shift-board-packet",
+      "plan": "planner-5f75fb17810c463fb9d84bd5821b254f/plans/planner-5f75fb17810c463fb9d84bd5821b254f.md",
+      "sha256": "5dd4c50cd2044e016e3593c337a5ccae966cfba8ef74cbcb8d0ffd95eaed55de",
+      "outcome_lines": [31, 32, 33, 34, 35, 36, 37, 38]
+    },
+    {
+      "id": "source-change-plan",
+      "plan": "planner-9b1a51761889446c8b5525bde02bc5d6/plans/planner-9b1a51761889446c8b5525bde02bc5d6.md",
+      "sha256": "3879d8eb6197f631311c659528b939d96f069702406d3e257b1ab1d84c40e3b7",
+      "outcome_lines": [39, 40, 41, 42, 43, 44, 45, 46]
+    },
+    {
+      "id": "temporal-plan",
+      "plan": "planner-13609527bde94e87ae5bcacaa2c86a70/plans/planner-13609527bde94e87ae5bcacaa2c86a70.md",
+      "sha256": "cb62e05f8b0307a27f6050aef455ccf7b0df42d8f83a1479124c127187b46464",
+      "outcome_lines": [42, 43, 44, 45, 46, 47, 48, 49, 50]
+    },
+    {
+      "id": "separate-legacy-plan",
+      "plan": "planner-13609527bde94e87ae5bcacaa2c86a70/plans/planner-ed8ab68cd001411d97ee43310862ae22.md",
+      "sha256": "01c10540400a08541da696b075d69183bfd62a290caca3f75f8aabdd8dfdd957",
+      "outcome_lines": [29, 30, 31, 32, 33, 34]
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "The later integrated product check must use actual FalkorDB; this artifact validator checks only fixed expectations and does not claim live behavior.",
+    "graph_ownership": "The later check creates a unique task-owned graph and deletes only that graph; it stops only processes it starts.",
+    "evidence_labels": ["observed source fact", "graph-derived path", "hypothetical branch", "missing or unknown evidence"],
+    "legacy_oracle_boundary": "The planner-ed8 INC-LIFT-01 fixture remains a separate existing oracle and is not mapped to either shift-board incident."
+  },
+  "cases": [
+    {
+      "id": "cold-empty-board",
+      "expected": {
+        "seeded_board_row_count": 0,
+        "incident_rows": [],
+        "source_rows": 0,
+        "role_paths": [],
+        "review_candidates": [],
+        "board_state": "empty/unknown",
+        "invented_incident_source_role_or_review_item": false
+      },
+      "evidence_semantics": "Absence in the cold graph is empty/unknown, not evidence of no operational risk or of a current role.",
+      "planner_refs": ["shift-board-packet#outcome-1", "source-change-plan#outcome-1"]
+    },
+    {
+      "id": "dock-role-time-and-source-evidence",
+      "expected": {
+        "incident_id": "INC-207",
+        "equipment_id": "EQ-DOCK-CART-2",
+        "service_id": "SVC-INBOUND-TRANSFER",
+        "department_id": "DEPT-RECEIVING-DOCK",
+        "before": {
+          "as_of": "2026-10-14T20:29:00Z",
+          "role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-DUTY"]
+        },
+        "at_effective_time": {
+          "as_of": "2026-10-14T20:30:00Z",
+          "role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"]
+        },
+        "only_changed_path_node": {
+          "from": "ROLE-DOCK-DUTY",
+          "to": "ROLE-DOCK-SWING"
+        },
+        "source_versions": [
+          {
+            "source_id": "SRC-DOCK-ROSTER-R1",
+            "title": "Synthetic Dock Operations Roster Revision 1",
+            "observed_at": "2026-10-14T19:00:00Z"
+          },
+          {
+            "source_id": "SRC-DOCK-ROSTER-R2",
+            "title": "Synthetic Dock Operations Roster Revision 2",
+            "observed_at": "2026-10-14T20:18:00Z",
+            "effective_at": "2026-10-14T20:30:00Z",
+            "supersedes": "SRC-DOCK-ROSTER-R1"
+          }
+        ],
+        "both_source_versions_preserved": true
+      },
+      "evidence_semantics": "R1/R2 and their timestamps are observed source facts; the five-node ownership chain is a graph-derived path.",
+      "planner_refs": ["shift-board-packet#outcome-2", "source-change-plan#outcomes-2-3"]
+    },
+    {
+      "id": "explicit-edge-review-queue",
+      "expected": {
+        "review_candidates": ["HND-DOCK-2020", "TKT-DOCK-88"],
+        "unchanged_handover_role_id": "ROLE-DOCK-DUTY",
+        "unchanged_handover_source_id": "SRC-DOCK-ROSTER-R1",
+        "excluded_lexical_only_id": "HND-DOCK-LEXICAL-ONLY",
+        "coverage_status": "explicit_edges_only",
+        "unlinked_artifact_status": "unknown",
+        "missing_link_does_not_mean_current": true
+      },
+      "evidence_semantics": "Candidates require explicit supersession/citation edges. Similar wording is not an edge; no link leaves coverage unknown.",
+      "planner_refs": ["shift-board-packet#outcome-3", "source-change-plan#outcome-4"]
+    },
+    {
+      "id": "conveyor-observed-and-hypothetical-times",
+      "expected": {
+        "incident_id": "INC-204",
+        "equipment_id": "CONVEYOR-C4",
+        "observed_at_1830": {
+          "at": "2026-10-14T18:30:00Z",
+          "status": "observed-impact",
+          "paths": [
+            ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+            ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+          ],
+          "canonical_path_evidence": [
+            {
+              "path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+              "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+              "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+              "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"]
+            },
+            {
+              "path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"],
+              "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+              "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+              "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]
+            }
+          ],
+          "event_id": "EVT-C4-UNAVAILABLE-01",
+          "source_id": "SRC-ASSET-C4-OUTAGE",
+          "event_at": "2026-10-14T18:02:00Z"
+        },
+        "observed_restoration_1930": {
+          "at": "2026-10-14T19:30:00Z",
+          "status": "restored",
+          "active_paths": [],
+          "restoration_event_id": "EVT-C4-RESTORED-01",
+          "restoration_source_id": "SRC-ASSET-C4-RESTORE",
+          "restoration_event_at": "2026-10-14T19:15:00Z",
+          "historical_at": "2026-10-14T18:30:00Z",
+          "historical_paths": [
+            ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+            ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+          ],
+          "historical_evidence_matches_canonical": true
+        },
+        "hypothetical_branch_1850": {
+          "at": "2026-10-14T18:50:00Z",
+          "branch_id": "BR-C4-RESTORE-DRILL",
+          "hypothetical_event_id": "EVT-BR-RESTORE-01",
+          "hypothetical_event_at": "2026-10-14T18:45:00Z",
+          "branch_status": "hypothetical-restored",
+          "branch_paths": [],
+          "mainline_status": "observed-impact",
+          "mainline_paths": [
+            ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+            ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+          ],
+          "mainline_evidence_matches_canonical": true,
+          "observed_state_mutated": false
+        },
+        "observed_source_facts_are_distinct_from_graph_paths_and_branch_assumptions": true
+      },
+      "evidence_semantics": "Outage/restoration source events are observed facts, impact paths are graph-derived, and BR-C4-RESTORE-DRILL is hypothetical only.",
+      "planner_refs": ["shift-board-packet#outcome-4", "shift-board-packet#outcome-8", "temporal-plan#outcomes-3-5"]
+    },
+    {
+      "id": "no-cross-case-path-or-causal-contamination",
+      "expected": {
+        "board_cases_are_separate": ["INC-207", "INC-204"],
+        "path_joining_INC-207_to_CONVEYOR-C4": false,
+        "dock_roster_revision_caused_INC-204_outage": false,
+        "dock_and_conveyor_provenance_are_separate": true,
+        "removing_owned_dependency_changes_only_its_recorded_path": true,
+        "removing_owned_citation_changes_only_its_review_candidate": true,
+        "text_similarity_cannot_recreate_removed_edge_results": true
+      },
+      "evidence_semantics": "Both cases may share the graph and board, but no path or causal assertion joins their unrelated synthetic events; missing graph edges cannot be supplied by text matching.",
+      "planner_refs": ["shift-board-packet#outcome-5", "source-change-plan#outcome-7", "temporal-plan#outcome-5"]
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "expected": {
+        "viewer_scope": "operations",
+        "dock_restricted_literals": [
+          "SRC-RESTRICTED-DOCK-99",
+          "Restricted Dock Continuity Annex 99",
+          "Restricted-only note: logistics bay status unresolved.",
+          "EQ-RESTRICTED-DOCK-99",
+          "DEPT-RESTRICTED-DOCK-99",
+          "ROLE-RESTRICTED-DOCK-OWNER"
+        ],
+        "conveyor_restricted_fixture": {
+          "event_id": "EV-C4-RESTRICTED-UPDATE",
+          "source_id": "SRC-RESTRICTED-92",
+          "source_title": "Restricted Continuity Annex 92",
+          "fact_text": "Restricted-only instruction: contact the secure lift coordinator.",
+          "event_effective_at": "2026-10-14T18:20:00Z",
+          "event_value": "available",
+          "event_acl_label": "operations",
+          "source_acl_label": "restricted"
+        },
+        "conveyor_restricted_forbidden_disclosures": ["event/source identifiers", "source title and body", "event time/value when sourced only through the denied source", "hidden count/existence", "relationship/path or dependent paraphrase"],
+        "visible_paths_and_evidence_unchanged": true,
+        "denied_identifier_title_fact_count_existence_path_or_paraphrase_disclosed": false,
+        "hidden_counts_or_existence_disclosed": false
+      },
+      "evidence_semantics": "Operations-visible outputs are invariant to restricted fixtures. Exact hidden literals are tripwires only and must never appear in the board response or path.",
+      "planner_refs": ["shift-board-packet#outcome-6", "source-change-plan#outcome-6", "temporal-plan#outcome-7"]
+    },
+    {
+      "id": "explicit-local-confirmation-no-external-writes",
+      "expected": {
+        "draft_persisted_before_confirmation": false,
+        "explicit_confirmation_required": true,
+        "local_synthetic_actions_written_after_one_confirmation": 1,
+        "external_writes": [],
+        "messages_sent": false,
+        "calls_made": false,
+        "external_tickets_created": false,
+        "clinical_action_proposed": false
+      },
+      "evidence_semantics": "Any action is an evidence-linked local draft, not an external operation; hypothetical branches never confirm it.",
+      "planner_refs": ["shift-board-packet#outcome-7", "source-change-plan#outcome-8", "temporal-plan#outcome-8"]
+    },
+    {
+      "id": "empty-reseed-reconnect-and-owned-cleanup",
+      "expected": {
+        "cold_empty_board_rows": 0,
+        "repeated_seed_node_delta": 0,
+        "repeated_seed_relationship_delta": 0,
+        "pinned_outputs_unchanged_after_reseed": true,
+        "new_client_reconnect_required": true,
+        "pinned_outputs_unchanged_after_reconnect": true,
+        "branch_reset_removes_only_branch_overlay": true,
+        "mainline_state_preserved_by_branch_reset": true,
+        "cleanup_deletes_only_unique_task_owned_graph": true,
+        "cleanup_stops_only_task_owned_processes": true
+      },
+      "evidence_semantics": "The empty result, repeated fixture load, fresh connection, isolated branch reset and test-owned cleanup are separate repeatability/safety conditions.",
+      "planner_refs": ["shift-board-packet#outcome-1", "shift-board-packet#outcome-8", "source-change-plan#outcomes-1,7", "temporal-plan#outcome-6", "separate-legacy-plan#outcome-4"]
+    }
+  ]
+}

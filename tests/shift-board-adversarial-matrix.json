@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/shift-board-expected-results.json",
+  "oracle_policy": "Each case maps one-to-one to an independently pinned outcome group. Expected values are fixed in that artifact and the exact cited planner files; candidate outputs never create or alter assertions.",
+  "cases": [
+    {
+      "id": "cold-empty-board",
+      "scenario_id": "cold-empty-board",
+      "attack_or_edge_case": "Open the integrated board on a newly owned graph before any fixture is seeded.",
+      "setup": "Create one unique empty graph. Query the board without loading source, temporal, legacy, or UI defaults.",
+      "pinned_assertions": ["zero seeded board rows", "zero incident/source/role/review records", "empty or unknown state is shown", "no default incident, source, role or review item is invented"],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Warm shared data or a hard-coded dashboard produces phantom rows or equates missing data with a known safe/no-impact state.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:31", "planner-9b1a51761889446c8b5525bde02bc5d6.md:39"]
+    },
+    {
+      "id": "dock-role-time-and-source-evidence",
+      "scenario_id": "dock-role-time-and-source-evidence",
+      "attack_or_edge_case": "Check ownership immediately before and exactly at R2's effective boundary, distinguishing observation time from effective time.",
+      "setup": "Use only pinned INC-207 dock fixture; retain R1 and append R2 observed at 20:18Z, effective at 20:30Z.",
+      "pinned_assertions": ["20:29Z is the exact ROLE-DOCK-DUTY five-node path", "20:30Z is the exact ROLE-DOCK-SWING five-node path", "only the final role changes", "R1 and R2 identifiers/titles/observed timestamps remain visible", "R2 effective timestamp and explicit supersession of R1 remain visible", "R2 is not applied early based on its observed_at", "ownership path is graph-derived, not a static displayed role list"],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "Wrong boundary, overwritten history, conflated observation/effective times, missing provenance or decorative graph.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:32", "planner-9b1a51761889446c8b5525bde02bc5d6.md:40-41"]
+    },
+    {
+      "id": "explicit-edge-review-queue",
+      "scenario_id": "explicit-edge-review-queue",
+      "attack_or_edge_case": "Contrast explicit supersession/citation dependencies against a lexical-only handover and an unlinked artifact.",
+      "setup": "Seed HND-DOCK-2020 and TKT-DOCK-88 with explicit evidence edges; preserve old handover data; include HND-DOCK-LEXICAL-ONLY without such an edge.",
+      "pinned_assertions": ["queue is exactly HND-DOCK-2020 and TKT-DOCK-88", "HND-DOCK-2020 retains ROLE-DOCK-DUTY", "HND-DOCK-2020 retains SRC-DOCK-ROSTER-R1", "HND-DOCK-LEXICAL-ONLY is excluded", "coverage_status is explicit_edges_only", "unlinked_artifact_status is unknown, not current"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Text similarity is treated as a relationship, the old record is rewritten, a candidate is omitted/added, or coverage is overstated.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:33", "planner-9b1a51761889446c8b5525bde02bc5d6.md:42"]
+    },
+    {
+      "id": "conveyor-observed-and-hypothetical-times",
+      "scenario_id": "conveyor-observed-and-hypothetical-times",
+      "attack_or_edge_case": "Compare the two observed outage paths at 18:30Z, restored mainline at 19:30Z, historical replay, and isolated hypothetical branch at 18:50Z.",
+      "setup": "Use the pinned INC-204 temporal event history and BR-C4-RESTORE-DRILL. Keep branch-only assumptions distinct from observed mainline events.",
+      "pinned_assertions": ["18:30Z returns both exact canonical five-node paths", "each path carries the exact four source IDs, titles and observation timestamps", "18:30Z includes EVT-C4-UNAVAILABLE-01 and SRC-ASSET-C4-OUTAGE provenance", "19:30Z observed mainline has zero active paths after the 19:15Z restoration", "19:30Z replay at 18:30Z preserves both canonical paths and their provenance", "18:50Z branch adds only EVT-BR-RESTORE-01 as a hypothetical 18:45Z restore and has zero paths", "18:50Z mainline still has both canonical paths and their provenance", "branch result is explicitly hypothetical and does not mutate observed state", "source facts, graph-derived paths and hypothetical assumptions are separately labeled"],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "Static rows replace graph event selection, restoration destroys history, branch leaks into mainline, or a hypothetical event is called observed.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:34,38", "planner-13609527bde94e87ae5bcacaa2c86a70.md:44-46"]
+    },
+    {
+      "id": "no-cross-case-path-or-causal-contamination",
+      "scenario_id": "no-cross-case-path-or-causal-contamination",
+      "attack_or_edge_case": "Load both unrelated incidents into one graph and attempt to join the dock source revision to the conveyor outage by shared board context or similar text.",
+      "setup": "Keep INC-207 and INC-204 as separate synthetic records with their own source provenance; remove one owned dependency or citation edge for the corresponding counterfactual.",
+      "pinned_assertions": ["no path connects INC-207 to CONVEYOR-C4", "SRC-DOCK-ROSTER-R2 is not a cause of the INC-204 outage", "each case retains its own incident/source provenance", "removing an owned dependency changes only its corresponding recorded path", "removing an owned citation changes only its corresponding review candidate", "text similarity cannot recreate a removed edge result"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Cross-incident path, invented causal claim, broad mutation side effect, or lexical fallback contaminates the shared board.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:35", "planner-9b1a51761889446c8b5525bde02bc5d6.md:45", "planner-13609527bde94e87ae5bcacaa2c86a70.md:46"]
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "scenario_id": "denied-source-nondisclosure",
+      "attack_or_edge_case": "Inject the exact restricted dock-source and conveyor-event fixtures and compare operations-scope board output before and after.",
+      "setup": "Preserve each pinned hidden ID/title/fact/equipment/department/role/event literal in the test-only restricted fixtures; inspect serialized paths, labels, counts and dependent paraphrases as operations viewer.",
+      "pinned_assertions": ["operations-visible paths and provenance are unchanged", "no dock restricted ID/title/fact/equipment/department/role leaks", "no conveyor restricted event/source ID, title, fact, or restricted-source-dependent time/value leaks", "no hidden count or existence signal leaks", "no path or inferred/paraphrased fact through denied evidence leaks", "operations output is invariant under both restricted fixtures", "hidden literals are only tripwires and never expected response content; generic visible values are not blanket-banned"],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "Direct, count/existence, relationship, path or dependent paraphrase disclosure changes an operations-visible result.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:36", "planner-9b1a51761889446c8b5525bde02bc5d6.md:44", "planner-13609527bde94e87ae5bcacaa2c86a70.md:48"]
+    },
+    {
+      "id": "explicit-local-confirmation-no-external-writes",
+      "scenario_id": "explicit-local-confirmation-no-external-writes",
+      "attack_or_edge_case": "Attempt to persist or execute a proposed handover action without the operator's explicit in-app confirmation.",
+      "setup": "Prepare one synthetic evidence-linked draft, inspect local persistence before confirmation, then confirm once and inspect external-effect counters.",
+      "pinned_assertions": ["draft is not persisted before confirmation", "explicit in-app confirmation is required", "one confirmation writes exactly one local synthetic action", "no external writes occur", "no message or call is sent", "no external ticket or service action occurs", "no clinical recommendation is produced"],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "A preview writes automatically, duplicate confirmations multiply actions, or an external/clinical action escapes the local boundary.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:37", "planner-9b1a51761889446c8b5525bde02bc5d6.md:46", "planner-13609527bde94e87ae5bcacaa2c86a70.md:49"]
+    },
+    {
+      "id": "empty-reseed-reconnect-and-owned-cleanup",
+      "scenario_id": "empty-reseed-reconnect-and-owned-cleanup",
+      "attack_or_edge_case": "Exercise the cold board, repeat fixture ingestion, new-client reconnect, temporal-branch reset and final cleanup on one isolated graph.",
+      "setup": "Choose a unique graph owned by this check; record empty state; seed and reseed both pinned cases; reconnect a fresh client; reset only the named hypothetical branch; clean up only owned resources.",
+      "pinned_assertions": ["cold empty result has zero board rows", "second seed adds zero duplicate nodes", "second seed adds zero duplicate relationships", "pinned dock and conveyor outputs remain unchanged after reseed", "a fresh client reconnect returns the same pinned outputs", "branch reset removes only branch overlay", "branch reset preserves observed mainline", "cleanup deletes only the unique task-owned graph", "cleanup stops only task-owned processes"],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "Warm-state dependence, duplicate ingestion, branch/base corruption, reconnect drift or cleanup of unowned resources.",
+      "planner_refs": ["planner-5f75fb17810c463fb9d84bd5821b254f.md:31,38", "planner-9b1a51761889446c8b5525bde02bc5d6.md:39,45", "planner-13609527bde94e87ae5bcacaa2c86a70.md:47", "planner-ed8ab68cd001411d97ee43310862ae22.md:32"]
+    }
+  ]
+}
