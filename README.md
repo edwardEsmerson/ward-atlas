@@ -1,6 +1,6 @@
 # WardAtlas
 
-WardAtlas is a local synthetic hospital-operations control room for the Company Brain track. It uses actual FalkorDB queries to trace a fictional equipment outage through a service to impacted departments and explicitly current operating roles, preserve source provenance, reveal a stale SOP reference and unresolved conflict, and exclude inaccessible evidence. Its integrated shift board keeps the INC-207 dock roster revision separate from INC-204 conveyor event replay: effective-dated ownership, explicit-edge review candidates, observed restoration, and a forked hypothetical drill are inspectable at pinned times. The responsive UI separates source facts, graph inference and missing evidence. It can prepare a source-linked shift handover, but writes it to local app state only after an explicit confirmation click. It does not send messages, make calls, create tickets, or perform external writes. Fixtures are invented and non-clinical; WardAtlas is not a validated hospital system or medical device.
+WardAtlas is a local synthetic hospital-operations control room for the Company Brain track. It uses actual FalkorDB queries to trace a fictional equipment outage through a service to impacted departments and explicitly current operating roles, preserve source provenance, reveal a stale SOP reference and unresolved conflict, and exclude inaccessible evidence. Its integrated shift board keeps the INC-207 dock roster revision separate from INC-204 conveyor event replay: effective-dated ownership, explicit-edge review candidates, observed restoration, and a forked hypothetical drill are inspectable at pinned times. The responsive UI separates source facts, graph inference and missing evidence. A handover preview carries an inspectable, timestamped snapshot of the exact impact paths and explicit source-backed SOP witness from the existing read-only graph query; missing edges stay incomplete/unknown. The confirmed local action stores that same snapshot only after an explicit confirmation click. It does not send messages, make calls, create tickets, or perform external writes. Fixtures are invented and non-clinical; WardAtlas is not a validated hospital system or medical device.
 
 ## Clean setup and verification
 
@@ -42,6 +42,26 @@ The latest exact results and the honest implemented/verified/planned feature mat
 ## Graph-backed SOP conflict impact trace
 
 The additive `/api/sop-impact?scope=operations&as_of=...` view joins the INC-204 → CONVEYOR-C4 → material-transfer service paths to SOP-OPS-9 only through explicit `APPLIES_TO`, `SOP_CONFLICT`, and `CLAIMS_ROLE` relationships plus source-evidence edges. Its claim rows are always labeled **unverified SOP claim**, separately from roster-derived current-owner paths. Removing either pinned applicability or conflict edge removes the complete witness but does not infer that the SOP is resolved or that no conflict exists. The archived V1/C3 source remains visible as history and is not attached to the C4 witness. Offset timestamps normalize to UTC; an observed restoration removes active impact paths without resolving the independent SOP disagreement. This is read-only, synthetic, operations-scoped and non-clinical.
+
+## Confirmed handover graph-witness snapshot
+
+`POST /api/handover/draft` accepts an optional explicit ISO-8601 `as_of` value (default `2026-10-14T18:30:00Z`) and calls the already-accepted `/api/sop-impact` service. `scripts/wardatlas_handover.py` is a pure projection; it does not duplicate graph traversal. The returned `snapshot` holds normalized `as_of`, ordered impact paths with each source ID/title/observation time, and a typed SOP witness with the real applicability/conflict edges, claim labels, provenance and archived-V1 exclusion. The preview does not write graph or action state. A removed witness edge preserves the outage paths, changes only witness linkage to `incomplete/unknown` or `unknown`, and removes the incident-linked SOP review proposal. Confirmation stores an immutable copy of the snapshot in the one local synthetic action; later graph changes do not rewrite what was reviewed. A missing edge is never reported as “resolved” or “no conflict.”
+
+Check the candidate-independent nine-case packet, unit tests, actual FalkorDB/API behavior, and desktop/mobile browser from this worker's allocated ports:
+
+```sh
+: "${WORKSHOP_PORT_BASE:?set the allocated private port base}"
+: "${WORKSHOP_PORT_SPAN:?set the allocated private port span}"
+: "${WORKSHOP_LANE:?set the allocated workshop lane}"
+DB_PORT="$((WORKSHOP_PORT_BASE + 80))"
+APP_PORT="$((WORKSHOP_PORT_BASE + 81))"
+test "$((APP_PORT - WORKSHOP_PORT_BASE))" -lt "$WORKSHOP_PORT_SPAN"
+python3 scripts/verify_handover_brief_contract.py --expected tests/handover-brief-expected-results.json --matrix tests/handover-brief-adversarial-matrix.json --pinned-plan /workspace/worktrees/planner-d0017f7f160844fe9cf5a6036aa5068f/plans/planner-d0017f7f160844fe9cf5a6036aa5068f.md --require-nine-cases
+python3 -m unittest tests.test_handover_brief_contract tests.test_handover_snapshot tests.test_handover_live_cleanup
+python3 scripts/verify_handover_brief_live.py --db-port "$DB_PORT" --app-port "$APP_PORT" --report "/workspace/evidence/preserve-handover-graph-witness/$WORKSHOP_LANE/live.json" --evidence-dir "/workspace/evidence/preserve-handover-graph-witness/$WORKSHOP_LANE/browser"
+```
+
+The live verifier owns a unique lane-named graph, loopback app, project-local state directory and database process; it deletes only those resources. On a source-only checkout the pinned FalkorDB module is bootstrapped and digest-verified automatically.
 
 Exercise all ten pinned groups against actual FalkorDB and the live API/browser from a clean source checkout (the verifier bootstraps the existing digest-pinned local module when needed):
 

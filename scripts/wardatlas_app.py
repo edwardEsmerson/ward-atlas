@@ -34,6 +34,7 @@ from wardatlas_sop_impact import (
     STALE_QUERY,
     assemble_response as assemble_sop_impact_response,
 )
+from wardatlas_handover import has_complete_sop_witness, snapshot_from_impact, source_ids_from_snapshot
 from wardatlas_shift_board import (
     BRANCH_AT,
     BRANCH_EVENT_QUERY,
@@ -139,6 +140,9 @@ APP_HTML = r'''<!doctype html>
     .fact-group.inference li::before { color:var(--blue); }
     .fact-group.missing li::before { color:var(--amber); }
     .handover-actions { display:flex; flex-wrap:wrap; gap:9px; margin:15px 0 0; }
+    .handover-controls { display:grid; gap:7px; margin-top:12px; }
+    .handover-controls label { color:#afc2bf; font-size:10px; }
+    .handover-controls input { width:100%; min-width:0; color:var(--ink); background:#1a3038; border:1px solid #426067; border-radius:7px; padding:9px 10px; font:inherit; font-size:11px; }
     .preview { margin-top:14px; border:1px solid #3a5964; background:#10212b; border-radius:11px; padding:14px; }
     .preview[hidden] { display:none; }
     .preview h3 { margin:0 0 8px; }
@@ -148,6 +152,15 @@ APP_HTML = r'''<!doctype html>
     .saved-item { border:1px solid #2f4c45; border-radius:10px; padding:12px; background:#142b27; }
     .saved-item strong { font-size:12px; }
     .saved-item p { margin:6px 0 0; color:#a9c2bb; font-size:11px; line-height:1.5; }
+    .handover-snapshot { border:1px solid #35534e; border-radius:9px; padding:11px; margin:11px 0; background:#10231f; min-width:0; }
+    .handover-snapshot h4 { margin:0 0 8px; color:#a9e9cd; font-size:10px; letter-spacing:.09em; text-transform:uppercase; }
+    .handover-snapshot h5 { margin:10px 0 5px; color:#c0d1cc; font-size:9px; letter-spacing:.08em; text-transform:uppercase; }
+    .handover-snapshot p { overflow-wrap:anywhere; }
+    .handover-witness-status { color:#f0cf91; font-size:10px; }
+    .handover-path { overflow-wrap:anywhere; border-left:2px solid var(--mint); padding:7px 8px; margin:7px 0; background:#102d2680; color:#d8e9e2; font-size:10px; line-height:1.55; }
+    .handover-source { color:#a9c2bb; font-size:9px; line-height:1.5; overflow-wrap:anywhere; padding:2px 0; }
+    .handover-claim { border-top:1px solid #344b43; padding:6px 0; color:#d4e1dd; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+    .handover-claim strong { color:#f0d9a9; }
     .safety { margin-top:18px; padding:13px 15px; border:1px solid #314650; border-radius:11px; color:#a9bec0; font-size:11px; line-height:1.55; background:#111f29; }
     .safety strong { color:#d3e2dc; }
     .notice { min-height:20px; margin-top:10px; color:#f1c278; font-size:12px; }
@@ -274,6 +287,7 @@ APP_HTML = r'''<!doctype html>
           <section class="card" aria-labelledby="handover-title">
             <div class="card-head"><div><div class="eyebrow">Human-confirmed local action</div><h2 id="handover-title">Shift handover</h2></div><span class="tag">No external send</span></div>
             <p class="subtle">Prepare an evidence-linked draft from the current graph. Nothing is saved until you explicitly confirm.</p>
+            <div class="handover-controls"><label for="handover-as-of">Evidence snapshot time · ISO-8601 with offset</label><input id="handover-as-of" type="text" value="2026-10-14T18:30:00Z" autocomplete="off" spellcheck="false" aria-describedby="handover-time-help"><span id="handover-time-help" class="subtle">The preview normalizes this instant to UTC. Invalid timestamps are rejected without a write.</span></div>
             <div class="handover-actions"><button id="prepare" class="button primary" type="button">Prepare handover draft</button></div>
             <div id="preview" class="preview" hidden></div>
             <div id="notice" class="notice" aria-live="polite"></div>
@@ -446,23 +460,48 @@ APP_HTML = r'''<!doctype html>
         for(const item of data.sop_finding.evidence) evidence.append(sourceName(item.source_id,item.title,item.observed_at));
       }
     }
-    async function loadAll() {
+     async function loadAll() {
       const [health, data, graph, actions, shiftBoard]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard()]);
       $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
       renderBriefing(data,graph); renderActions(actions.actions);
+    }
+    function renderHandoverSnapshot(snapshot, saved=false) {
+      const root=element('section',saved?'handover-snapshot saved-snapshot':'handover-snapshot');
+      if(!saved) root.id='handover-snapshot';
+      root.dataset.snapshot=JSON.stringify(snapshot); root.dataset.asOf=snapshot.as_of;
+      root.append(element('h4','',`Graph witness snapshot · ${snapshot.as_of}`));
+      root.append(element('div','handover-witness-status',`Impact · ${snapshot.impact.status}`));
+      root.append(element('h5','','Connected impact paths'));
+      if(!snapshot.impact.paths.length) root.append(element('p','subtle','No active graph path is present at this time; this does not establish safety or absence of risk.'));
+      for(const item of snapshot.impact.path_evidence) {
+        root.append(element('div','handover-path',item.path.join('  →  ')));
+        for(let i=0;i<item.source_ids.length;i++) root.append(element('div','handover-source',`${item.source_ids[i]} · ${item.source_titles[i]} · observed ${item.observed_at[i]}`));
+      }
+      const witness=snapshot.sop_witness;
+      root.append(element('h5','','SOP-OPS-9 relationship witness'));
+      if(!witness) root.append(element('div','handover-witness-status','Linkage unknown · no complete source-backed witness is available.'));
+      else {
+        root.append(element('div','handover-witness-status',`${witness.linkage_status} · ${witness.conflict_status} · shared equipment ${witness.shared_equipment_id||'unknown'}`));
+        for(const edge of witness.applicability_edges) root.append(element('div','handover-source',`${edge.from} —[${edge.relationship}]→ ${edge.to}`));
+        if(witness.conflict_edge) root.append(element('div','handover-source',`${witness.conflict_edge.from} —[${witness.conflict_edge.relationship}]→ ${witness.conflict_edge.to} · ${witness.conflict_edge.status}`));
+        for(const claim of witness.claim_evidence) root.append(element('div','handover-claim',`${claim.sop_version_id} · ${claim.claim_label} · ${claim.role_id} · ${claim.source_id} · ${claim.source_title} · observed ${claim.observed_at}`));
+        const stale=witness.stale_version_excluded_from_c4_witness;
+        if(stale) root.append(element('div','handover-source',`Archived history excluded from this C4 witness: ${stale.version_id} · ${stale.source_id} · ${stale.source_title} · observed ${stale.observed_at} · references ${stale.referenced_equipment_id}`));
+      }
+      return root;
     }
     function renderActions(actions) {
       $('saved-count').textContent=`${actions.length} saved`;
       const root=$('saved'); root.replaceChildren();
       if(!actions.length) { root.append(element('div','empty','No confirmed handovers yet.')); return; }
-      for(const item of actions.slice().reverse()) { const card=element('div','saved-item'); card.append(element('strong','',`${item.id} · ${item.incident_id}`)); card.append(element('p','',`Confirmed ${item.confirmed_at}. Stored only in local app state.`)); root.append(card); }
+      for(const item of actions.slice().reverse()) { const card=element('div','saved-item'); card.append(element('strong','',`${item.id} · ${item.incident_id}`)); card.append(element('p','',`Confirmed ${item.confirmed_at}. Stored only in local app state.`)); if(item.snapshot) card.append(renderHandoverSnapshot(item.snapshot,true)); root.append(card); }
     }
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('dock-time').addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
     for(const button of document.querySelectorAll('[data-conveyor-at]')) button.addEventListener('click',()=>{ conveyorAt=button.dataset.conveyorAt; loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`); });
     $('branch-reset').addEventListener('click',async()=>{ const button=$('branch-reset'); button.disabled=true; try { await api('/api/shift-board/branch/reset',{method:'POST',body:'{}'}); $('shift-board-notice').textContent='Only the named hypothetical overlay was reset; observed events were preserved.'; await loadShiftBoard(); } catch(e) { $('shift-board-notice').textContent=`Branch reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('prepare').addEventListener('click',async()=>{ const button=$('prepare'); button.disabled=true; $('notice').textContent='Preparing a source-linked draft…'; try {
-      const draft=await api('/api/handover/draft',{method:'POST',body:JSON.stringify({incident_id:'INC-204'})}); const box=$('preview'); box.replaceChildren(); box.append(element('h3','',`Preview · ${draft.incident_id}`)); box.append(element('p','',draft.summary));
+      const draft=await api('/api/handover/draft',{method:'POST',body:JSON.stringify({incident_id:'INC-204',as_of:$('handover-as-of').value})}); const box=$('preview'); box.replaceChildren(); box.append(element('h3','',`Preview · ${draft.incident_id}`)); box.append(element('p','',draft.summary)); box.append(renderHandoverSnapshot(draft.snapshot));
       const list=element('ul','task-list'); for(const task of draft.proposed_actions) list.append(element('li','',`${task.text} [${task.source_ids.join(', ')}]`)); box.append(list);
       box.append(element('p','subtle','This preview is not persisted. Confirm below to save it locally.'));
       const confirm=element('button','button primary','Confirm & save locally'); confirm.type='button'; confirm.id='confirm-handover'; confirm.addEventListener('click',async()=>{ confirm.disabled=true; try { const result=await api('/api/handover/confirm',{method:'POST',body:JSON.stringify({token:draft.confirmation_token,confirm:true})}); $('notice').textContent=`Saved locally as ${result.action.id}. No external action was taken.`; box.hidden=true; await loadAll(); } catch(e) { $('notice').textContent=`Not saved: ${e.message}`; confirm.disabled=false; } }); box.append(confirm); box.hidden=false; $('notice').textContent='Draft prepared in memory only. Nothing has been saved.';
@@ -876,22 +915,58 @@ class WardAtlasService:
                 raise RuntimeError("local action state has an unsupported format")
             return value["items"]
 
-    def preview_handover(self, incident_id: str) -> dict:
+    def preview_handover(self, incident_id: str, as_of: str = CONVEYOR_OUTAGE_AT) -> dict:
         if incident_id != "INC-204":
             raise ValueError("Only the pinned synthetic incident is available in this demo.")
-        data = self.briefing()
-        if not data["impact_paths"] or not data["sop_finding"]:
-            raise RuntimeError("No complete graph-backed outage briefing is available; reset the synthetic scenario first.")
+        # Validate and query through the accepted read-only SOP-impact service
+        # before creating even an in-memory pending draft. The handover only
+        # projects that service result; graph traversal stays in one place.
+        impact = self.sop_impact(as_of)
+        snapshot = snapshot_from_impact(impact)
+        witness = snapshot["sop_witness"]
+        if not snapshot["impact"]["paths"] and witness is None:
+            raise RuntimeError("No graph-backed handover evidence is available; reset the synthetic scenario first.")
+        if has_complete_sop_witness(snapshot) and snapshot["as_of"] == CONVEYOR_OUTAGE_AT and len(snapshot["impact"]["paths"]) == 2:
+            # Keep the original handover content byte-for-byte for its default
+            # workflow; the additive graph snapshot is the only default change.
+            summary = "Open material-transfer outage affects two operations departments. Confirmed role paths and source timestamps are included; SOP-OPS-9 remains unresolved and no escalation winner is asserted."
+        elif has_complete_sop_witness(snapshot):
+            summary = f"The evidence snapshot contains {len(snapshot['impact']['paths'])} active impact paths as of {snapshot['as_of']}. The source-backed SOP-OPS-9 disagreement remains unresolved; no escalation winner is selected."
+        elif witness:
+            summary = "Graph-backed handover evidence is available, but the SOP-OPS-9 linkage is incomplete/unknown. No resolved, absent, or authoritative-conflict conclusion is asserted."
+        else:
+            summary = "Graph-backed impact evidence is available. No complete SOP witness is linked, and no conflict-resolution conclusion is asserted."
+        path_sources = (snapshot["impact"]["path_evidence"][0].get("source_ids", [])[:2]
+                        if snapshot["impact"]["path_evidence"] else [])
+        proposed_actions = []
+        if snapshot["impact"]["paths"]:
+            proposed_actions.append({
+                "text": "Carry forward the equipment status for next-shift verification; do not infer a restoration time.",
+                "source_ids": path_sources,
+            })
+        if has_complete_sop_witness(snapshot):
+            proposed_actions.append({
+                "text": "Resolve the SOP-OPS-9 escalation disagreement before treating either current claim as authoritative.",
+                "source_ids": sorted({claim["source_id"] for claim in witness["claim_evidence"]}),
+            })
         token = secrets.token_urlsafe(24)
         draft = {
             "confirmation_token": token,
             "incident_id": "INC-204",
-            "summary": "Open material-transfer outage affects two operations departments. Confirmed role paths and source timestamps are included; SOP-OPS-9 remains unresolved and no escalation winner is asserted.",
-            "proposed_actions": [
-                {"text": "Carry forward the equipment status for next-shift verification; do not infer a restoration time.", "source_ids": ["SRC-INC-204", "SRC-ASSET-C4"]},
-                {"text": "Resolve the SOP-OPS-9 escalation disagreement before treating either current claim as authoritative.", "source_ids": ["SRC-SOP-CURRENT-V2", "SRC-SOP-CURRENT-V3"]},
-            ],
-            "source_ids": sorted({source["source_id"] for path in data["impact_paths"] for source in path["evidence"]} | {source["source_id"] for source in data["sop_finding"]["evidence"]}),
+            "summary": summary,
+            "proposed_actions": proposed_actions,
+            "source_ids": source_ids_from_snapshot(snapshot),
+            "snapshot": snapshot,
+            "action_boundary": {
+                "source_truth_resolved": False,
+                "work_claimed_performed": False,
+                "clinical_action_proposed": False,
+                "messages_sent": False,
+                "calls_made": False,
+                "external_tickets_created": False,
+                "external_writes": [],
+                "automatically_confirmed": False,
+            },
             "prepared_at": utc_now(),
         }
         with self.action_lock:
@@ -915,6 +990,8 @@ class WardAtlasService:
                 "summary": draft["summary"],
                 "proposed_actions": draft["proposed_actions"],
                 "source_ids": draft["source_ids"],
+                "snapshot": draft["snapshot"],
+                "action_boundary": draft["action_boundary"],
                 "confirmed_at": utc_now(),
                 "storage": "local-only",
             }
@@ -1060,7 +1137,7 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/handover/draft":
             try:
                 body = self._json_body()
-                self._send(201, service.preview_handover(body.get("incident_id", "INC-204")))
+                self._send(201, service.preview_handover(body.get("incident_id", "INC-204"), body.get("as_of", CONVEYOR_OUTAGE_AT)))
             except ValueError as exc:
                 self._error(400, str(exc))
             except RuntimeError as exc:
