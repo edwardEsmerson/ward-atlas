@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/cross-case-handover-expected-results.json",
+  "oracle_policy": "Every assertion maps to an exact field in the pinned candidate-independent expected-results artifact and exact numbered planner outcome. Candidate output is never an oracle.",
+  "cases": [
+    {
+      "id": "cold-empty-unknown",
+      "scenario_id": "cold-empty-unknown",
+      "attack_or_edge_case": "Cold empty / unknown",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "empty.no-fabricated",
+          "expected_pointer": "/cases/0/expected/no_fabricated_records",
+          "assertion": "no records are invented"
+        },
+        {
+          "id": "empty.inc204",
+          "expected_pointer": "/cases/0/expected/inc204",
+          "assertion": "INC-204 facts and paths are empty"
+        },
+        {
+          "id": "empty.inc207",
+          "expected_pointer": "/cases/0/expected/inc207",
+          "assertion": "INC-207 ownership is unknown"
+        },
+        {
+          "id": "empty.actions",
+          "expected_pointer": "/cases/0/expected/saved_actions",
+          "assertion": "no saved actions are fabricated"
+        },
+        {
+          "id": "empty.unknown-not-safe",
+          "expected_pointer": "/cases/0/expected/absence_of_risk_concluded",
+          "assertion": "absence is not a safety/risk conclusion"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:74"
+      ]
+    },
+    {
+      "id": "outage-known-at-1914-with-dock-r1",
+      "scenario_id": "outage-known-at-1914-with-dock-r1",
+      "attack_or_edge_case": "19:14Z knowledge: outage and R1",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "outage.time-pair",
+          "expected_pointer": "/cases/1/expected/request",
+          "assertion": "exact shared knowledge and both independent valid times"
+        },
+        {
+          "id": "outage.event-source",
+          "expected_pointer": "/cases/1/expected/inc204/event",
+          "assertion": "exact observed outage event and source record"
+        },
+        {
+          "id": "outage.paths",
+          "expected_pointer": "/cases/1/expected/inc204/impact_paths",
+          "assertion": "exact ordered multi-hop paths"
+        },
+        {
+          "id": "outage.path-provenance",
+          "expected_pointer": "/cases/1/expected/inc204/path_evidence",
+          "assertion": "source IDs, titles and observation times for both paths"
+        },
+        {
+          "id": "outage.dock-r1",
+          "expected_pointer": "/cases/1/expected/inc207",
+          "assertion": "exact R1 duty path and no R2 hint"
+        },
+        {
+          "id": "outage.no-causality",
+          "expected_pointer": "/cases/1/expected/cross_case",
+          "assertion": "separate case IDs/provenance and no causal/path join"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:75"
+      ]
+    },
+    {
+      "id": "restoration-known-at-1916-same-valid-times",
+      "scenario_id": "restoration-known-at-1916-same-valid-times",
+      "attack_or_edge_case": "19:16Z knowledge: restoration at same valid times",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "restore.time-pair",
+          "expected_pointer": "/cases/2/expected/request",
+          "assertion": "only knowledge advances while valid times stay fixed"
+        },
+        {
+          "id": "restore.event-source",
+          "expected_pointer": "/cases/2/expected/inc204/event",
+          "assertion": "exact 19:15 restoration event, source, title and observation time"
+        },
+        {
+          "id": "restore.no-active-paths",
+          "expected_pointer": "/cases/2/expected/inc204/active_impact_paths",
+          "assertion": "no active outage paths after known restoration"
+        },
+        {
+          "id": "restore.historical-replay",
+          "expected_pointer": "/cases/2/expected/inc204/historical_replay",
+          "assertion": "exact 18:30 historical paths and evidence"
+        },
+        {
+          "id": "restore.sop-conflict",
+          "expected_pointer": "/cases/2/expected/inc204/sop_witness",
+          "assertion": "two exact unresolved claims remain separate"
+        },
+        {
+          "id": "restore.dock-r1-unchanged",
+          "expected_pointer": "/cases/2/expected/inc207",
+          "assertion": "R1 duty result remains unchanged"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:76"
+      ]
+    },
+    {
+      "id": "dock-r2-not-yet-known-at-201759",
+      "scenario_id": "dock-r2-not-yet-known-at-201759",
+      "attack_or_edge_case": "20:17:59Z knowledge: R2 unknown",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "unknown.time-pair",
+          "expected_pointer": "/cases/3/expected/request",
+          "assertion": "exact 20:17:59Z/20:30Z crossed axes"
+        },
+        {
+          "id": "unknown.role",
+          "expected_pointer": "/cases/3/expected/inc207/role_path",
+          "assertion": "expired R1 and unknown R2 yield no role path"
+        },
+        {
+          "id": "unknown.r1-only",
+          "expected_pointer": "/cases/3/expected/inc207/source_versions",
+          "assertion": "only previously known R1 is visible"
+        },
+        {
+          "id": "unknown.no-candidates",
+          "expected_pointer": "/cases/3/expected/inc207/review_candidates",
+          "assertion": "no review candidate leaks"
+        },
+        {
+          "id": "unknown.no-r2-hint",
+          "expected_pointer": "/cases/3/expected/r2_identifier_title_time_count_or_existence_hint_disclosed",
+          "assertion": "no R2 existence side channel"
+        },
+        {
+          "id": "unknown.restoration-independent",
+          "expected_pointer": "/cases/3/expected/inc204",
+          "assertion": "INC-204 restoration remains independent and unchanged"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:77"
+      ]
+    },
+    {
+      "id": "dock-r2-known-at-2019-effective-2030",
+      "scenario_id": "dock-r2-known-at-2019-effective-2030",
+      "attack_or_edge_case": "20:19Z knowledge: R2 swing at selected effective time",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "r2.time-pair",
+          "expected_pointer": "/cases/4/expected/request",
+          "assertion": "20:19 knowledge and 20:30 effective instant"
+        },
+        {
+          "id": "r2.role-path",
+          "expected_pointer": "/cases/4/expected/inc207/role_path",
+          "assertion": "exact selected-time swing role path"
+        },
+        {
+          "id": "r2.source-provenance",
+          "expected_pointer": "/cases/4/expected/inc207/source_versions",
+          "assertion": "exact R1/R2 IDs, titles, observed and effective times"
+        },
+        {
+          "id": "r2.explicit-candidates",
+          "expected_pointer": "/cases/4/expected/inc207/review_candidates",
+          "assertion": "exactly HND-DOCK-2020 and TKT-DOCK-88"
+        },
+        {
+          "id": "r2.pending-status",
+          "expected_pointer": "/cases/4/expected/inc207/candidate_disposition",
+          "assertion": "candidate disposition remains pending review"
+        },
+        {
+          "id": "r2.not-hindsight",
+          "expected_pointer": "/cases/4/expected/r2_is_not_claimed_effective_at_known_at",
+          "assertion": "does not claim R2 effective at 20:19Z"
+        },
+        {
+          "id": "r2.restored-case-isolated",
+          "expected_pointer": "/cases/4/expected/inc204",
+          "assertion": "conveyor restoration and SOP conflict unchanged"
+        },
+        {
+          "id": "r2.before-boundary-duty",
+          "expected_pointer": "/cases/4/expected/dock_before_effective/role_path",
+          "assertion": "known R2 does not change role before 20:30 effective boundary"
+        },
+        {
+          "id": "r2.before-boundary-candidates",
+          "expected_pointer": "/cases/4/expected/dock_before_effective/review_candidates",
+          "assertion": "R2 review candidates are visible while the old role remains effective"
+        },
+        {
+          "id": "r2.exact-effective-boundary",
+          "expected_pointer": "/cases/4/expected/effective_boundary",
+          "assertion": "duty path at 20:29Z and swing path only at 20:30Z"
+        }
+      ],
+      "nonzero_assertion_count": 10,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:78"
+      ]
+    },
+    {
+      "id": "case-isolated-edge-removals",
+      "scenario_id": "case-isolated-edge-removals",
+      "attack_or_edge_case": "Independent case-isolated graph counterfactuals",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "edge.restoration-only",
+          "expected_pointer": "/cases/5/expected/restoration_evidence_edge_removal",
+          "assertion": "exact only restoration EVIDENCED_BY edge removal outcome"
+        },
+        {
+          "id": "edge.restoration-isolation",
+          "expected_pointer": "/cases/5/expected/restoration_evidence_edge_removal/unaffected_inc207_result",
+          "assertion": "dock R1 result is unchanged"
+        },
+        {
+          "id": "edge.supersedes-only",
+          "expected_pointer": "/cases/5/expected/r2_supersedes_edge_removal",
+          "assertion": "exact SUPERSEDES-only candidate/linkage effect"
+        },
+        {
+          "id": "edge.supersedes-does-not-change-role",
+          "expected_pointer": "/cases/5/expected/r2_supersedes_edge_removal/role_path_after_removal",
+          "assertion": "swing role path remains graph-owned"
+        },
+        {
+          "id": "edge.owned-by-only",
+          "expected_pointer": "/cases/5/expected/r2_owned_by_edge_removal",
+          "assertion": "exact OWNED_BY-only unknown-role effect"
+        },
+        {
+          "id": "edge.other-case-unchanged",
+          "expected_pointer": "/cases/5/expected/r2_owned_by_edge_removal/unaffected_inc204_result",
+          "assertion": "INC-204 stays restored during dock mutation"
+        },
+        {
+          "id": "edge.reseed",
+          "expected_pointer": "/cases/5/expected/reseed",
+          "assertion": "each owned mutation reseeds exact baseline"
+        },
+        {
+          "id": "edge.restoration-time-pair",
+          "expected_pointer": "/cases/5/expected/restoration_evidence_mutation_times",
+          "assertion": "restoration evidence edge removal uses the 19:16Z shared cutoff and 20:29Z dock effective time"
+        },
+        {
+          "id": "edge.r2-time-pair",
+          "expected_pointer": "/cases/5/expected/r2_edge_mutation_times",
+          "assertion": "R2 supersedes and ownership edge removals use the 20:19Z/20:30Z baseline"
+        }
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:79"
+      ]
+    },
+    {
+      "id": "hypothetical-branch-separate-from-mainline",
+      "scenario_id": "hypothetical-branch-separate-from-mainline",
+      "attack_or_edge_case": "18:50Z branch remains hypothetical",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "branch.time-pair",
+          "expected_pointer": "/cases/6/expected/request",
+          "assertion": "18:50 valid / 19:16 known axes and dock time"
+        },
+        {
+          "id": "branch.hypothetical-zero",
+          "expected_pointer": "/cases/6/expected/branch",
+          "assertion": "zero paths; exact branch/event remains hypothetical"
+        },
+        {
+          "id": "branch.observed-two-paths",
+          "expected_pointer": "/cases/6/expected/observed_mainline",
+          "assertion": "exact two observed outage paths and provenance"
+        },
+        {
+          "id": "branch.dock-unknown",
+          "expected_pointer": "/cases/6/expected/inc207",
+          "assertion": "dock stays unknown before R2 observation"
+        },
+        {
+          "id": "branch.no-observed-mutation",
+          "expected_pointer": "/cases/6/expected/observed_mainline_mutated",
+          "assertion": "hypothetical overlay does not mutate mainline"
+        },
+        {
+          "id": "branch.no-saved-action-mutation",
+          "expected_pointer": "/cases/6/expected/existing_saved_local_actions_unchanged",
+          "assertion": "saved actions remain unchanged"
+        },
+        {
+          "id": "branch.no-causality",
+          "expected_pointer": "/cases/6/expected/cross_case_causality_asserted",
+          "assertion": "no cross-case causal claim"
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:80"
+      ]
+    },
+    {
+      "id": "full-denied-source-response-invariance",
+      "scenario_id": "full-denied-source-response-invariance",
+      "attack_or_edge_case": "Full denied-source invariance",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "acl.viewer",
+          "expected_pointer": "/cases/7/expected/viewer_scope",
+          "assertion": "operations-visible audience is fixed"
+        },
+        {
+          "id": "acl.dock-probe",
+          "expected_pointer": "/cases/7/expected/restricted_tripwire_fixtures/dock_literals",
+          "assertion": "exact restricted dock tripwire literals"
+        },
+        {
+          "id": "acl.conveyor-probe",
+          "expected_pointer": "/cases/7/expected/restricted_tripwire_fixtures/conveyor_event",
+          "assertion": "exact restricted event/source fixture"
+        },
+        {
+          "id": "acl.sop-probe",
+          "expected_pointer": "/cases/7/expected/restricted_tripwire_fixtures/sop_claim",
+          "assertion": "exact restricted SOP fixture and path"
+        },
+        {
+          "id": "acl.full-api-equality",
+          "expected_pointer": "/cases/7/expected/full_response_invariance/combined_api_projection_unchanged",
+          "assertion": "full combined API remains invariant"
+        },
+        {
+          "id": "acl.counts-and-ui-equality",
+          "expected_pointer": "/cases/7/expected/full_response_invariance",
+          "assertion": "counts, browser text, accessibility tree all remain invariant"
+        },
+        {
+          "id": "acl.no-direct-derived-leak",
+          "expected_pointer": "/cases/7/expected/full_response_invariance/hidden_identifier_title_fact_source_time_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+          "assertion": "no direct or derived disclosure"
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:81"
+      ]
+    },
+    {
+      "id": "repeat-reconnect-read-only-responsive-owned-cleanup",
+      "scenario_id": "repeat-reconnect-read-only-responsive-owned-cleanup",
+      "attack_or_edge_case": "Idempotence, reconnect, read-only, responsive agreement, owned cleanup",
+      "setup": "Use a unique, lane-owned graph with the fixed synthetic fixture and actual FalkorDB for later behavior work; compare only to this pinned expected-results oracle and the cited unchanged sources.",
+      "pinned_assertions": [
+        {
+          "id": "repeat.idempotent-seed",
+          "expected_pointer": "/cases/8/expected/duplicate_fixed_node_count_after_second_seed",
+          "assertion": "zero duplicate fixed nodes/edges"
+        },
+        {
+          "id": "repeat.fresh-reconnect",
+          "expected_pointer": "/cases/8/expected/reconnected_snapshot_matches_case",
+          "assertion": "fresh client and restarted app reproduce exact pinned result"
+        },
+        {
+          "id": "repeat.desktop-mobile",
+          "expected_pointer": "/cases/8/expected/api_desktop_mobile_snapshots_match_expected_case",
+          "assertion": "API, desktop and mobile match pinned result"
+        },
+        {
+          "id": "repeat.read-only",
+          "expected_pointer": "/cases/8/expected/graph_write_delta_for_query_or_time_selection",
+          "assertion": "zero graph writes on queries/time selection"
+        },
+        {
+          "id": "repeat.no-action-external-writes",
+          "expected_pointer": "/cases/8/expected/local_action_write_delta_for_query_or_time_selection",
+          "assertion": "zero action and external writes"
+        },
+        {
+          "id": "repeat.confirmation-separate",
+          "expected_pointer": "/cases/8/expected/explicit_confirmation_is_separate_human_action",
+          "assertion": "confirmation remains a separate explicit human action"
+        },
+        {
+          "id": "repeat.owned-cleanup",
+          "expected_pointer": "/cases/8/expected/cleanup_deletes_only_task_owned_graph_and_state",
+          "assertion": "cleanup is limited to owned graph/state/processes"
+        },
+        {
+          "id": "repeat.no-duplicate-relationships",
+          "expected_pointer": "/cases/8/expected/duplicate_fixed_relationship_count_after_second_seed",
+          "assertion": "second seed creates zero duplicate fixed relationships"
+        },
+        {
+          "id": "repeat.external-side-effects",
+          "expected_pointer": "/cases/8/expected/external_side_effects",
+          "assertion": "no messages, calls, tickets or external writes"
+        },
+        {
+          "id": "repeat.owned-process-cleanup",
+          "expected_pointer": "/cases/8/expected/cleanup_stops_only_task_owned_processes",
+          "assertion": "cleanup stops only processes owned by the test"
+        }
+      ],
+      "nonzero_assertion_count": 10,
+      "failure_detected": "Any changed/missing pinned time, path, source ID/title/timestamp, status, candidate, no-leak/no-causality invariant, mutation isolation, read-only/reconnect behavior, or zero/mispointed assertion mapping fails.",
+      "planner_refs": [
+        "planner-b282158eb9404a67925e94e5c174a389.md:82"
+      ]
+    }
+  ]
+}

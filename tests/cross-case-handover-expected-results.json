@@ -1,0 +1,1522 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent fixed outcomes for nine cross-case INC-204/INC-207 evidence-known-time groups, pinned before any cross-case behavior work.",
+  "oracle_policy": "Expected values are transcribed from the pinned cross-case planner packet and cross-checked against the unchanged accepted synthetic source oracles listed below. Candidate behavior, API responses, UI output, and any candidate-produced report are never read, copied, or used to amend an expectation.",
+  "oracle_author": "cross-case-handover-contract-author",
+  "pinned_sources": [
+    {
+      "id": "cross-case-handover-packet",
+      "file": "plans/planner-b282158eb9404a67925e94e5c174a389.md",
+      "sha256": "370431eb2defa6363a4e56d521aeb6aaae8b38a272389d21b41febb1e0dcc44c",
+      "outcome_lines": [
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82
+      ]
+    },
+    {
+      "id": "conveyor-bitemporal-expected-results",
+      "file": "tests/conveyor-bitemporal-expected-results.json",
+      "sha256": "8ffa7ee25a52219808656ead871fac4779625300f9eea0eaa9543e8b0c7740e6"
+    },
+    {
+      "id": "conveyor-bitemporal-adversarial-matrix",
+      "file": "tests/conveyor-bitemporal-adversarial-matrix.json",
+      "sha256": "e036570a3db09c8b544cb339b2665beeee3d469416c4b5fe69e5be2b3597eb67"
+    },
+    {
+      "id": "dock-bitemporal-expected-results",
+      "file": "tests/dock-bitemporal-expected-results.json",
+      "sha256": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"
+    },
+    {
+      "id": "dock-bitemporal-adversarial-matrix",
+      "file": "tests/dock-bitemporal-adversarial-matrix.json",
+      "sha256": "84127f273043a03299823905bbecc06a755f79cb9a3b34c44793815eda7f5318"
+    },
+    {
+      "id": "handover-known-time-expected-results",
+      "file": "tests/handover-known-time-expected-results.json",
+      "sha256": "fd72df03c8e865cfe347839074ee8251bf57216deac33fcc9d5a4d1152513f93"
+    },
+    {
+      "id": "handover-known-time-adversarial-matrix",
+      "file": "tests/handover-known-time-adversarial-matrix.json",
+      "sha256": "7b8450947696e55af0dc48aaa6d27fd0231f458b0f527b3fc00f643ad1f64f67"
+    },
+    {
+      "id": "shift-board-expected-results",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "shift-board-adversarial-matrix",
+      "file": "tests/shift-board-adversarial-matrix.json",
+      "sha256": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7"
+    },
+    {
+      "id": "sop-impact-expected-results",
+      "file": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "id": "sop-impact-adversarial-matrix",
+      "file": "tests/sop-impact-adversarial-matrix.json",
+      "sha256": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6"
+    },
+    {
+      "id": "handover-brief-expected-results",
+      "file": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    },
+    {
+      "id": "handover-brief-adversarial-matrix",
+      "file": "tests/handover-brief-adversarial-matrix.json",
+      "sha256": "d084f31a1b542670ab99818852cba8e1141bfb56688845c439b01f5ac1d89003"
+    },
+    {
+      "id": "expected-results",
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    },
+    {
+      "id": "adversarial-matrix",
+      "file": "tests/adversarial-matrix.json",
+      "sha256": "6d0edbc69620da85b494185879565c8260c9d2d3fe6afdd5bf56c5acd92205ba"
+    }
+  ],
+  "frozen_hash_manifest": {
+    "file": "tests/cross-case-handover-frozen-hashes.json",
+    "sha256": "d3e34775e0a616a51fd1981a1df244a04d0e5c7ac99fe329fd607ebf3b647819",
+    "file_count": 30
+  },
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "candidate_output_is_oracle": false,
+    "external_writes": false,
+    "viewer_scope": "operations",
+    "database_requirement": "Any later behavior check must use actual FalkorDB; this oracle and its validator make no live database claim.",
+    "valid_time_axes": {
+      "conveyor_at": "INC-204 event-valid instant",
+      "dock_effective_at": "INC-207 ownership effective-time instant"
+    },
+    "shared_knowledge_axis": "known_at is source observation-time cutoff passed independently to both case queries; no cross-case causal relationship exists."
+  },
+  "fixture": {
+    "inc204": {
+      "incident_id": "INC-204",
+      "equipment_id": "CONVEYOR-C4",
+      "service_id": "SVC-MATERIAL-TRANSFER",
+      "canonical_paths": [
+        [
+          "INC-204",
+          "CONVEYOR-C4",
+          "SVC-MATERIAL-TRANSFER",
+          "DEPT-CENTRAL-STERILE",
+          "ROLE-STERILE-OPS-COORD"
+        ],
+        [
+          "INC-204",
+          "CONVEYOR-C4",
+          "SVC-MATERIAL-TRANSFER",
+          "DEPT-MATERIALS-LOGISTICS",
+          "ROLE-MATERIALS-DUTY"
+        ]
+      ],
+      "canonical_path_evidence": [
+        {
+          "path": [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          "source_ids": [
+            "SRC-INC-204",
+            "SRC-ASSET-C4",
+            "SRC-SERVICE-CATALOG",
+            "SRC-OPS-ROSTER"
+          ],
+          "source_titles": [
+            "Synthetic Incident Register INC-204",
+            "Synthetic Asset State Ledger",
+            "Synthetic Service Dependency Register",
+            "Synthetic Operations Role Roster"
+          ],
+          "observed_at": [
+            "2026-10-14T18:00:00Z",
+            "2026-10-14T18:02:00Z",
+            "2026-10-14T18:03:00Z",
+            "2026-10-14T18:04:00Z"
+          ]
+        },
+        {
+          "path": [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ],
+          "source_ids": [
+            "SRC-INC-204",
+            "SRC-ASSET-C4",
+            "SRC-SERVICE-CATALOG",
+            "SRC-OPS-ROSTER"
+          ],
+          "source_titles": [
+            "Synthetic Incident Register INC-204",
+            "Synthetic Asset State Ledger",
+            "Synthetic Service Dependency Register",
+            "Synthetic Operations Role Roster"
+          ],
+          "observed_at": [
+            "2026-10-14T18:00:00Z",
+            "2026-10-14T18:02:00Z",
+            "2026-10-14T18:03:00Z",
+            "2026-10-14T18:05:00Z"
+          ]
+        }
+      ],
+      "outage_event": {
+        "event_id": "EVT-C4-UNAVAILABLE-01",
+        "source_id": "SRC-ASSET-C4-OUTAGE",
+        "title": "Synthetic C4 Outage Event Ledger",
+        "event_at": "2026-10-14T18:02:00Z",
+        "observed_at": "2026-10-14T18:02:00Z"
+      },
+      "restoration_event": {
+        "event_id": "EVT-C4-RESTORED-01",
+        "source_id": "SRC-ASSET-C4-RESTORE",
+        "title": "Synthetic C4 Restoration Event Ledger",
+        "event_at": "2026-10-14T19:15:00Z",
+        "observed_at": "2026-10-14T19:15:00Z"
+      },
+      "sop_conflict_versions": [
+        "SOP-OPS-9-V2",
+        "SOP-OPS-9-V3"
+      ]
+    },
+    "inc207": {
+      "incident_id": "INC-207",
+      "equipment_id": "EQ-DOCK-CART-2",
+      "service_id": "SVC-INBOUND-TRANSFER",
+      "department_id": "DEPT-RECEIVING-DOCK",
+      "r1": {
+        "source_id": "SRC-DOCK-ROSTER-R1",
+        "title": "Synthetic Dock Operations Roster Revision 1",
+        "observed_at": "2026-10-14T19:00:00Z",
+        "role_id": "ROLE-DOCK-DUTY"
+      },
+      "r2": {
+        "source_id": "SRC-DOCK-ROSTER-R2",
+        "title": "Synthetic Dock Operations Roster Revision 2",
+        "observed_at": "2026-10-14T20:18:00Z",
+        "effective_at": "2026-10-14T20:30:00Z",
+        "supersedes": "SRC-DOCK-ROSTER-R1",
+        "role_id": "ROLE-DOCK-SWING"
+      },
+      "review_candidates": [
+        "HND-DOCK-2020",
+        "TKT-DOCK-88"
+      ]
+    },
+    "branch": {
+      "branch_id": "BR-C4-RESTORE-DRILL",
+      "event_id": "EVT-BR-RESTORE-01",
+      "event_at": "2026-10-14T18:45:00Z"
+    }
+  },
+  "cases": [
+    {
+      "id": "cold-empty-unknown",
+      "scenario_id": "cold-empty-unknown",
+      "expected": {
+        "graph_state": "empty/unknown",
+        "inc204": {
+          "event": null,
+          "impact_paths": [],
+          "path_evidence": [],
+          "sop_witness": null
+        },
+        "inc207": {
+          "role_path": [],
+          "role_id": null,
+          "role_status": "unknown",
+          "source_versions": [],
+          "review_candidates": []
+        },
+        "saved_actions": [],
+        "no_fabricated_records": true,
+        "availability_concluded": false,
+        "safety_concluded": false,
+        "absence_of_risk_concluded": false,
+        "no_conflict_concluded": false
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-1"
+      ],
+      "evidence_semantics": "The cold owned graph proves absence is unknown, not evidence of safety, availability, no conflict, or no risk."
+    },
+    {
+      "id": "outage-known-at-1914-with-dock-r1",
+      "scenario_id": "outage-known-at-1914-with-dock-r1",
+      "expected": {
+        "request": {
+          "known_at": "2026-10-14T19:14:00Z",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "dock_effective_at": "2026-10-14T20:29:00Z"
+        },
+        "inc204": {
+          "event": {
+            "event_id": "EVT-C4-UNAVAILABLE-01",
+            "value": "unavailable",
+            "event_kind": "observed",
+            "event_at": "2026-10-14T18:02:00Z",
+            "evidence_label": "observed source fact",
+            "source": {
+              "source_id": "SRC-ASSET-C4-OUTAGE",
+              "title": "Synthetic C4 Outage Event Ledger",
+              "observed_at": "2026-10-14T18:02:00Z"
+            }
+          },
+          "state_status": "observed-impact",
+          "impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "path_evidence": [
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:04:00Z"
+              ]
+            },
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-MATERIALS-LOGISTICS",
+                "ROLE-MATERIALS-DUTY"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:05:00Z"
+              ]
+            }
+          ],
+          "sop_witness": {
+            "shared_equipment_id": "CONVEYOR-C4",
+            "linkage_status": "complete",
+            "conflict_status": "unresolved",
+            "applicability_edges": [
+              {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              }
+            ],
+            "conflict_edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "claim_evidence": [
+              {
+                "sop_version_id": "SOP-OPS-9-V2",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V2",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z"
+              },
+              {
+                "sop_version_id": "SOP-OPS-9-V3",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V3",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z"
+              }
+            ],
+            "stale_version_excluded_from_c4_witness": {
+              "version_id": "SOP-OPS-9-V1",
+              "source_id": "SRC-SOP-ARCHIVE-9",
+              "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+              "observed_at": "2026-01-10T12:00:00Z",
+              "referenced_equipment_id": "CONVEYOR-C3",
+              "is_applicable_to_c4": false,
+              "is_joined_to_inc204_conflict_witness": false
+            },
+            "claims_are_current_owner_facts": false,
+            "winner_selected": false,
+            "contact_supplied": false,
+            "direct_incident_to_sop_causal_edge_asserted": false,
+            "procedure_or_clinical_conclusion_supplied": false
+          }
+        },
+        "inc207": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T19:14:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-DUTY"
+          ],
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "review_candidates": [],
+          "r2_identifier_title_effective_time_count_or_future_revision_wording_visible": false
+        },
+        "cross_case": {
+          "case_ids": [
+            "INC-204",
+            "INC-207"
+          ],
+          "dock_roster_revision_caused_conveyor_outage": false,
+          "path_joining_INC_207_to_CONVEYOR_C4": false,
+          "provenance_is_separate": true
+        },
+        "recorded_evidence_not_forecast_or_current_state_claim": true
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-2"
+      ],
+      "evidence_semantics": "The same known_at filters independent event and dock evidence; exact paths and provenance are pinned and no cross-case causal join is allowed."
+    },
+    {
+      "id": "restoration-known-at-1916-same-valid-times",
+      "scenario_id": "restoration-known-at-1916-same-valid-times",
+      "expected": {
+        "request": {
+          "known_at": "2026-10-14T19:16:00Z",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "historical_conveyor_at": "2026-10-14T18:30:00Z",
+          "dock_effective_at": "2026-10-14T20:29:00Z"
+        },
+        "inc204": {
+          "event": {
+            "event_id": "EVT-C4-RESTORED-01",
+            "value": "available",
+            "event_kind": "observed",
+            "event_at": "2026-10-14T19:15:00Z",
+            "evidence_label": "observed source fact",
+            "source": {
+              "source_id": "SRC-ASSET-C4-RESTORE",
+              "title": "Synthetic C4 Restoration Event Ledger",
+              "observed_at": "2026-10-14T19:15:00Z"
+            }
+          },
+          "state_status": "restored",
+          "active_impact_paths": [],
+          "sop_witness": {
+            "shared_equipment_id": "CONVEYOR-C4",
+            "linkage_status": "complete",
+            "conflict_status": "unresolved",
+            "applicability_edges": [
+              {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              }
+            ],
+            "conflict_edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "claim_evidence": [
+              {
+                "sop_version_id": "SOP-OPS-9-V2",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V2",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z"
+              },
+              {
+                "sop_version_id": "SOP-OPS-9-V3",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V3",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z"
+              }
+            ],
+            "stale_version_excluded_from_c4_witness": {
+              "version_id": "SOP-OPS-9-V1",
+              "source_id": "SRC-SOP-ARCHIVE-9",
+              "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+              "observed_at": "2026-01-10T12:00:00Z",
+              "referenced_equipment_id": "CONVEYOR-C3",
+              "is_applicable_to_c4": false,
+              "is_joined_to_inc204_conflict_witness": false
+            },
+            "claims_are_current_owner_facts": false,
+            "winner_selected": false,
+            "contact_supplied": false,
+            "direct_incident_to_sop_causal_edge_asserted": false,
+            "procedure_or_clinical_conclusion_supplied": false
+          },
+          "sop_conflict_status": "unresolved",
+          "sop_safe_conclusion_asserted": false,
+          "no_operational_risk_conclusion_asserted": false,
+          "historical_replay": {
+            "at": "2026-10-14T18:30:00Z",
+            "status": "observed-impact",
+            "paths": [
+              [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-MATERIALS-LOGISTICS",
+                "ROLE-MATERIALS-DUTY"
+              ]
+            ],
+            "canonical_path_evidence": [
+              {
+                "path": [
+                  "INC-204",
+                  "CONVEYOR-C4",
+                  "SVC-MATERIAL-TRANSFER",
+                  "DEPT-CENTRAL-STERILE",
+                  "ROLE-STERILE-OPS-COORD"
+                ],
+                "source_ids": [
+                  "SRC-INC-204",
+                  "SRC-ASSET-C4",
+                  "SRC-SERVICE-CATALOG",
+                  "SRC-OPS-ROSTER"
+                ],
+                "source_titles": [
+                  "Synthetic Incident Register INC-204",
+                  "Synthetic Asset State Ledger",
+                  "Synthetic Service Dependency Register",
+                  "Synthetic Operations Role Roster"
+                ],
+                "observed_at": [
+                  "2026-10-14T18:00:00Z",
+                  "2026-10-14T18:02:00Z",
+                  "2026-10-14T18:03:00Z",
+                  "2026-10-14T18:04:00Z"
+                ]
+              },
+              {
+                "path": [
+                  "INC-204",
+                  "CONVEYOR-C4",
+                  "SVC-MATERIAL-TRANSFER",
+                  "DEPT-MATERIALS-LOGISTICS",
+                  "ROLE-MATERIALS-DUTY"
+                ],
+                "source_ids": [
+                  "SRC-INC-204",
+                  "SRC-ASSET-C4",
+                  "SRC-SERVICE-CATALOG",
+                  "SRC-OPS-ROSTER"
+                ],
+                "source_titles": [
+                  "Synthetic Incident Register INC-204",
+                  "Synthetic Asset State Ledger",
+                  "Synthetic Service Dependency Register",
+                  "Synthetic Operations Role Roster"
+                ],
+                "observed_at": [
+                  "2026-10-14T18:00:00Z",
+                  "2026-10-14T18:02:00Z",
+                  "2026-10-14T18:03:00Z",
+                  "2026-10-14T18:05:00Z"
+                ]
+              }
+            ],
+            "event_id": "EVT-C4-UNAVAILABLE-01",
+            "source_id": "SRC-ASSET-C4-OUTAGE",
+            "event_at": "2026-10-14T18:02:00Z"
+          }
+        },
+        "inc207": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T19:16:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-DUTY"
+          ],
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "review_candidates": [],
+          "r2_identifier_title_effective_time_count_or_future_revision_wording_visible": false
+        },
+        "sop_claim_rows": [
+          {
+            "sop_version_id": "SOP-OPS-9-V2",
+            "claim_relationship": "CLAIMS_ROLE",
+            "role_id": "ROLE-FACILITIES-DUTY",
+            "claim_label": "unverified SOP claim",
+            "source_evidence_linked": true,
+            "source_id": "SRC-SOP-CURRENT-V2",
+            "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+            "observed_at": "2026-10-14T16:00:00Z"
+          },
+          {
+            "sop_version_id": "SOP-OPS-9-V3",
+            "claim_relationship": "CLAIMS_ROLE",
+            "role_id": "ROLE-MATERIALS-LEAD",
+            "claim_label": "unverified SOP claim",
+            "source_evidence_linked": true,
+            "source_id": "SRC-SOP-CURRENT-V3",
+            "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+            "observed_at": "2026-10-14T16:04:00Z"
+          }
+        ],
+        "sop_conflict_remains_unresolved": true,
+        "no_safety_or_no_risk_conclusion": false,
+        "only_event_result_changes_between_cases_2_and_3": true
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-3"
+      ],
+      "evidence_semantics": "Only the observed event selection changes; historical replay, unresolved SOP claims, and dock R1 remain exact."
+    },
+    {
+      "id": "dock-r2-not-yet-known-at-201759",
+      "scenario_id": "dock-r2-not-yet-known-at-201759",
+      "expected": {
+        "request": {
+          "known_at": "2026-10-14T20:17:59Z",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "dock_effective_at": "2026-10-14T20:30:00Z"
+        },
+        "inc204": {
+          "event": {
+            "event_id": "EVT-C4-RESTORED-01",
+            "value": "available",
+            "event_kind": "observed",
+            "event_at": "2026-10-14T19:15:00Z",
+            "evidence_label": "observed source fact",
+            "source": {
+              "source_id": "SRC-ASSET-C4-RESTORE",
+              "title": "Synthetic C4 Restoration Event Ledger",
+              "observed_at": "2026-10-14T19:15:00Z"
+            }
+          },
+          "state_status": "restored",
+          "active_impact_paths": [],
+          "sop_witness": {
+            "shared_equipment_id": "CONVEYOR-C4",
+            "linkage_status": "complete",
+            "conflict_status": "unresolved",
+            "applicability_edges": [
+              {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              }
+            ],
+            "conflict_edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "claim_evidence": [
+              {
+                "sop_version_id": "SOP-OPS-9-V2",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V2",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z"
+              },
+              {
+                "sop_version_id": "SOP-OPS-9-V3",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V3",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z"
+              }
+            ],
+            "stale_version_excluded_from_c4_witness": {
+              "version_id": "SOP-OPS-9-V1",
+              "source_id": "SRC-SOP-ARCHIVE-9",
+              "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+              "observed_at": "2026-01-10T12:00:00Z",
+              "referenced_equipment_id": "CONVEYOR-C3",
+              "is_applicable_to_c4": false,
+              "is_joined_to_inc204_conflict_witness": false
+            },
+            "claims_are_current_owner_facts": false,
+            "winner_selected": false,
+            "contact_supplied": false,
+            "direct_incident_to_sop_causal_edge_asserted": false,
+            "procedure_or_clinical_conclusion_supplied": false
+          },
+          "sop_conflict_status": "unresolved",
+          "sop_safe_conclusion_asserted": false,
+          "no_operational_risk_conclusion_asserted": false
+        },
+        "inc207": {
+          "effective_at": "2026-10-14T20:30:00Z",
+          "known_at": "2026-10-14T20:17:59Z",
+          "role_path": [],
+          "role_id": null,
+          "role_status": "unknown",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "review_candidates": [],
+          "r2_identifier_title_effective_time_count_or_existence_hint_visible": false,
+          "expired_r1_not_returned_as_current": true,
+          "unknown_not_guessed_as_duty_or_swing": true
+        },
+        "r2_identifier_title_time_count_or_existence_hint_disclosed": false,
+        "unknown_role_not_guessed_as_duty_or_swing": true
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-4"
+      ],
+      "evidence_semantics": "The future-effective ownership gap is unknown without disclosing R2 existence, identifiers, titles, times, counts, or candidates."
+    },
+    {
+      "id": "dock-r2-known-at-2019-effective-2030",
+      "scenario_id": "dock-r2-known-at-2019-effective-2030",
+      "expected": {
+        "request": {
+          "known_at": "2026-10-14T20:19:00Z",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "dock_effective_at": "2026-10-14T20:30:00Z"
+        },
+        "inc204": {
+          "event": {
+            "event_id": "EVT-C4-RESTORED-01",
+            "value": "available",
+            "event_kind": "observed",
+            "event_at": "2026-10-14T19:15:00Z",
+            "evidence_label": "observed source fact",
+            "source": {
+              "source_id": "SRC-ASSET-C4-RESTORE",
+              "title": "Synthetic C4 Restoration Event Ledger",
+              "observed_at": "2026-10-14T19:15:00Z"
+            }
+          },
+          "state_status": "restored",
+          "active_impact_paths": [],
+          "sop_witness": {
+            "shared_equipment_id": "CONVEYOR-C4",
+            "linkage_status": "complete",
+            "conflict_status": "unresolved",
+            "applicability_edges": [
+              {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              }
+            ],
+            "conflict_edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "claim_evidence": [
+              {
+                "sop_version_id": "SOP-OPS-9-V2",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V2",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z"
+              },
+              {
+                "sop_version_id": "SOP-OPS-9-V3",
+                "claim_relationship": "CLAIMS_ROLE",
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source_evidence_linked": true,
+                "source_id": "SRC-SOP-CURRENT-V3",
+                "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z"
+              }
+            ],
+            "stale_version_excluded_from_c4_witness": {
+              "version_id": "SOP-OPS-9-V1",
+              "source_id": "SRC-SOP-ARCHIVE-9",
+              "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+              "observed_at": "2026-01-10T12:00:00Z",
+              "referenced_equipment_id": "CONVEYOR-C3",
+              "is_applicable_to_c4": false,
+              "is_joined_to_inc204_conflict_witness": false
+            },
+            "claims_are_current_owner_facts": false,
+            "winner_selected": false,
+            "contact_supplied": false,
+            "direct_incident_to_sop_causal_edge_asserted": false,
+            "procedure_or_clinical_conclusion_supplied": false
+          },
+          "sop_conflict_status": "unresolved",
+          "sop_safe_conclusion_asserted": false,
+          "no_operational_risk_conclusion_asserted": false
+        },
+        "inc207": {
+          "effective_at": "2026-10-14T20:30:00Z",
+          "known_at": "2026-10-14T20:19:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-SWING"
+          ],
+          "role_id": "ROLE-DOCK-SWING",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            },
+            {
+              "source_id": "SRC-DOCK-ROSTER-R2",
+              "title": "Synthetic Dock Operations Roster Revision 2",
+              "observed_at": "2026-10-14T20:18:00Z",
+              "effective_at": "2026-10-14T20:30:00Z",
+              "supersedes": "SRC-DOCK-ROSTER-R1",
+              "status": "recorded/pending"
+            }
+          ],
+          "review_candidates": [
+            "HND-DOCK-2020",
+            "TKT-DOCK-88"
+          ],
+          "interpretation": "ROLE-DOCK-SWING is valid at effective_at and known by known_at; this does not claim swing was effective at known_at",
+          "candidate_disposition": "pending review; not declared-invalid artifacts"
+        },
+        "r2_observation_time": "2026-10-14T20:18:00Z",
+        "r2_is_valid_only_at_selected_effective_instant": true,
+        "r2_is_not_claimed_effective_at_known_at": true,
+        "dock_before_effective": {
+          "effective_at": "2026-10-14T20:29:00Z",
+          "known_at": "2026-10-14T20:19:00Z",
+          "role_path": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-DUTY"
+          ],
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            },
+            {
+              "source_id": "SRC-DOCK-ROSTER-R2",
+              "title": "Synthetic Dock Operations Roster Revision 2",
+              "observed_at": "2026-10-14T20:18:00Z",
+              "effective_at": "2026-10-14T20:30:00Z",
+              "supersedes": "SRC-DOCK-ROSTER-R1",
+              "status": "recorded/pending"
+            }
+          ],
+          "review_candidates": [
+            "HND-DOCK-2020",
+            "TKT-DOCK-88"
+          ],
+          "candidate_disposition": "pending review; not declared-invalid artifacts"
+        },
+        "effective_boundary": {
+          "at_2026_10_14T20_29_00Z": "ROLE-DOCK-DUTY",
+          "at_2026_10_14T20_30_00Z": "ROLE-DOCK-SWING",
+          "only_swing_at_selected_effective_boundary": true
+        }
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-5"
+      ],
+      "evidence_semantics": "R2 and exactly its two explicit-edge candidates become visible only when known and at 20:30Z effective time."
+    },
+    {
+      "id": "case-isolated-edge-removals",
+      "scenario_id": "case-isolated-edge-removals",
+      "expected": {
+        "restoration_evidence_edge_removal": {
+          "source_oracle_case": {
+            "baseline": {
+              "conveyor_at": "2026-10-14T19:30:00Z",
+              "conveyor_known_at": "2026-10-14T19:16:00Z",
+              "state_status": "restored",
+              "selected_event": {
+                "event_id": "EVT-C4-RESTORED-01",
+                "source_id": "SRC-ASSET-C4-RESTORE",
+                "event_at": "2026-10-14T19:15:00Z"
+              },
+              "active_paths": []
+            },
+            "remove_only_edge": {
+              "from": "EVT-C4-RESTORED-01",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-ASSET-C4-RESTORE",
+              "ownership": "test-owned edge only"
+            },
+            "after_removal": {
+              "state_status": "observed-impact",
+              "selected_event": {
+                "event_id": "EVT-C4-UNAVAILABLE-01",
+                "source_id": "SRC-ASSET-C4-OUTAGE",
+                "event_at": "2026-10-14T18:02:00Z"
+              },
+              "impact_paths": [
+                [
+                  "INC-204",
+                  "CONVEYOR-C4",
+                  "SVC-MATERIAL-TRANSFER",
+                  "DEPT-CENTRAL-STERILE",
+                  "ROLE-STERILE-OPS-COORD"
+                ],
+                [
+                  "INC-204",
+                  "CONVEYOR-C4",
+                  "SVC-MATERIAL-TRANSFER",
+                  "DEPT-MATERIALS-LOGISTICS",
+                  "ROLE-MATERIALS-DUTY"
+                ]
+              ],
+              "restoration_event_or_source_details_emitted": false
+            },
+            "reseed_restores_exact_baseline": true
+          },
+          "unaffected_inc207_result": {
+            "effective_at": "2026-10-14T20:29:00Z",
+            "known_at": "2026-10-14T19:16:00Z",
+            "role_path": [
+              "INC-207",
+              "EQ-DOCK-CART-2",
+              "SVC-INBOUND-TRANSFER",
+              "DEPT-RECEIVING-DOCK",
+              "ROLE-DOCK-DUTY"
+            ],
+            "role_id": "ROLE-DOCK-DUTY",
+            "source_versions": [
+              {
+                "source_id": "SRC-DOCK-ROSTER-R1",
+                "title": "Synthetic Dock Operations Roster Revision 1",
+                "observed_at": "2026-10-14T19:00:00Z"
+              }
+            ],
+            "review_candidates": [],
+            "r2_identifier_title_effective_time_count_or_future_revision_wording_visible": false
+          },
+          "unaffected_inc207_result_matches_case": "restoration-known-at-1916-same-valid-times",
+          "only_inc204_case_changes": true
+        },
+        "r2_supersedes_edge_removal": {
+          "source_oracle_case": {
+            "edge": {
+              "from": "SRC-DOCK-ROSTER-R2",
+              "relationship": "SUPERSEDES",
+              "to": "SRC-DOCK-ROSTER-R1"
+            },
+            "review_candidates": [],
+            "linkage_status": "unknown",
+            "currentness_conclusion": false
+          },
+          "baseline_inc207": {
+            "effective_at": "2026-10-14T20:30:00Z",
+            "known_at": "2026-10-14T20:19:00Z",
+            "role_path": [
+              "INC-207",
+              "EQ-DOCK-CART-2",
+              "SVC-INBOUND-TRANSFER",
+              "DEPT-RECEIVING-DOCK",
+              "ROLE-DOCK-SWING"
+            ],
+            "review_candidates": [
+              "HND-DOCK-2020",
+              "TKT-DOCK-88"
+            ]
+          },
+          "unaffected_inc204_result": {
+            "event": {
+              "event_id": "EVT-C4-RESTORED-01",
+              "value": "available",
+              "event_kind": "observed",
+              "event_at": "2026-10-14T19:15:00Z",
+              "evidence_label": "observed source fact",
+              "source": {
+                "source_id": "SRC-ASSET-C4-RESTORE",
+                "title": "Synthetic C4 Restoration Event Ledger",
+                "observed_at": "2026-10-14T19:15:00Z"
+              }
+            },
+            "state_status": "restored",
+            "active_impact_paths": [],
+            "sop_witness": {
+              "shared_equipment_id": "CONVEYOR-C4",
+              "linkage_status": "complete",
+              "conflict_status": "unresolved",
+              "applicability_edges": [
+                {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                }
+              ],
+              "conflict_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "claim_evidence": [
+                {
+                  "sop_version_id": "SOP-OPS-9-V2",
+                  "claim_relationship": "CLAIMS_ROLE",
+                  "role_id": "ROLE-FACILITIES-DUTY",
+                  "claim_label": "unverified SOP claim",
+                  "source_evidence_linked": true,
+                  "source_id": "SRC-SOP-CURRENT-V2",
+                  "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z"
+                },
+                {
+                  "sop_version_id": "SOP-OPS-9-V3",
+                  "claim_relationship": "CLAIMS_ROLE",
+                  "role_id": "ROLE-MATERIALS-LEAD",
+                  "claim_label": "unverified SOP claim",
+                  "source_evidence_linked": true,
+                  "source_id": "SRC-SOP-CURRENT-V3",
+                  "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:04:00Z"
+                }
+              ],
+              "stale_version_excluded_from_c4_witness": {
+                "version_id": "SOP-OPS-9-V1",
+                "source_id": "SRC-SOP-ARCHIVE-9",
+                "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+                "observed_at": "2026-01-10T12:00:00Z",
+                "referenced_equipment_id": "CONVEYOR-C3",
+                "is_applicable_to_c4": false,
+                "is_joined_to_inc204_conflict_witness": false
+              },
+              "claims_are_current_owner_facts": false,
+              "winner_selected": false,
+              "contact_supplied": false,
+              "direct_incident_to_sop_causal_edge_asserted": false,
+              "procedure_or_clinical_conclusion_supplied": false
+            },
+            "sop_conflict_status": "unresolved",
+            "sop_safe_conclusion_asserted": false,
+            "no_operational_risk_conclusion_asserted": false
+          },
+          "unaffected_inc204_result_matches_case": "dock-r2-known-at-2019-effective-2030",
+          "only_inc207_case_changes": true,
+          "role_path_after_removal": [
+            "INC-207",
+            "EQ-DOCK-CART-2",
+            "SVC-INBOUND-TRANSFER",
+            "DEPT-RECEIVING-DOCK",
+            "ROLE-DOCK-SWING"
+          ],
+          "role_id_after_removal": "ROLE-DOCK-SWING"
+        },
+        "r2_owned_by_edge_removal": {
+          "source_oracle_case": {
+            "edge": {
+              "from": "DEPT-RECEIVING-DOCK",
+              "relationship": "OWNED_BY",
+              "to": "ROLE-DOCK-SWING",
+              "source_id": "SRC-DOCK-ROSTER-R2"
+            },
+            "role_path": [],
+            "role_id": null,
+            "role_status": "unknown"
+          },
+          "unaffected_inc204_result": {
+            "event": {
+              "event_id": "EVT-C4-RESTORED-01",
+              "value": "available",
+              "event_kind": "observed",
+              "event_at": "2026-10-14T19:15:00Z",
+              "evidence_label": "observed source fact",
+              "source": {
+                "source_id": "SRC-ASSET-C4-RESTORE",
+                "title": "Synthetic C4 Restoration Event Ledger",
+                "observed_at": "2026-10-14T19:15:00Z"
+              }
+            },
+            "state_status": "restored",
+            "active_impact_paths": [],
+            "sop_witness": {
+              "shared_equipment_id": "CONVEYOR-C4",
+              "linkage_status": "complete",
+              "conflict_status": "unresolved",
+              "applicability_edges": [
+                {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                }
+              ],
+              "conflict_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "claim_evidence": [
+                {
+                  "sop_version_id": "SOP-OPS-9-V2",
+                  "claim_relationship": "CLAIMS_ROLE",
+                  "role_id": "ROLE-FACILITIES-DUTY",
+                  "claim_label": "unverified SOP claim",
+                  "source_evidence_linked": true,
+                  "source_id": "SRC-SOP-CURRENT-V2",
+                  "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z"
+                },
+                {
+                  "sop_version_id": "SOP-OPS-9-V3",
+                  "claim_relationship": "CLAIMS_ROLE",
+                  "role_id": "ROLE-MATERIALS-LEAD",
+                  "claim_label": "unverified SOP claim",
+                  "source_evidence_linked": true,
+                  "source_id": "SRC-SOP-CURRENT-V3",
+                  "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:04:00Z"
+                }
+              ],
+              "stale_version_excluded_from_c4_witness": {
+                "version_id": "SOP-OPS-9-V1",
+                "source_id": "SRC-SOP-ARCHIVE-9",
+                "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+                "observed_at": "2026-01-10T12:00:00Z",
+                "referenced_equipment_id": "CONVEYOR-C3",
+                "is_applicable_to_c4": false,
+                "is_joined_to_inc204_conflict_witness": false
+              },
+              "claims_are_current_owner_facts": false,
+              "winner_selected": false,
+              "contact_supplied": false,
+              "direct_incident_to_sop_causal_edge_asserted": false,
+              "procedure_or_clinical_conclusion_supplied": false
+            },
+            "sop_conflict_status": "unresolved",
+            "sop_safe_conclusion_asserted": false,
+            "no_operational_risk_conclusion_asserted": false
+          },
+          "unaffected_inc204_result_matches_case": "dock-r2-known-at-2019-effective-2030",
+          "only_inc207_case_changes": true
+        },
+        "reseed": {
+          "restoration_evidence_restores_exact_inc204_baseline": true,
+          "dock_edge_removals_restore_exact_baseline": true
+        },
+        "mutation_scope": "Each mutation removes exactly one named edge in this test-owned graph; no other fixture or case is mutated.",
+        "r2_edge_mutation_times": {
+          "known_at": "2026-10-14T20:19:00Z",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "dock_effective_at": "2026-10-14T20:30:00Z"
+        },
+        "restoration_evidence_mutation_times": {
+          "known_at": "2026-10-14T19:16:00Z",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "dock_effective_at": "2026-10-14T20:29:00Z"
+        }
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-6"
+      ],
+      "evidence_semantics": "Restoration evidence, R2 supersession, and R2 ownership edge removals affect only their own case and reseeding restores exact baselines."
+    },
+    {
+      "id": "hypothetical-branch-separate-from-mainline",
+      "scenario_id": "hypothetical-branch-separate-from-mainline",
+      "expected": {
+        "request": {
+          "known_at": "2026-10-14T19:16:00Z",
+          "conveyor_at": "2026-10-14T18:50:00Z",
+          "dock_effective_at": "2026-10-14T20:30:00Z"
+        },
+        "branch": {
+          "branch_id": "BR-C4-RESTORE-DRILL",
+          "label": "hypothetical",
+          "event_id": "EVT-BR-RESTORE-01",
+          "event_at": "2026-10-14T18:45:00Z",
+          "status": "hypothetical-restored",
+          "impact_paths": [],
+          "event_is_observed": false,
+          "path_count": 0
+        },
+        "observed_mainline": {
+          "event": {
+            "event_id": "EVT-C4-UNAVAILABLE-01",
+            "value": "unavailable",
+            "event_kind": "observed",
+            "event_at": "2026-10-14T18:02:00Z",
+            "evidence_label": "observed source fact",
+            "source": {
+              "source_id": "SRC-ASSET-C4-OUTAGE",
+              "title": "Synthetic C4 Outage Event Ledger",
+              "observed_at": "2026-10-14T18:02:00Z"
+            }
+          },
+          "status": "observed-impact",
+          "impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "path_evidence": [
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:04:00Z"
+              ]
+            },
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-MATERIALS-LOGISTICS",
+                "ROLE-MATERIALS-DUTY"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:05:00Z"
+              ]
+            }
+          ],
+          "path_count": 2
+        },
+        "inc207": {
+          "effective_at": "2026-10-14T20:30:00Z",
+          "known_at": "2026-10-14T19:16:00Z",
+          "role_path": [],
+          "role_id": null,
+          "role_status": "unknown",
+          "source_versions": [
+            {
+              "source_id": "SRC-DOCK-ROSTER-R1",
+              "title": "Synthetic Dock Operations Roster Revision 1",
+              "observed_at": "2026-10-14T19:00:00Z"
+            }
+          ],
+          "review_candidates": [],
+          "r2_identifier_title_effective_time_count_or_existence_hint_visible": false,
+          "expired_r1_not_returned_as_current": true,
+          "unknown_not_guessed_as_duty_or_swing": true
+        },
+        "branch_facts_labeled_hypothetical": true,
+        "observed_mainline_mutated": false,
+        "branch_in_observed_snapshot": false,
+        "existing_saved_local_actions_unchanged": true,
+        "cross_case_causality_asserted": false
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-7"
+      ],
+      "evidence_semantics": "The 19:16Z evidence cutoff still yields two observed outage paths at conveyor valid time 18:50Z and zero hypothetical branch paths."
+    },
+    {
+      "id": "full-denied-source-response-invariance",
+      "scenario_id": "full-denied-source-response-invariance",
+      "expected": {
+        "viewer_scope": "operations",
+        "restricted_tripwire_fixtures": {
+          "dock_literals": [
+            "SRC-RESTRICTED-DOCK-99",
+            "Restricted Dock Continuity Annex 99",
+            "Restricted-only note: logistics bay status unresolved.",
+            "EQ-RESTRICTED-DOCK-99",
+            "DEPT-RESTRICTED-DOCK-99",
+            "ROLE-RESTRICTED-DOCK-OWNER"
+          ],
+          "conveyor_event": {
+            "event_id": "EV-C4-RESTRICTED-UPDATE",
+            "source_id": "SRC-RESTRICTED-92",
+            "source_title": "Restricted Continuity Annex 92",
+            "fact_text": "Restricted-only instruction: contact the secure lift coordinator.",
+            "event_effective_at": "2026-10-14T18:20:00Z",
+            "event_value": "available",
+            "event_acl_label": "operations",
+            "source_acl_label": "restricted"
+          },
+          "sop_claim": {
+            "version_id": "SOP-RESTRICTED-PROBE-91",
+            "claimed_role_id": "ROLE-RESTRICTED-PROBE-91",
+            "source_id": "SRC-RESTRICTED-SOP-PROBE-91",
+            "source_title": "Restricted synthetic SOP-impact probe 91",
+            "source_text": "Restricted synthetic SOP claim: role probe 91.",
+            "department_id": "DEPT-RESTRICTED-PROBE-91",
+            "relationship_id": "REL-RESTRICTED-SOP-PROBE-91",
+            "path": [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-RESTRICTED-PROBE-91",
+              "ROLE-RESTRICTED-PROBE-91"
+            ],
+            "acl": "restricted"
+          }
+        },
+        "checked_views": [
+          {
+            "case_id": "outage-known-at-1914-with-dock-r1",
+            "known_at": "2026-10-14T19:14:00Z",
+            "conveyor_at": "2026-10-14T19:30:00Z",
+            "dock_effective_at": "2026-10-14T20:29:00Z"
+          },
+          {
+            "case_id": "restoration-known-at-1916-same-valid-times",
+            "known_at": "2026-10-14T19:16:00Z",
+            "conveyor_at": "2026-10-14T19:30:00Z",
+            "dock_effective_at": "2026-10-14T20:29:00Z"
+          },
+          {
+            "case_id": "dock-r2-not-yet-known-at-201759",
+            "known_at": "2026-10-14T20:17:59Z",
+            "conveyor_at": "2026-10-14T19:30:00Z",
+            "dock_effective_at": "2026-10-14T20:30:00Z"
+          },
+          {
+            "case_id": "dock-r2-known-at-2019-effective-2030",
+            "known_at": "2026-10-14T20:19:00Z",
+            "conveyor_at": "2026-10-14T19:30:00Z",
+            "dock_effective_at": "2026-10-14T20:30:00Z"
+          },
+          {
+            "case_id": "hypothetical-branch-separate-from-mainline",
+            "known_at": "2026-10-14T19:16:00Z",
+            "conveyor_at": "2026-10-14T18:50:00Z",
+            "dock_effective_at": "2026-10-14T20:30:00Z",
+            "branch_id": "BR-C4-RESTORE-DRILL"
+          }
+        ],
+        "full_response_invariance": {
+          "combined_api_projection_unchanged": true,
+          "visible_count_fields_unchanged": true,
+          "browser_visible_text_unchanged": true,
+          "accessibility_tree_semantically_unchanged": true,
+          "hidden_identifier_title_fact_source_time_count_existence_relationship_path_or_dependent_paraphrase_disclosed": false
+        },
+        "tripwire_fixtures_are_never_visible_expected_content": true
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-8"
+      ],
+      "evidence_semantics": "Injecting already-pinned restricted dock, conveyor, and SOP fixtures cannot change any operations-visible combined response or leak a direct/derived fact."
+    },
+    {
+      "id": "repeat-reconnect-read-only-responsive-owned-cleanup",
+      "scenario_id": "repeat-reconnect-read-only-responsive-owned-cleanup",
+      "expected": {
+        "seed_runs": 2,
+        "task_owned_unique_graph_required": true,
+        "duplicate_fixed_node_count_after_second_seed": 0,
+        "duplicate_fixed_relationship_count_after_second_seed": 0,
+        "fresh_falkordb_client_and_restarted_app_required": true,
+        "reconnected_snapshot_matches_case": "dock-r2-known-at-2019-effective-2030",
+        "api_desktop_mobile_snapshots_match_expected_case": true,
+        "graph_write_delta_for_query_or_time_selection": 0,
+        "local_action_write_delta_for_query_or_time_selection": 0,
+        "external_writes": [],
+        "messages_sent": false,
+        "calls_made": false,
+        "tickets_created": false,
+        "existing_handover_unchanged_unless_separate_explicit_confirmation": true,
+        "explicit_confirmation_is_separate_human_action": true,
+        "cleanup_deletes_only_task_owned_graph_and_state": true,
+        "cleanup_stops_only_task_owned_processes": true,
+        "external_side_effects": {
+          "messages_sent": false,
+          "calls_made": false,
+          "tickets_created": false,
+          "external_writes": []
+        }
+      },
+      "planner_refs": [
+        "cross-case-handover-packet#outcome-9"
+      ],
+      "evidence_semantics": "Repeat seed and fresh reconnect preserve exact selected output; reads do not write; desktop/mobile agree and cleanup stays within owned resources."
+    }
+  ]
+}
