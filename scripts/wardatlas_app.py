@@ -28,6 +28,7 @@ from verify_falkordb_live import (
     text,
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
+from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -219,6 +220,15 @@ APP_HTML = r'''<!doctype html>
     .sop-impact-edge { color:#f4cf8c; font-size:10px; line-height:1.6; overflow-wrap:anywhere; }
     .sop-impact-stale { border:1px solid #665035; border-radius:9px; padding:10px 12px; margin-top:12px; color:#d8c6a8; font-size:10px; line-height:1.55; background:#30281d88; }
     .sop-impact-empty { color:#f1c278; font-size:12px; padding:6px 0; }
+    .decision-docket { margin:0 0 18px; border-color:#3f5f60; background:linear-gradient(145deg,#193333,#172731 68%); }
+    .decision-docket-intro { color:#bfcbc7; font-size:12px; line-height:1.55; margin:4px 0 14px; max-width:920px; }
+    .decision-record { border:1px solid #426363; border-radius:10px; padding:13px; margin:10px 0; background:#10272988; }
+    .decision-record h3 { margin:0 0 6px; color:#d7eee6; font-size:14px; }
+    .decision-meta { color:#a9c2bd; font-size:10px; line-height:1.7; overflow-wrap:anywhere; }
+    .decision-edges { font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace; color:#cde4dc; overflow-wrap:anywhere; }
+    .decision-claim { border-top:1px solid #355052; padding:8px 0; color:#f0d9a9; font-size:11px; line-height:1.6; }
+    .decision-claim small { display:block; color:#afc0bb; overflow-wrap:anywhere; }
+    .decision-unknown { color:#f1c278; font-size:12px; padding:7px 0; }
     @media (max-width:760px) { .sop-impact-grid { grid-template-columns:1fr; } }
     #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
@@ -276,6 +286,13 @@ APP_HTML = r'''<!doctype html>
           <p id="sop-impact-unknown" class="subtle" hidden></p>
         </div>
         <div id="sop-impact-notice" class="notice" aria-live="polite"></div>
+      </section>
+      <section id="decision-docket" class="card decision-docket" aria-labelledby="decision-docket-title">
+        <div class="card-head"><div><div class="eyebrow">Register-rooted provenance · read only</div><h2 id="decision-docket-title">Decision provenance docket</h2></div><span id="decision-docket-badge" class="tag blue">Loading register evidence…</span></div>
+        <p class="decision-docket-intro">This docket starts at the synthetic operations register and follows explicit TRACKS, CONSIDERS, CLAIMS_ROLE and EVIDENCED_BY relationships. Recorded state is not a selected procedure: neither disputed version is made authoritative, and claim roles are not current owners or contacts.</p>
+        <div id="decision-docket-empty" class="decision-unknown" hidden>Unknown / no evidence. The register record or its own source link is unavailable; no decision absence, resolution, procedure, or owner is inferred.</div>
+        <div id="decision-docket-content" aria-live="polite"></div>
+        <div id="decision-docket-notice" class="notice" aria-live="polite"></div>
       </section>
       <div id="legacy-grid" class="grid" hidden>
         <div class="stack">
@@ -425,6 +442,53 @@ APP_HTML = r'''<!doctype html>
         $('sop-impact-notice').textContent=`SOP impact trace unavailable: ${e.message}. The existing briefing and shift board remain available.`;
       }
     }
+    function renderDecisionDocket(data) {
+      const unknown=data.state==='unknown';
+      $('decision-docket-badge').textContent=unknown?'Unknown · no evidence':data.state==='open-unresolved'?'Source-backed · unresolved':'Incomplete · unknown';
+      $('decision-docket-empty').hidden=!unknown;
+      const content=$('decision-docket-content'); content.replaceChildren();
+      if(unknown) return;
+      for(const docket of data.docket_rows) {
+        const record=docket.decision_record; const card=element('article','decision-record');
+        card.dataset.decisionId=record.id;
+        card.append(element('h3','',`${record.id} · ${record.title}`));
+        card.append(element('div','decision-meta',`Register ${data.root_id} · TRACKS · ${docket.state} · recorded state ${record.recorded_state}`));
+        card.append(element('p','decision-meta',record.recorded_statement));
+        const source=record.record_source;
+        card.append(element('div','decision-meta',`Decision-register evidence · ${source.id} · ${source.title} · observed ${source.observed_at} · ${record.id} -[EVIDENCED_BY]-> ${source.id}`));
+        const considered=element('div','decision-edges');
+        considered.textContent=docket.considered_edges.length
+          ? docket.considered_edges.map(edge=>`${edge.from} -[${edge.relationship}]-> ${edge.to}`).join(' · ')
+          : 'No considered-version edge is established; linkage is unknown.';
+        card.append(considered);
+        if(docket.conflict_edge) card.append(element('div','decision-edges',`${docket.conflict_edge.from} -[${docket.conflict_edge.relationship} · ${docket.conflict_edge.status}]-> ${docket.conflict_edge.to}`));
+        else card.append(element('div','decision-unknown','Conflict linkage unknown; no absence or resolution is inferred.'));
+        for(const claim of docket.claims) {
+          const item=element('div','decision-claim',`${claim.version_id} · ${claim.claim_label} → ${claim.role_id}`);
+          item.append(element('small','',`${claim.source.id} · ${claim.source.title} · observed ${claim.source.observed_at} · explicit ${claim.source.evidence_link.from} -[EVIDENCED_BY]-> ${claim.source.evidence_link.to}`));
+          card.append(item);
+        }
+        const stateText=docket.complete_two_claim_witness_present
+          ? 'Both source-backed claims and the unresolved conflict edge are present. Neither claim is selected as authoritative.'
+          : 'Evidence witness is incomplete / unknown. A surviving claim is not promoted; no conflict resolution or current owner is inferred.';
+        card.append(element('p','decision-meta',stateText));
+        content.append(card);
+      }
+    }
+    async function loadDecisionDocket() {
+      try {
+        const data=await api('/api/decision-docket?scope=operations');
+        renderDecisionDocket(data);
+        $('decision-docket-notice').textContent='';
+        return data;
+      } catch(e) {
+        $('decision-docket-badge').textContent='Docket unavailable';
+        $('decision-docket-empty').hidden=true;
+        $('decision-docket-content').replaceChildren();
+        $('decision-docket-notice').textContent=`Decision provenance unavailable: ${e.message}. The existing incident briefing and shift board remain available.`;
+        return null;
+      }
+    }
     function renderPaths(data) {
       const svg=$('graph'); svg.replaceChildren();
       const positions={
@@ -487,7 +551,7 @@ APP_HTML = r'''<!doctype html>
       }
     }
      async function loadAll() {
-      const [health, data, graph, actions, shiftBoard]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard()]);
+      const [health, data, graph, actions, shiftBoard, docket]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadDecisionDocket()]);
       $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
       renderBriefing(data,graph); renderActions(actions.actions);
     }
@@ -789,6 +853,16 @@ class WardAtlasService:
             stale,
         )
 
+    def decision_docket(self) -> dict:
+        """Read the operations docket through its register and source edges."""
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                records = self._rows(connection, RECORDS_QUERY)
+                return project_docket(records, lambda query: self._rows(connection, query))
+            finally:
+                connection.close()
+
     @staticmethod
     def _event_order(row: dict) -> datetime:
         return datetime.fromisoformat(row["event_at"].replace("Z", "+00:00"))
@@ -1014,7 +1088,7 @@ class WardAtlasService:
                     existing = self._rows(connection, "MATCH (n) RETURN n.id AS id LIMIT 1")
                     if existing:
                         raise RuntimeError("Refusing to reset a nonempty graph not seeded by this WardAtlas process.")
-                for query in [*seed_queries(), *seed_shift_board_queries()]:
+                for query in [*seed_queries(), *seed_shift_board_queries(), *decision_seed_queries()]:
                     query_result(connection.command("GRAPH.QUERY", self.graph_name, query))
                 self.scenario_seeded_by_this_process = True
             finally:
@@ -1216,7 +1290,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/handover/compare"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/handover/compare"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -1245,6 +1319,8 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
                 data = service.sop_impact(values.get("as_of", [CONVEYOR_OUTAGE_AT])[0])
                 self._send(200, data)
+            elif parsed.path == "/api/decision-docket":
+                self._send(200, service.decision_docket())
             elif parsed.path == "/api/handover/compare":
                 values = parse_qs(parsed.query, keep_blank_values=True)
                 for key in ("action_id", "observed_at", "branch_at"):
@@ -1270,7 +1346,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._error(503, "Local graph or action state is unavailable.")
         except ValueError as exc:
-            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/handover/compare"}:
+            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/handover/compare"}:
                 message = str(exc)
                 if parsed.path != "/api/handover/compare" and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
                     message = "Invalid timestamp; use an explicit ISO-8601 offset."

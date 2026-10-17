@@ -47,7 +47,7 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
         self.assertEqual(assertions, 84)
         self.assertEqual(tuple(row["id"] for row in self.expected["cases"]), contract.REQUIRED_CASES)
         self.assertEqual(tuple(row["id"] for row in self.matrix["cases"]), contract.REQUIRED_CASES)
-        self.assertEqual(len(digests), 29)  # packet, 24 frozen files, and two pinned additive pairs
+        self.assertEqual(len(digests), 33)  # packet, 24 frozen files, and four pinned additive pairs
         self.assertEqual(len(contract.PINNED_EXISTING), 24)
         self.assertEqual(
             set(contract.verify_existing_oracles(ROOT, self.expected)),
@@ -209,7 +209,7 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
                     contract.validate_structure(self.expected, changed, True)
 
     def test_frozen_hash_manifest_rejects_byte_drift_missing_or_new_oracle(self):
-        self.assertEqual(len(contract.verify_existing_oracles(ROOT, self.expected)), 28)
+        self.assertEqual(len(contract.verify_existing_oracles(ROOT, self.expected)), 32)
         with tempfile.TemporaryDirectory() as directory:
             temp_root = Path(directory)
             pinned_files = {**contract.PINNED_EXISTING, **contract._pinned_additive_files()}

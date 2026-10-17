@@ -47,6 +47,19 @@ The additive `/api/sop-impact?scope=operations&as_of=...` view joins the INC-204
 
 `POST /api/handover/draft` accepts an optional explicit ISO-8601 `as_of` value (default `2026-10-14T18:30:00Z`) and calls the already-accepted `/api/sop-impact` service. `scripts/wardatlas_handover.py` is a pure projection; it does not duplicate graph traversal. The returned `snapshot` holds normalized `as_of`, ordered impact paths with each source ID/title/observation time, and a typed SOP witness with the real applicability/conflict edges, claim labels, provenance and archived-V1 exclusion. The preview does not write graph or action state. A removed witness edge preserves the outage paths, changes only witness linkage to `incomplete/unknown` or `unknown`, and removes the incident-linked SOP review proposal. Confirmation stores an immutable copy of the snapshot in the one local synthetic action; later graph changes do not rewrite what was reviewed. A missing edge is never reported as “resolved” or “no conflict.”
 
+## Register-rooted decision provenance docket
+
+The read-only `GET /api/decision-docket?scope=operations` traverses the synthetic `DecisionRegister -[:TRACKS]-> DecisionRecord` root and requires the record's own `EVIDENCED_BY` edge before exposing its ID, title, state, or register source. It then follows `CONSIDERS`, `CLAIMS_ROLE`, and claim-source `EVIDENCED_BY` relationships to show both SOP-OPS-9 role claims and their source titles/timestamps beside the unresolved V2→V3 conflict. This record says **open-unresolved**; it does not select an SOP winner, current owner, procedure, contact, or action. Missing evidence yields generic unknown or incomplete/unknown, never an absence or resolution conclusion. Every traversed node and edge is operations-filtered; a connected restricted-source injection leaves the complete API and accessible browser view unchanged. The app's synthetic reset seeds this additive fixture idempotently into its actual FalkorDB graph.
+
+Run the focused tests and actual-FalkorDB/API/browser verifier (the latter chooses distinct ports from this worker's `WORKSHOP_PORT_BASE`/`WORKSHOP_PORT_SPAN` and cleans only its lane-named graph/process/state):
+
+```sh
+python3 -m unittest tests.test_decision_provenance_docket tests.test_decision_provenance_contract
+python3 scripts/verify_decision_provenance_live.py --require-live-falkordb --require-nine-groups --assert-api --assert-browser --desktop-mobile --assert-owned-cleanup
+```
+
+The live check exercises all nine frozen packet groups and their 54 mapped assertions, including the three exact edge counterfactuals, idempotent restoration, fresh-client reads, restricted-view invariance, and desktop/mobile browser evidence. It is synthetic behavior evidence only, not real-hospital validation.
+
 Check the candidate-independent nine-case packet, unit tests, actual FalkorDB/API behavior, and desktop/mobile browser from this worker's allocated ports:
 
 ```sh

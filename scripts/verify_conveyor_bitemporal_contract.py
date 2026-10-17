@@ -60,6 +60,18 @@ PINNED_ADDITIVE_ORACLE_MATRIX_PAIRS = (
         "matrix": "tests/handover-known-time-adversarial-matrix.json",
         "matrix_sha256": "7b8450947696e55af0dc48aaa6d27fd0231f458b0f527b3fc00f643ad1f64f67",
     },
+    {
+        "oracle": "tests/cross-case-handover-expected-results.json",
+        "oracle_sha256": "931b39dcac5e4315d773b84b6100865ad4a172fc64faecc6c758cb0b8598d22a",
+        "matrix": "tests/cross-case-handover-adversarial-matrix.json",
+        "matrix_sha256": "24b27185c7586694b97b5e86145b60638b2a1ddf327d1ce497cd229c42e83715",
+    },
+    {
+        "oracle": "tests/decision-provenance-expected-results.json",
+        "oracle_sha256": "4143bbc135b32ed6fb89444f2c32b01bfd5ca89d50127cea5e4099fdffed5c5d",
+        "matrix": "tests/decision-provenance-adversarial-matrix.json",
+        "matrix_sha256": "256048400ee304f59884ecf3393f9a59e30d76f29281c9c6ea5378740dd71ad3",
+    },
 )
 
 # Exact bytes of every tests/*expected-results.json and
