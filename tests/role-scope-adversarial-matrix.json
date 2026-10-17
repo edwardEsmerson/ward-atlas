@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/role-scope-expected-results.json",
+  "oracle_policy": "Each adversarial case maps one-to-one to the fixed outcome group. Expected IDs, paths, grants, source, timestamps, branch, coverage, denied markers and local-only boundaries are independently pinned in the oracle and planning packet; candidate output never creates or changes an assertion.",
+  "cases": [
+    {
+      "id": "cold-empty-and-unknown-scope",
+      "scenario_id": "cold-empty-and-unknown-scope",
+      "attack_or_edge_case": "Query a new empty owned graph and then request a scope identifier that is not one of the authored synthetic personas.",
+      "setup": "Create a unique empty graph without seeding. Submit an unknown scope value; inspect only the generic response and do not enumerate valid personas.",
+      "pinned_assertions": [
+        "cold graph has zero role-scoped paths",
+        "cold graph says empty/unknown and makes no availability claim",
+        "unknown scope receives a generic denial",
+        "denial reveals no valid-scope list, path count, path, or source details",
+        "no role or source identifier is invented"
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Warm or default data invents paths, missing data is presented as safe/available, or invalid-scope handling discloses authorized scopes or graph contents.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:23-25"]
+    },
+    {
+      "id": "exact-role-scope-paths-and-grant-traces",
+      "scenario_id": "exact-role-scope-paths-and-grant-traces",
+      "attack_or_edge_case": "Select each of the three synthetic scopes for the same hypothetical INC-312 facilities outage and inspect exact ordered paths and grant/source/time/branch provenance.",
+      "setup": "At 2026-10-15T06:30:00Z on BR-FPU-OUTAGE-DRILL, query dock, linen, and coordinator scopes in that order against the pinned event and source.",
+      "pinned_assertions": [
+        "dock scope returns exactly INC-312 → EQ-FPU-7 → EQ-DOCK-CHARGER-2 → SVC-DOCK-TRANSFER → DEPT-RECEIVING-DOCK → ROLE-DOCK-FACILITIES",
+        "dock path trace contains only GRANT-DOCK-01",
+        "linen scope returns exactly INC-312 → EQ-FPU-7 → EQ-LINEN-CONVEYOR-7 → SVC-LINEN-TRANSFER → DEPT-LINEN-LOGISTICS → ROLE-LINEN-DUTY",
+        "linen path trace contains only GRANT-LINEN-01",
+        "coordinator returns both exact paths in dock-then-linen order",
+        "coordinator trace contains GRANT-OPS-DOCK-01 then GRANT-OPS-LINEN-01",
+        "all three outcomes are labeled hypothetical",
+        "each trace pins EVT-FPU-OUTAGE-HYP-01, SRC-TABLETOP-FPU-7, 06:15Z event, BR-FPU-OUTAGE-DRILL, and 06:30Z as-of",
+        "no scope returns an additional path"
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "A path or grant is missing/extra/reordered, provenance is wrong, hypothetical data is presented as observed, or an out-of-scope path is returned.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:13-21", "planner-a4d9fd7447db467faab0a96048741775.md:26"]
+    },
+    {
+      "id": "grant-edge-removal-is-scope-specific",
+      "scenario_id": "grant-edge-removal-is-scope-specific",
+      "attack_or_edge_case": "Remove exactly GRANT-DOCK-01, query all three scopes, then restore by reseeding and try a disconnected lexical decoy.",
+      "setup": "Use the unique verifier-owned graph. Change only the dock grant edge, preserve the separate coordinator grant edges, and include DOC-FPU-LEXICAL-DECOY-01 without a graph grant/path edge.",
+      "pinned_assertions": [
+        "removing GRANT-DOCK-01 leaves dock scope with no matching path and outside scope unknown",
+        "linen scope retains its exact single path",
+        "coordinator retains both exact paths through its separate grants",
+        "reseed restores the exact dock path",
+        "the disconnected lexical decoy cannot restore a graph path",
+        "the grant removal does not mutate the event, source, branch, or other scope grants"
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Scope is cosmetic post-filtering, grant removal has collateral effects, coordinator access depends on the removed grant, or lexical text recreates an absent graph edge.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:27"]
+    },
+    {
+      "id": "mainline-versus-hypothetical-branch",
+      "scenario_id": "mainline-versus-hypothetical-branch",
+      "attack_or_edge_case": "Compare the fixed mainline and BR-FPU-OUTAGE-DRILL at the same as-of time, query BR-OTHER-UNKNOWN, and verify branch isolation.",
+      "setup": "Read mainline first, then the named hypothetical branch and a separate unknown branch on the same owned graph; reread mainline and the named branch afterward.",
+      "pinned_assertions": [
+        "mainline has zero impact paths at 2026-10-15T06:30:00Z",
+        "BR-FPU-OUTAGE-DRILL returns only the two pinned scoped paths and is labeled hypothetical",
+        "BR-OTHER-UNKNOWN returns no paths",
+        "querying another branch does not change mainline or BR-FPU-OUTAGE-DRILL"
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Hypothetical assumptions bleed into mainline, unrelated branch state is inherited, or branch evaluation mutates another branch.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:13-19", "planner-a4d9fd7447db467faab0a96048741775.md:28"]
+    },
+    {
+      "id": "selected-scope-trace-and-outside-unknown",
+      "scenario_id": "selected-scope-trace-and-outside-unknown",
+      "attack_or_edge_case": "Inspect each answer's access trace and try to interpret a scope-limited result as a global count or complete hospital view.",
+      "setup": "For each selected synthetic persona, compare trace fields to its explicit graph grant, returned path, source/event provenance, branch and query time; request no global aggregate.",
+      "pinned_assertions": [
+        "each answer trace names the selected scope and only its explicit grant edge IDs",
+        "trace contains exactly that scope's returned path or paths",
+        "trace contains SRC-TABLETOP-FPU-7 and EVT-FPU-OUTAGE-HYP-01",
+        "trace distinguishes event time 06:15Z from as-of time 06:30Z and identifies the branch",
+        "coverage is selected_scope_only and outside_scope is unknown",
+        "source facts, graph inference, and missing/out-of-scope evidence remain distinct without a completeness claim"
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Trace omits or misattributes a grant/provenance field, conflates event and query times, or implies global completeness from one selected scope.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:21", "planner-a4d9fd7447db467faab0a96048741775.md:29"]
+    },
+    {
+      "id": "distinctive-ungranted-source-nondisclosure",
+      "scenario_id": "distinctive-ungranted-source-nondisclosure",
+      "attack_or_edge_case": "Inject the fixed restricted source/title/body/path markers without grants and compare each selected scope's serialized API/graph/browser result before and after.",
+      "setup": "Record all visible role-scope results; add the denied SRC-RESTRICTED-FPU-77 fixture and its distinctive path only to the verifier-owned graph; repeat every selected-scope request and compare semantic results and visible output.",
+      "pinned_assertions": [
+        "all visible selected-scope results are semantically unchanged before and after injection",
+        "no distinctive denied ID, title, body, or path marker is disclosed",
+        "no hidden source/path count or source existence is disclosed",
+        "no dependent paraphrase derived from the denied body or path is disclosed",
+        "denied fixture markers are test-only tripwires and never expected response content"
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Direct content, path/count/existence side channel, or a dependent paraphrase changes a selected-scope response when an ungranted source is added.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:30"]
+    },
+    {
+      "id": "idempotent-reseed-and-reconnect",
+      "scenario_id": "idempotent-reseed-and-reconnect",
+      "attack_or_edge_case": "Seed the scoped fixture twice, reconnect with a fresh database client, and compare ordered paths and complete traces.",
+      "setup": "Use a unique task-owned graph name incorporating WORKSHOP_LANE. Capture all three scopes, reseed the same bundle, capture again, close the client, reconnect, and capture again.",
+      "pinned_assertions": [
+        "second seed creates zero duplicate nodes",
+        "second seed creates zero duplicate relationships",
+        "fresh-client reconnect preserves ordered scope paths",
+        "fresh-client reconnect preserves complete grant/source/event/branch/time traces",
+        "grant-removal counterfactual changes only the exact pinned scope outcomes"
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Shared warm state hides duplicate ingestion, reconnect drops provenance or changes path order, or a scoped mutation leaks into unrelated scope results.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:31"]
+    },
+    {
+      "id": "desktop-mobile-api-and-local-boundary",
+      "scenario_id": "desktop-mobile-api-and-local-boundary",
+      "attack_or_edge_case": "Switch scopes on desktop and mobile and compare each visible path/trace to the API while checking identity, clinical and external-action boundaries.",
+      "setup": "Exercise all three synthetic personas plus generic unknown scope on both responsive browser widths and the API; inspect outbound effects and local action behavior.",
+      "pinned_assertions": [
+        "desktop displays the exact selected-scope API paths and traces",
+        "mobile displays the same exact selected-scope API paths and traces",
+        "unknown scope denial is generic and does not enumerate available personas",
+        "selector is visibly a synthetic persona, not real identity or authentication",
+        "no handover action, source mutation, ticket, message, call, or other external write is performed",
+        "no clinical inference or clinical action is produced",
+        "hypothetical branch and outside-scope unknown semantics remain visible",
+        "browser and API never disclose the fixed denied-source tripwires"
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "Responsive UI disagrees with graph/API, the selector is misrepresented as identity/security, or any prohibited clinical or external behavior appears.",
+      "planner_refs": ["planner-a4d9fd7447db467faab0a96048741775.md:32"]
+    }
+  ]
+}

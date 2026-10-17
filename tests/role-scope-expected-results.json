@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent outcomes for synthetic role-scoped graph paths, per-answer provenance traces, and access-boundary adversaries; this artifact pins expected behavior before any role-scope query or UI change.",
+  "oracle_policy": "Every expected value is fixed by the approved role-scope planning packet and its pinned INC-312 cascade predecessor. Candidate query, API, graph, or browser output must never supply or amend an expected value.",
+  "pinned_sources": [
+    {
+      "id": "role-scope-packet",
+      "plan": "planner-a4d9fd7447db467faab0a96048741775.md",
+      "sha256": "01073e7e1bc4294a8bb14948aa3db24bb25f48911a9435269571f1ab167b6fec",
+      "pinned_lines": [13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+    },
+    {
+      "id": "cascade-outcome-predecessor",
+      "plan": "planner-8b15037dc21642129e4f0cbd47508f2f.md",
+      "sha256": "a0ab793c8fe21383decf987f3582f3d9f94a89ce68d5afe48efada7fb60cbe11",
+      "pinned_lines": [11, 43, 46],
+      "verification_note": "The operator-supplied --pinned-plan path is the role-scope packet. Cascade values below are cross-pinned here from the named predecessor; the verifier does not discover expected values from candidate output."
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "Actual FalkorDB; a fake or Redis-only substitute is not an acceptable integrated behavior check.",
+    "graph_ownership": "Use a unique task-owned graph, include the allocated WORKSHOP_LANE in its identity, and delete only that graph.",
+    "scope_selector_semantics": "A synthetic demo persona selector, not authentication, real identity, or proof of authorization.",
+    "coverage": "selected_scope_only",
+    "outside_scope": "unknown",
+    "external_effects": false
+  },
+  "fixed_fixture": {
+    "incident_id": "INC-312",
+    "as_of": "2026-10-15T06:30:00Z",
+    "branch_id": "BR-FPU-OUTAGE-DRILL",
+    "branch_status": "hypothetical",
+    "event_id": "EVT-FPU-OUTAGE-HYP-01",
+    "event_at": "2026-10-15T06:15:00Z",
+    "source_id": "SRC-TABLETOP-FPU-7",
+    "source_observed_at": null,
+    "source_observed_at_status": "not pinned by either packet; do not fabricate a separate source-observation timestamp",
+    "scope_results": [
+      {
+        "scope_id": "SCOPE-DOCK-FACILITIES",
+        "grant_ids": ["GRANT-DOCK-01"],
+        "paths": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"]
+        ],
+        "hypothetical": true,
+        "source_id": "SRC-TABLETOP-FPU-7",
+        "event_id": "EVT-FPU-OUTAGE-HYP-01",
+        "event_at": "2026-10-15T06:15:00Z",
+        "branch_id": "BR-FPU-OUTAGE-DRILL",
+        "as_of": "2026-10-15T06:30:00Z",
+        "coverage": "selected_scope_only",
+        "outside_scope": "unknown"
+      },
+      {
+        "scope_id": "SCOPE-LINEN-LOGISTICS",
+        "grant_ids": ["GRANT-LINEN-01"],
+        "paths": [
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "hypothetical": true,
+        "source_id": "SRC-TABLETOP-FPU-7",
+        "event_id": "EVT-FPU-OUTAGE-HYP-01",
+        "event_at": "2026-10-15T06:15:00Z",
+        "branch_id": "BR-FPU-OUTAGE-DRILL",
+        "as_of": "2026-10-15T06:30:00Z",
+        "coverage": "selected_scope_only",
+        "outside_scope": "unknown"
+      },
+      {
+        "scope_id": "SCOPE-OPS-COORDINATOR",
+        "grant_ids": ["GRANT-OPS-DOCK-01", "GRANT-OPS-LINEN-01"],
+        "paths": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "hypothetical": true,
+        "source_id": "SRC-TABLETOP-FPU-7",
+        "event_id": "EVT-FPU-OUTAGE-HYP-01",
+        "event_at": "2026-10-15T06:15:00Z",
+        "branch_id": "BR-FPU-OUTAGE-DRILL",
+        "as_of": "2026-10-15T06:30:00Z",
+        "coverage": "selected_scope_only",
+        "outside_scope": "unknown"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "cold-empty-and-unknown-scope",
+      "expected": {
+        "cold_graph_paths": [],
+        "cold_graph_role_ids": [],
+        "cold_graph_source_ids": [],
+        "cold_graph_state": "empty/unknown",
+        "availability_claim": false,
+        "unknown_scope_response": "generic denial",
+        "unknown_scope_valid_scope_list": false,
+        "unknown_scope_path_count": false,
+        "unknown_scope_path_or_source_details": false
+      },
+      "planner_refs": ["role-scope-packet#lines-23-25"]
+    },
+    {
+      "id": "exact-role-scope-paths-and-grant-traces",
+      "expected": {
+        "results_in_order": [
+          {
+            "scope_id": "SCOPE-DOCK-FACILITIES",
+            "grant_ids": ["GRANT-DOCK-01"],
+            "paths": [["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"]],
+            "hypothetical": true,
+            "source_id": "SRC-TABLETOP-FPU-7",
+            "event_id": "EVT-FPU-OUTAGE-HYP-01",
+            "event_at": "2026-10-15T06:15:00Z",
+            "branch_id": "BR-FPU-OUTAGE-DRILL",
+            "as_of": "2026-10-15T06:30:00Z",
+            "coverage": "selected_scope_only",
+            "outside_scope": "unknown"
+          },
+          {
+            "scope_id": "SCOPE-LINEN-LOGISTICS",
+            "grant_ids": ["GRANT-LINEN-01"],
+            "paths": [["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]],
+            "hypothetical": true,
+            "source_id": "SRC-TABLETOP-FPU-7",
+            "event_id": "EVT-FPU-OUTAGE-HYP-01",
+            "event_at": "2026-10-15T06:15:00Z",
+            "branch_id": "BR-FPU-OUTAGE-DRILL",
+            "as_of": "2026-10-15T06:30:00Z",
+            "coverage": "selected_scope_only",
+            "outside_scope": "unknown"
+          },
+          {
+            "scope_id": "SCOPE-OPS-COORDINATOR",
+            "grant_ids": ["GRANT-OPS-DOCK-01", "GRANT-OPS-LINEN-01"],
+            "paths": [
+              ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+              ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+            ],
+            "hypothetical": true,
+            "source_id": "SRC-TABLETOP-FPU-7",
+            "event_id": "EVT-FPU-OUTAGE-HYP-01",
+            "event_at": "2026-10-15T06:15:00Z",
+            "branch_id": "BR-FPU-OUTAGE-DRILL",
+            "as_of": "2026-10-15T06:30:00Z",
+            "coverage": "selected_scope_only",
+            "outside_scope": "unknown"
+          }
+        ],
+        "extra_paths_per_scope": false,
+        "scope_is_authentication": false
+      },
+      "planner_refs": ["role-scope-packet#lines-13-21", "role-scope-packet#lines-26"]
+    },
+    {
+      "id": "grant-edge-removal-is-scope-specific",
+      "expected": {
+        "removed_grant_id": "GRANT-DOCK-01",
+        "dock_after_removal": {
+          "paths": [],
+          "result": "no matching path in the selected scope",
+          "coverage": "selected_scope_only",
+          "outside_scope": "unknown"
+        },
+        "linen_after_removal": [["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]],
+        "coordinator_after_removal": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "reseed_restores_dock_path": true,
+        "disconnected_lexical_decoy_id": "DOC-FPU-LEXICAL-DECOY-01",
+        "lexical_decoy_restores_path": false
+      },
+      "planner_refs": ["role-scope-packet#lines-27"]
+    },
+    {
+      "id": "mainline-versus-hypothetical-branch",
+      "expected": {
+        "mainline_as_of": "2026-10-15T06:30:00Z",
+        "mainline_paths": [],
+        "mainline_unchanged": true,
+        "hypothetical_branch_id": "BR-FPU-OUTAGE-DRILL",
+        "hypothetical_branch_status": "hypothetical",
+        "hypothetical_branch_paths": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "other_branch_id": "BR-OTHER-UNKNOWN",
+        "other_branch_paths": [],
+        "evaluating_other_branch_mutates_mainline_or_named_branch": false
+      },
+      "planner_refs": ["role-scope-packet#lines-13-19", "role-scope-packet#lines-28"]
+    },
+    {
+      "id": "selected-scope-trace-and-outside-unknown",
+      "expected": {
+        "required_trace_fields": ["selected_scope_id", "grant_edge_ids", "returned_paths", "source_id", "event_id", "event_at", "branch_id", "as_of", "coverage", "outside_scope"],
+        "grant_edges_by_scope": {
+          "SCOPE-DOCK-FACILITIES": ["GRANT-DOCK-01"],
+          "SCOPE-LINEN-LOGISTICS": ["GRANT-LINEN-01"],
+          "SCOPE-OPS-COORDINATOR": ["GRANT-OPS-DOCK-01", "GRANT-OPS-LINEN-01"]
+        },
+        "source_id": "SRC-TABLETOP-FPU-7",
+        "event_id": "EVT-FPU-OUTAGE-HYP-01",
+        "event_at": "2026-10-15T06:15:00Z",
+        "branch_id": "BR-FPU-OUTAGE-DRILL",
+        "as_of": "2026-10-15T06:30:00Z",
+        "coverage": "selected_scope_only",
+        "outside_scope": "unknown",
+        "fact_inference_and_missing_evidence_distinct": true,
+        "trace_claims_global_completeness": false
+      },
+      "planner_refs": ["role-scope-packet#lines-21", "role-scope-packet#lines-29"]
+    },
+    {
+      "id": "distinctive-ungranted-source-nondisclosure",
+      "expected": {
+        "viewer_scope": "selected synthetic scope",
+        "denied_fixture": {
+          "source_id": "SRC-RESTRICTED-FPU-77",
+          "title": "Restricted FPU side-channel memo / Violet-Quartz-77",
+          "body": "Restricted-only: violet-quartz-77 routes through the mothballed loading spur.",
+          "path": ["INC-312", "EQ-RESTRICTED-FPU-77", "SVC-RESTRICTED-LOADING-77", "DEPT-RESTRICTED-LOGISTICS-77", "ROLE-RESTRICTED-OWNER-77"],
+          "distinctive_path_markers": ["EQ-RESTRICTED-FPU-77", "SVC-RESTRICTED-LOADING-77", "DEPT-RESTRICTED-LOGISTICS-77", "ROLE-RESTRICTED-OWNER-77"]
+        },
+        "fixture_marker_selection": "Synthetic test-only tripwires fixed here because the packet requires distinctive markers but does not prescribe their literal values; never include them in an expected response.",
+        "visible_semantic_response_unchanged_before_after": true,
+        "forbidden_response_literals": ["SRC-RESTRICTED-FPU-77", "Restricted FPU side-channel memo / Violet-Quartz-77", "Restricted-only: violet-quartz-77 routes through the mothballed loading spur.", "violet-quartz-77", "EQ-RESTRICTED-FPU-77", "SVC-RESTRICTED-LOADING-77", "DEPT-RESTRICTED-LOGISTICS-77", "ROLE-RESTRICTED-OWNER-77"],
+        "forbidden_disclosure_classes": ["hidden ID", "title", "fact", "path", "path count", "source count", "existence", "dependent paraphrase"],
+        "hidden_count_or_existence_disclosed": false,
+        "dependent_paraphrase_disclosed": false
+      },
+      "planner_refs": ["role-scope-packet#lines-30"]
+    },
+    {
+      "id": "idempotent-reseed-and-reconnect",
+      "expected": {
+        "second_seed_node_delta": 0,
+        "second_seed_relationship_delta": 0,
+        "reconnect_uses_fresh_client": true,
+        "reconnect_ordered_scope_results_equal": true,
+        "reconnect_complete_trace_equal": true,
+        "grant_edge_removal_changes_only_case_3_pinned_scope_results": true,
+        "graph_name_is_unique_and_lane_scoped": true
+      },
+      "planner_refs": ["role-scope-packet#lines-31"]
+    },
+    {
+      "id": "desktop-mobile-api-and-local-boundary",
+      "expected": {
+        "surfaces": ["desktop browser", "mobile browser", "API"],
+        "all_surfaces_match_exact_scope_paths_and_traces": true,
+        "unknown_scope_is_generic_without_scope_enumeration": true,
+        "scope_selector_is_real_identity_or_authentication": false,
+        "external_effects": [],
+        "handover_action": false,
+        "source_mutation": false,
+        "message_or_call": false,
+        "clinical_inference_or_action": false
+      },
+      "planner_refs": ["role-scope-packet#lines-32"]
+    }
+  ]
+}
