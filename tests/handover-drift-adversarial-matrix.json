@@ -1,0 +1,756 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/handover-drift-expected-results.json",
+  "oracle_policy": "Assertions trace to immutable expected-result fields fixed from planner outcomes and pinned accepted source oracles; candidate output never supplies an expected value.",
+  "required_case_count": 9,
+  "cases": [
+    {
+      "case_id": "handover-drift-cold-unknown",
+      "expected_case_id": "handover-drift-cold-unknown",
+      "attack_or_edge_case": "Query an owned cold graph both without an action and with a saved historical action while current graph facts are unavailable.",
+      "setup": "Create an empty unique owned graph; exercise the no-snapshot and preserved-snapshot/unknown-current variants.",
+      "pinned_assertions": [
+        {
+          "id": "cold.no-snapshot-is-empty-unknown",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/current_state",
+          "assertion": "No snapshot and an empty graph produce empty/unknown, not a no-risk conclusion."
+        },
+        {
+          "id": "cold.no-current-paths",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/current_impact_paths",
+          "assertion": "No current impact paths are fabricated."
+        },
+        {
+          "id": "cold.no-current-witness",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/current_sop_witness",
+          "assertion": "No current SOP witness is fabricated."
+        },
+        {
+          "id": "cold.comparison-unknown",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/comparison_status",
+          "assertion": "Missing current state is unknown, not an empty delta or resolution."
+        },
+        {
+          "id": "cold-no-history",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/historical_snapshot",
+          "assertion": "No historical snapshot is fabricated when no action exists."
+        },
+        {
+          "id": "cold-no-risk-conclusion",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/risk_or_conflict_absence_concluded",
+          "assertion": "The no-history cold graph does not imply absence of risk or conflict."
+        },
+        {
+          "id": "cold.no-action-invented",
+          "expected_pointer": "/cases/0/expected/cold_without_snapshot/saved_actions",
+          "assertion": "No action is invented."
+        },
+        {
+          "id": "cold.saved-history-preserved",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/historical_snapshot",
+          "assertion": "An existing action retains the canonical historical snapshot."
+        },
+        {
+          "id": "cold.saved-action-not-rewritten",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/saved_action_unchanged",
+          "assertion": "The current-graph gap does not rewrite the saved action."
+        },
+        {
+          "id": "cold.absence-not-safety",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/risk_or_conflict_absence_concluded",
+          "assertion": "Absence is not “safe”, “no risk”, or “no conflict”."
+        },
+        {
+          "id": "cold.saved-history-current-state-unknown",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/current_state",
+          "assertion": "If historical action exists but current graph is unavailable, its comparison state is still empty/unknown."
+        },
+        {
+          "id": "cold.saved-history-comparison-unknown",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/comparison_status",
+          "assertion": "Historical facts do not permit fabricating a current comparison."
+        },
+        {
+          "id": "cold.saved-history-no-current-paths",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/current_impact_paths",
+          "assertion": "An unavailable current graph has no fabricated paths despite saved history."
+        },
+        {
+          "id": "cold.saved-history-no-current-witness",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/current_sop_witness",
+          "assertion": "An unavailable current graph has no fabricated SOP witness despite saved history."
+        },
+        {
+          "id": "cold.saved-history-explicit-label",
+          "expected_pointer": "/cases/0/expected/saved_snapshot_with_empty_or_unavailable_graph/historical_snapshot_label",
+          "assertion": "The saved evidence remains explicitly labeled historical."
+        }
+      ],
+      "nonzero_assertion_count": 15,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:64"
+      ]
+    },
+    {
+      "case_id": "handover-drift-reviewed-snapshot",
+      "expected_case_id": "handover-drift-reviewed-snapshot",
+      "attack_or_edge_case": "Compare the saved 18:30Z graph snapshot to literal original impact paths/provenance and typed V2/V3 SOP witness; keep action confirmation time separate.",
+      "setup": "Use the two fixed INC-204 paths, original per-path evidence, and explicit SOP applicability/conflict/claim witness at 2026-10-14T18:30:00Z.",
+      "pinned_assertions": [
+        {
+          "id": "snapshot.exact-as-of",
+          "expected_pointer": "/cases/1/expected/as_of",
+          "assertion": "The evidence snapshot graph-state time is exactly 2026-10-14T18:30:00Z."
+        },
+        {
+          "id": "snapshot.exact-ordered-impact-paths",
+          "expected_pointer": "/cases/1/expected/impact_paths",
+          "assertion": "Exactly the two pinned ordered five-node paths are present."
+        },
+        {
+          "id": "snapshot.full-original-provenance",
+          "expected_pointer": "/cases/1/expected/path_evidence",
+          "assertion": "Every source ID, title and per-path observed_at equals the original oracle."
+        },
+        {
+          "id": "snapshot.typed-v2-v3-witness",
+          "expected_pointer": "/cases/1/expected/sop_witness",
+          "assertion": "The snapshot contains the exact typed V2/V3 witness and source-backed unverified claims."
+        },
+        {
+          "id": "snapshot-canonical-equals-source-witness",
+          "expected_pointer": "/canonical_snapshot",
+          "assertion": "The full saved snapshot is a literal timestamped graph witness, not a generated prose summary."
+        },
+        {
+          "id": "snapshot.confirmation-time-separate",
+          "expected_pointer": "/cases/1/expected/action_confirmation_timestamp_preserved_separately",
+          "assertion": "The action confirmed_at remains its separate pre-existing timestamp field."
+        },
+        {
+          "id": "snapshot.confirmation-time-not-replaced",
+          "expected_pointer": "/cases/1/expected/action_timestamp_not_replaced_by_snapshot_as_of",
+          "assertion": "Comparison does not substitute as_of for confirmed_at."
+        },
+        {
+          "id": "snapshot.action-history-immutable",
+          "expected_pointer": "/cases/1/expected/action_snapshot_immutable_after_confirmation",
+          "assertion": "Subsequent graph changes cannot rewrite what was reviewed."
+        },
+        {
+          "id": "snapshot.no-direct-causal-edge",
+          "expected_pointer": "/canonical_snapshot/sop_witness/direct_incident_to_sop_causal_edge_asserted",
+          "assertion": "No direct incident-to-SOP causal edge is asserted."
+        },
+        {
+          "id": "snapshot.no-winner",
+          "expected_pointer": "/cases/1/expected/winner_selected",
+          "assertion": "Neither current SOP claim is selected as winner."
+        },
+        {
+          "id": "snapshot.incident-identity",
+          "expected_pointer": "/cases/1/expected/incident_id",
+          "assertion": "The saved evidence identifies INC-204."
+        },
+        {
+          "id": "snapshot.saved-witness-reference",
+          "expected_pointer": "/cases/1/expected/snapshot",
+          "assertion": "The saved snapshot reference identifies the canonical graph witness."
+        },
+        {
+          "id": "snapshot.confirmation-field-name",
+          "expected_pointer": "/cases/1/expected/action_timestamp_field",
+          "assertion": "The distinct action timestamp field is named confirmed_at."
+        },
+        {
+          "id": "snapshot-no-direct-causal-claim-in-case",
+          "expected_pointer": "/cases/1/expected/direct_incident_to_sop_causal_edge_asserted",
+          "assertion": "The snapshot case does not assert a direct incident-to-SOP causal edge."
+        }
+      ],
+      "nonzero_assertion_count": 14,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:65"
+      ]
+    },
+    {
+      "case_id": "handover-drift-observed-restoration-delta",
+      "expected_case_id": "handover-drift-observed-restoration-delta",
+      "attack_or_edge_case": "At 19:30Z compare the saved snapshot against the observed restoration: exact two removals, no additions, restoration provenance, and separately unchanged unresolved SOP witness.",
+      "setup": "Use the accepted shift-board observed-restoration fact and original snapshot; do not infer safety or resolved procedure.",
+      "pinned_assertions": [
+        {
+          "id": "restore.exact-as-of",
+          "expected_pointer": "/cases/2/expected/as_of",
+          "assertion": "The current observation time is exactly 2026-10-14T19:30:00Z."
+        },
+        {
+          "id": "restore-observed-status",
+          "expected_pointer": "/cases/2/expected/current_status",
+          "assertion": "The current graph status is restored."
+        },
+        {
+          "id": "restore-no-active-paths",
+          "expected_pointer": "/cases/2/expected/current_active_paths",
+          "assertion": "Observed restoration leaves no current active impact paths."
+        },
+        {
+          "id": "restore.exactly-two-removed-paths",
+          "expected_pointer": "/cases/2/expected/removed_paths",
+          "assertion": "The delta contains exactly the two reviewed paths in removed_paths."
+        },
+        {
+          "id": "restore-no-added-or-new-role-path",
+          "expected_pointer": "/cases/2/expected/added_paths",
+          "assertion": "No new path or role is introduced."
+        },
+        {
+          "id": "restore-no-new-role-paths",
+          "expected_pointer": "/cases/2/expected/new_role_paths",
+          "assertion": "The explicit new_role_paths collection is empty."
+        },
+        {
+          "id": "restore-observed-source-provenance",
+          "expected_pointer": "/cases/2/expected/restoration_source_fact",
+          "assertion": "EVT-C4-RESTORED-01 / SRC-ASSET-C4-RESTORE / 19:15Z remain observed facts."
+        },
+        {
+          "id": "restore-sop-witness-stays-unresolved",
+          "expected_pointer": "/cases/2/expected/sop_conflict_status",
+          "assertion": "The independent source-backed V2/V3 conflict remains unresolved."
+        },
+        {
+          "id": "restore-sop-witness-unchanged",
+          "expected_pointer": "/cases/2/expected/sop_witness_unchanged",
+          "assertion": "The separately stored structured SOP witness is unchanged."
+        },
+        {
+          "id": "restore-saved-action-unchanged",
+          "expected_pointer": "/cases/2/expected/saved_action_unchanged",
+          "assertion": "Observed graph change does not rewrite historical action evidence."
+        },
+        {
+          "id": "restore-historical-witness-reference",
+          "expected_pointer": "/cases/2/expected/historical_snapshot",
+          "assertion": "The historical graph witness remains the canonical reviewed snapshot."
+        },
+        {
+          "id": "restore-separate-witness-reference",
+          "expected_pointer": "/cases/2/expected/sop_witness",
+          "assertion": "The unresolved SOP witness remains a separate evidence object."
+        },
+        {
+          "id": "restore-no-safety-conclusion",
+          "expected_pointer": "/cases/2/expected/safe_conclusion_asserted",
+          "assertion": "No “safe” or no-operational-risk conclusion is asserted."
+        },
+        {
+          "id": "restore-no-operational-risk-conclusion",
+          "expected_pointer": "/cases/2/expected/no_operational_risk_conclusion_asserted",
+          "assertion": "No separate no-operational-risk conclusion is asserted."
+        }
+      ],
+      "nonzero_assertion_count": 14,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:66"
+      ]
+    },
+    {
+      "case_id": "handover-drift-hypothetical-branch-isolation",
+      "expected_case_id": "handover-drift-hypothetical-branch-isolation",
+      "attack_or_edge_case": "At 18:50Z keep the empty hypothetical branch distinct from the still-impacted observed mainline.",
+      "setup": "Select BR-C4-RESTORE-DRILL at 18:50Z without changing observed events or the saved action.",
+      "pinned_assertions": [
+        {
+          "id": "branch.exact-time",
+          "expected_pointer": "/cases/3/expected/as_of",
+          "assertion": "The branch view is fixed at 2026-10-14T18:50:00Z."
+        },
+        {
+          "id": "branch.exact-identity",
+          "expected_pointer": "/cases/3/expected/branch_id",
+          "assertion": "The comparison identifies BR-C4-RESTORE-DRILL."
+        },
+        {
+          "id": "branch-hypothetical-status",
+          "expected_pointer": "/cases/3/expected/branch_status",
+          "assertion": "The branch state is explicitly hypothetical-restored."
+        },
+        {
+          "id": "branch-labeled-hypothetical",
+          "expected_pointer": "/cases/3/expected/branch_delta_label",
+          "assertion": "Branch evidence remains labeled hypothetical, not observed."
+        },
+        {
+          "id": "branch-empty-paths",
+          "expected_pointer": "/cases/3/expected/branch_paths",
+          "assertion": "The hypothetical restoration branch has zero paths."
+        },
+        {
+          "id": "branch-mainline-keeps-paths",
+          "expected_pointer": "/cases/3/expected/observed_mainline_paths",
+          "assertion": "Observed mainline retains both exact saved paths."
+        },
+        {
+          "id": "branch-mainline-status-observed",
+          "expected_pointer": "/cases/3/expected/observed_mainline_status",
+          "assertion": "Mainline remains observed-impact at this time."
+        },
+        {
+          "id": "branch-does-not-mutate-mainline",
+          "expected_pointer": "/cases/3/expected/observed_state_mutated",
+          "assertion": "The branch does not mutate observed state."
+        },
+        {
+          "id": "branch-preserves-snapshot-and-action",
+          "expected_pointer": "/cases/3/expected/saved_action_unchanged",
+          "assertion": "The branch comparison leaves the immutable snapshot/action unchanged."
+        },
+        {
+          "id": "branch-historical-witness-reference",
+          "expected_pointer": "/cases/3/expected/historical_snapshot",
+          "assertion": "The branch retains the canonical historical snapshot reference."
+        },
+        {
+          "id": "branch-not-an-observed-fact",
+          "expected_pointer": "/cases/3/expected/branch_is_not_observed_fact",
+          "assertion": "The hypothetical branch event is not presented as observed fact."
+        }
+      ],
+      "nonzero_assertion_count": 11,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:67"
+      ]
+    },
+    {
+      "case_id": "handover-drift-isolated-witness-edge-removals",
+      "expected_case_id": "handover-drift-isolated-witness-edge-removals",
+      "attack_or_edge_case": "Remove only each owned applicability/conflict edge in isolation; current witness becomes unknown while impact paths and historical snapshot remain intact.",
+      "setup": "For each counterfactual remove only its named test-owned relation, compare current graph and saved action, then reseed.",
+      "pinned_assertions": [
+        {
+          "id": "edge.baseline-impact-paths",
+          "expected_pointer": "/cases/4/expected/baseline_current_impact_paths",
+          "assertion": "Both canonical outage paths are the counterfactual baseline."
+        },
+        {
+          "id": "edge.only-v2-applicability-removed",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/removed_edge",
+          "assertion": "First mutation removes only V2 APPLIES_TO C4."
+        },
+        {
+          "id": "edge.applicability-now-unknown",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/current_linkage_status",
+          "assertion": "Missing applicability produces incomplete/unknown linkage."
+        },
+        {
+          "id": "edge.applicability-not-resolved",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/conflict_conclusion",
+          "assertion": "A missing edge is not a conflict-resolution conclusion."
+        },
+        {
+          "id": "edge.applicability-no-complete-witness",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/complete_current_witness_returned",
+          "assertion": "The current SOP witness is incomplete after applicability-edge loss."
+        },
+        {
+          "id": "edge.applicability-paths-preserved",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/current_impact_paths",
+          "assertion": "Both outage paths remain unchanged."
+        },
+        {
+          "id": "edge.applicability-paths-unchanged-flag",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/current_impact_paths_unchanged",
+          "assertion": "The current impact-path comparison explicitly remains unchanged."
+        },
+        {
+          "id": "edge.applicability-snapshot-preserved",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/saved_snapshot_unchanged",
+          "assertion": "Historical snapshot/action remains exactly what was reviewed."
+        },
+        {
+          "id": "edge.applicability-historical-snapshot-reference",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/historical_snapshot",
+          "assertion": "The historical snapshot reference remains canonical after applicability-edge loss."
+        },
+        {
+          "id": "edge.applicability-saved-action-unchanged",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/saved_action_unchanged",
+          "assertion": "The saved action remains unchanged after applicability-edge loss."
+        },
+        {
+          "id": "edge.applicability-path-evidence-unchanged-flag",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/current_path_evidence_unchanged",
+          "assertion": "The current ownership provenance is explicitly unchanged."
+        },
+        {
+          "id": "edge.applicability-no-resolution-absence-conclusion",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/no_resolved_or_absent_conclusion",
+          "assertion": "Missing applicability is neither resolution nor an absence conclusion."
+        },
+        {
+          "id": "edge.only-v2-v3-conflict-removed",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/removed_edge",
+          "assertion": "Second mutation removes only V2 SOP_CONFLICT V3."
+        },
+        {
+          "id": "edge.conflict-now-unknown",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/current_linkage_status",
+          "assertion": "Missing conflict linkage is unknown, never resolved/absent."
+        },
+        {
+          "id": "edge.conflict-no-conclusion",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/conflict_conclusion",
+          "assertion": "Missing conflict linkage does not imply conflict resolution or absence."
+        },
+        {
+          "id": "edge.conflict-no-complete-witness",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/complete_current_witness_returned",
+          "assertion": "No complete current witness is returned after conflict-edge loss."
+        },
+        {
+          "id": "edge.conflict-claims-preserved",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/source_claims_preserved",
+          "assertion": "Removing the relation does not delete source-backed claims."
+        },
+        {
+          "id": "edge.conflict-paths-preserved",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/current_impact_paths",
+          "assertion": "Both outage paths remain unchanged after conflict-edge removal."
+        },
+        {
+          "id": "edge.conflict-paths-unchanged-flag",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/current_impact_paths_unchanged",
+          "assertion": "The current impact-path comparison explicitly remains unchanged."
+        },
+        {
+          "id": "edge.conflict-snapshot-preserved",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/saved_snapshot_unchanged",
+          "assertion": "The historical snapshot is not rewritten by current edge loss."
+        },
+        {
+          "id": "edge.conflict-historical-snapshot-reference",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/historical_snapshot",
+          "assertion": "The historical snapshot reference remains canonical after conflict-edge loss."
+        },
+        {
+          "id": "edge.conflict-saved-action-unchanged",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/saved_action_unchanged",
+          "assertion": "The saved action remains unchanged after conflict-edge loss."
+        },
+        {
+          "id": "edge.conflict-path-evidence-unchanged-flag",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/current_path_evidence_unchanged",
+          "assertion": "The current ownership provenance is explicitly unchanged."
+        },
+        {
+          "id": "edge.reseed-restores-witness",
+          "expected_pointer": "/cases/4/expected/reseed_restores_exact_current_witness",
+          "assertion": "Owned reseed restores the exact canonical current witness."
+        },
+        {
+          "id": "edge.applicability-path-provenance",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/current_path_evidence",
+          "assertion": "After losing the applicability edge, every current path retains the original source IDs, titles, and timestamps."
+        },
+        {
+          "id": "edge.conflict-path-provenance",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/current_path_evidence",
+          "assertion": "After losing the conflict edge, every current path retains the original source IDs, titles, and timestamps."
+        },
+        {
+          "id": "edge.applicability-suppresses-proposal",
+          "expected_pointer": "/cases/4/expected/applicability_edge_removal/incident_linked_sop_review_proposal_returned",
+          "assertion": "A missing applicability witness does not retain an incident-linked SOP proposal."
+        },
+        {
+          "id": "edge.conflict-suppresses-proposal",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/incident_linked_sop_review_proposal_returned",
+          "assertion": "A missing conflict edge does not retain an incident-linked SOP proposal."
+        },
+        {
+          "id": "edge.conflict-no-absence-conclusion",
+          "expected_pointer": "/cases/4/expected/conflict_edge_removal/no_resolved_or_absent_conclusion",
+          "assertion": "A missing conflict edge is never reported as resolved or absent."
+        },
+        {
+          "id": "edge-historical-snapshot-canonical",
+          "expected_pointer": "/cases/4/expected/historical_snapshot_remains_canonical",
+          "assertion": "Both isolated edge counterfactuals preserve the canonical historical snapshot."
+        }
+      ],
+      "nonzero_assertion_count": 30,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:68"
+      ]
+    },
+    {
+      "case_id": "handover-drift-restricted-source-invariance",
+      "expected_case_id": "handover-drift-restricted-source-invariance",
+      "attack_or_edge_case": "Inject the fixed restricted SOP probe and prove the complete operations-visible snapshot/current delta is unchanged and no hidden existence or derived data leaks.",
+      "setup": "Compare operations responses before and after the exact restricted probe from the unchanged SOP-impact oracle is injected.",
+      "pinned_assertions": [
+        {
+          "id": "acl.operations-scope",
+          "expected_pointer": "/cases/5/expected/viewer_scope",
+          "assertion": "Viewer remains operations-scoped."
+        },
+        {
+          "id": "acl.exact-restricted-probe",
+          "expected_pointer": "/cases/5/expected/restricted_probe",
+          "assertion": "Use the exact pinned restricted test probe, not candidate-derived content."
+        },
+        {
+          "id": "acl.full-response-invariance",
+          "expected_pointer": "/cases/5/expected/operations_snapshot_delta_response_semantically_identical_before_after",
+          "assertion": "The full visible response is semantically identical before/after injection."
+        },
+        {
+          "id": "acl-historical-snapshot-unchanged",
+          "expected_pointer": "/cases/5/expected/historical_snapshot_unchanged",
+          "assertion": "Saved visible evidence snapshot is invariant."
+        },
+        {
+          "id": "acl-current-delta-unchanged",
+          "expected_pointer": "/cases/5/expected/current_delta_unchanged",
+          "assertion": "Visible current comparison is invariant."
+        },
+        {
+          "id": "acl-no-hidden-literals",
+          "expected_pointer": "/cases/5/expected/restricted_probe_literals_disclosed",
+          "assertion": "No restricted identifier/title/fact is disclosed."
+        },
+        {
+          "id": "acl-no-hidden-existence-count",
+          "expected_pointer": "/cases/5/expected/hidden_count_or_existence_disclosed",
+          "assertion": "No hidden count or existence is disclosed."
+        },
+        {
+          "id": "acl-no-hidden-edge-path-paraphrase",
+          "expected_pointer": "/cases/5/expected/hidden_relationship_path_or_dependent_paraphrase_disclosed",
+          "assertion": "No hidden edge/path or dependent paraphrase is disclosed."
+        },
+        {
+          "id": "acl.no-hidden-derived-path",
+          "expected_pointer": "/cases/5/expected/hidden_path_disclosed",
+          "assertion": "No denied path is disclosed."
+        }
+      ],
+      "nonzero_assertion_count": 9,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:69"
+      ]
+    },
+    {
+      "case_id": "handover-drift-read-only-boundary",
+      "expected_case_id": "handover-drift-read-only-boundary",
+      "attack_or_edge_case": "Open/refresh the drift review without altering FalkorDB, confirmed-actions JSON, confirmation state, or any external system.",
+      "setup": "Take graph and local action-file snapshots before and after read-only review; observe outbound side-effect counters.",
+      "pinned_assertions": [
+        {
+          "id": "readonly.zero-graph-mutations",
+          "expected_pointer": "/cases/6/expected/graph_mutations",
+          "assertion": "Review performs zero graph writes."
+        },
+        {
+          "id": "readonly.zero-action-file-mutations",
+          "expected_pointer": "/cases/6/expected/confirmed_action_file_mutations",
+          "assertion": "Review performs zero confirmed-action file writes."
+        },
+        {
+          "id": "readonly-action-file-identical",
+          "expected_pointer": "/cases/6/expected/saved_action_before_after_identical",
+          "assertion": "Saved action bytes/semantics remain identical."
+        },
+        {
+          "id": "readonly-no-explicit-confirmation",
+          "expected_pointer": "/cases/6/expected/explicit_confirmation_performed",
+          "assertion": "Opening/refreshing does not confirm an action."
+        },
+        {
+          "id": "readonly-no-automatic-confirmation",
+          "expected_pointer": "/cases/6/expected/automatic_confirmation",
+          "assertion": "No automatic confirmation occurs."
+        },
+        {
+          "id": "readonly-no-external-writes",
+          "expected_pointer": "/cases/6/expected/external_writes",
+          "assertion": "No external writes, messages, calls, or tickets occur."
+        },
+        {
+          "id": "readonly-no-messages",
+          "expected_pointer": "/cases/6/expected/messages_sent",
+          "assertion": "No message is sent."
+        },
+        {
+          "id": "readonly-no-calls",
+          "expected_pointer": "/cases/6/expected/calls_made",
+          "assertion": "No call is made."
+        },
+        {
+          "id": "readonly-no-tickets",
+          "expected_pointer": "/cases/6/expected/tickets_created",
+          "assertion": "No ticket is created."
+        },
+        {
+          "id": "readonly-no-clinical-action",
+          "expected_pointer": "/cases/6/expected/clinical_action_proposed",
+          "assertion": "No clinical action is proposed."
+        },
+        {
+          "id": "readonly-no-false-resolution-or-work-claim",
+          "expected_pointer": "/cases/6/expected/work_claimed_performed",
+          "assertion": "No source truth resolution or work-completed claim is asserted."
+        },
+        {
+          "id": "readonly-source-truth-unresolved",
+          "expected_pointer": "/cases/6/expected/source_truth_resolved",
+          "assertion": "Opening the comparison does not resolve underlying source truth."
+        }
+      ],
+      "nonzero_assertion_count": 12,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:70"
+      ]
+    },
+    {
+      "case_id": "handover-drift-time-validation",
+      "expected_case_id": "handover-drift-time-validation",
+      "attack_or_edge_case": "Normalize the accepted offset timestamp to the pinned UTC snapshot and reject malformed time before any graph/action mutation.",
+      "setup": "Submit the exact offset and malformed strings through API and verify equivalent browser semantics on desktop/mobile.",
+      "pinned_assertions": [
+        {
+          "id": "time.exact-offset",
+          "expected_pointer": "/cases/7/expected/offset_input",
+          "assertion": "The exact offset input is 2026-10-14T20:30:00+02:00."
+        },
+        {
+          "id": "time.offset-to-utc",
+          "expected_pointer": "/cases/7/expected/normalized_as_of",
+          "assertion": "Offset normalizes to 2026-10-14T18:30:00Z."
+        },
+        {
+          "id": "time.normalized-result-is-snapshot",
+          "expected_pointer": "/cases/7/expected/normalized_result",
+          "assertion": "Normalized result is the exact canonical snapshot."
+        },
+        {
+          "id": "time.exact-malformed-value",
+          "expected_pointer": "/cases/7/expected/malformed_timestamp",
+          "assertion": "The malformed probe is not-a-timestamp."
+        },
+        {
+          "id": "time-malformed-rejected",
+          "expected_pointer": "/cases/7/expected/malformed_rejected",
+          "assertion": "Malformed input is rejected."
+        },
+        {
+          "id": "time-reject-before-graph-write",
+          "expected_pointer": "/cases/7/expected/rejection_precedes_graph_mutation",
+          "assertion": "Reject before graph mutation."
+        },
+        {
+          "id": "time-reject-before-action-write",
+          "expected_pointer": "/cases/7/expected/rejection_precedes_action_mutation",
+          "assertion": "Reject before local action mutation."
+        },
+        {
+          "id": "time-desktop-mobile-api-agree",
+          "expected_pointer": "/cases/7/expected/desktop_mobile_api_and_browser_semantics_agree",
+          "assertion": "API, desktop, and mobile semantics agree."
+        }
+      ],
+      "nonzero_assertion_count": 8,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:71"
+      ]
+    },
+    {
+      "case_id": "handover-drift-repeat-reconnect-persistence",
+      "expected_case_id": "handover-drift-repeat-reconnect-persistence",
+      "attack_or_edge_case": "Repeat seed/query, reconnect with a fresh FalkorDB client, restart the app, and prove the ordered current delta and historical action persist with owned-only cleanup.",
+      "setup": "Use one unique owned graph, deterministic reseed, a new client and app process, and compare outputs against the fixed snapshot/delta.",
+      "pinned_assertions": [
+        {
+          "id": "repeat.exact-seed-runs",
+          "expected_pointer": "/cases/8/expected/seed_runs",
+          "assertion": "Run deterministic seed twice."
+        },
+        {
+          "id": "repeat.no-node-duplicates",
+          "expected_pointer": "/cases/8/expected/node_delta_after_second_seed",
+          "assertion": "Second seed creates zero nodes."
+        },
+        {
+          "id": "repeat.no-edge-duplicates",
+          "expected_pointer": "/cases/8/expected/relationship_delta_after_second_seed",
+          "assertion": "Second seed creates zero relationships."
+        },
+        {
+          "id": "repeat.no-fixture-id-duplicates",
+          "expected_pointer": "/cases/8/expected/duplicate_fixture_ids",
+          "assertion": "No duplicate fixture IDs."
+        },
+        {
+          "id": "repeat.fresh-client",
+          "expected_pointer": "/cases/8/expected/fresh_falkordb_client_required",
+          "assertion": "A genuinely new FalkorDB client is used."
+        },
+        {
+          "id": "repeat.restarted-app",
+          "expected_pointer": "/cases/8/expected/restarted_app_required",
+          "assertion": "The app is restarted before persistence verification."
+        },
+        {
+          "id": "repeat-current-snapshot-fixed",
+          "expected_pointer": "/cases/8/expected/reconnected_snapshot",
+          "assertion": "Reconnect returns the exact canonical snapshot."
+        },
+        {
+          "id": "repeat-query-result-fixed",
+          "expected_pointer": "/cases/8/expected/repeated_query_result",
+          "assertion": "Repeated query returns the exact canonical snapshot."
+        },
+        {
+          "id": "repeat-delta-fixed",
+          "expected_pointer": "/cases/8/expected/reconnected_delta_matches_fixed_observed_delta",
+          "assertion": "Reconnect returns the fixed observed restoration delta."
+        },
+        {
+          "id": "repeat-action-time-preserved",
+          "expected_pointer": "/cases/8/expected/historical_snapshot_and_action_timestamp_preserved",
+          "assertion": "The separate action timestamp and historical snapshot survive restart unchanged."
+        },
+        {
+          "id": "repeat-action-record-unchanged-after-restart",
+          "expected_pointer": "/cases/8/expected/saved_action_unchanged_after_restart",
+          "assertion": "The saved action record is unchanged after app restart."
+        },
+        {
+          "id": "repeat.unique-owned-graph-and-cleanup",
+          "expected_pointer": "/cases/8/expected/unique_task_owned_graph_required",
+          "assertion": "Graph, processes and cleanup are limited to the unique task-owned run."
+        },
+        {
+          "id": "repeat-cleanup-deletes-only-owned-graph",
+          "expected_pointer": "/cases/8/expected/cleanup_deletes_only_owned_graph",
+          "assertion": "Cleanup deletes only the graph owned by this run."
+        },
+        {
+          "id": "repeat-cleanup-stops-only-owned-processes",
+          "expected_pointer": "/cases/8/expected/cleanup_stops_only_task_owned_processes",
+          "assertion": "Cleanup stops only processes started by this run."
+        },
+        {
+          "id": "repeat-no-process-left",
+          "expected_pointer": "/cases/8/expected/no_owned_process_left_running",
+          "assertion": "No process started by the check remains after cleanup."
+        }
+      ],
+      "nonzero_assertion_count": 15,
+      "planner_refs": [
+        "planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md:72"
+      ]
+    }
+  ]
+}

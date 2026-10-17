@@ -1,0 +1,725 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent nine-group oracle for comparing an immutable synthetic handover evidence snapshot with observed and hypothetical graph state.",
+  "oracle_policy": "Every expected value is fixed by the pinned drift packet, handover-witness packet/oracle, and unchanged original, shift-board, and SOP-impact oracles. Candidate output never supplies or amends expectations.",
+  "pinned_sources": [
+    {
+      "id": "handover-drift-packet",
+      "file": "planner-828ef7b6a76e4128b9e1b2ecad33c4a7/plans/planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md",
+      "sha256": "21a0b4cd4ae3b5a2fc7a1783a1964bc0bd47d68675a38b61b1a6bd14d606e6b5",
+      "outcome_lines": [
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72
+      ]
+    },
+    {
+      "id": "handover-witness-packet",
+      "file": "planner-d0017f7f160844fe9cf5a6036aa5068f/plans/planner-d0017f7f160844fe9cf5a6036aa5068f.md",
+      "sha256": "82ee7daadb65238676478e1bea7e1229f3a7dee003d7d25620b7ebbf4c70d36b",
+      "outcome_lines": [
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ]
+    },
+    {
+      "id": "handover-witness-expected-results",
+      "file": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    },
+    {
+      "id": "handover-witness-adversarial-matrix",
+      "file": "tests/handover-brief-adversarial-matrix.json",
+      "sha256": "d084f31a1b542670ab99818852cba8e1141bfb56688845c439b01f5ac1d89003"
+    },
+    {
+      "id": "original-expected-results",
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    },
+    {
+      "id": "shift-board-expected-results",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "sop-impact-expected-results",
+      "file": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "Later live behavior verification must use actual FalkorDB; this artifact validator does not claim live behavior.",
+    "graph_ownership": "Every later live run uses a unique lane-owned graph and removes only that graph; stops only processes it started.",
+    "external_writes": false,
+    "candidate_output_is_oracle": false
+  },
+  "fixture": {
+    "incident_id": "INC-204",
+    "equipment_id": "CONVEYOR-C4",
+    "service_id": "SVC-MATERIAL-TRANSFER",
+    "snapshot_as_of": "2026-10-14T18:30:00Z",
+    "observed_restoration_as_of": "2026-10-14T19:30:00Z",
+    "restoration_event_id": "EVT-C4-RESTORED-01",
+    "restoration_source_id": "SRC-ASSET-C4-RESTORE",
+    "restoration_event_at": "2026-10-14T19:15:00Z",
+    "branch_as_of": "2026-10-14T18:50:00Z",
+    "branch_id": "BR-C4-RESTORE-DRILL",
+    "hypothetical_event_id": "EVT-BR-RESTORE-01",
+    "hypothetical_event_at": "2026-10-14T18:45:00Z",
+    "offset_input": "2026-10-14T20:30:00+02:00",
+    "offset_normalized_as_of": "2026-10-14T18:30:00Z",
+    "malformed_timestamp_probe": "not-a-timestamp",
+    "viewer_scope": "operations",
+    "restricted_probe": {
+      "version_id": "SOP-RESTRICTED-PROBE-91",
+      "claimed_role_id": "ROLE-RESTRICTED-PROBE-91",
+      "source_id": "SRC-RESTRICTED-SOP-PROBE-91",
+      "source_title": "Restricted synthetic SOP-impact probe 91",
+      "source_text": "Restricted synthetic SOP claim: role probe 91.",
+      "department_id": "DEPT-RESTRICTED-PROBE-91",
+      "relationship_id": "REL-RESTRICTED-SOP-PROBE-91",
+      "path": [
+        "INC-204",
+        "CONVEYOR-C4",
+        "SVC-MATERIAL-TRANSFER",
+        "DEPT-RESTRICTED-PROBE-91",
+        "ROLE-RESTRICTED-PROBE-91"
+      ],
+      "acl": "restricted"
+    },
+    "confirmation_timestamp_field": "confirmed_at",
+    "confirmation_timestamp_semantics": "Preserve the existing action timestamp verbatim in its own field; it is not the graph snapshot as_of value and no new timestamp literal is inferred by this oracle."
+  },
+  "canonical_snapshot": {
+    "as_of": "2026-10-14T18:30:00Z",
+    "impact": {
+      "status": "observed-impact",
+      "paths": [
+        [
+          "INC-204",
+          "CONVEYOR-C4",
+          "SVC-MATERIAL-TRANSFER",
+          "DEPT-CENTRAL-STERILE",
+          "ROLE-STERILE-OPS-COORD"
+        ],
+        [
+          "INC-204",
+          "CONVEYOR-C4",
+          "SVC-MATERIAL-TRANSFER",
+          "DEPT-MATERIALS-LOGISTICS",
+          "ROLE-MATERIALS-DUTY"
+        ]
+      ],
+      "path_evidence": [
+        {
+          "path": [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          "source_ids": [
+            "SRC-INC-204",
+            "SRC-ASSET-C4",
+            "SRC-SERVICE-CATALOG",
+            "SRC-OPS-ROSTER"
+          ],
+          "source_titles": [
+            "Synthetic Incident Register INC-204",
+            "Synthetic Asset State Ledger",
+            "Synthetic Service Dependency Register",
+            "Synthetic Operations Role Roster"
+          ],
+          "observed_at": [
+            "2026-10-14T18:00:00Z",
+            "2026-10-14T18:02:00Z",
+            "2026-10-14T18:03:00Z",
+            "2026-10-14T18:04:00Z"
+          ]
+        },
+        {
+          "path": [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ],
+          "source_ids": [
+            "SRC-INC-204",
+            "SRC-ASSET-C4",
+            "SRC-SERVICE-CATALOG",
+            "SRC-OPS-ROSTER"
+          ],
+          "source_titles": [
+            "Synthetic Incident Register INC-204",
+            "Synthetic Asset State Ledger",
+            "Synthetic Service Dependency Register",
+            "Synthetic Operations Role Roster"
+          ],
+          "observed_at": [
+            "2026-10-14T18:00:00Z",
+            "2026-10-14T18:02:00Z",
+            "2026-10-14T18:03:00Z",
+            "2026-10-14T18:05:00Z"
+          ]
+        }
+      ]
+    },
+    "sop_witness": {
+      "shared_equipment_id": "CONVEYOR-C4",
+      "linkage_status": "complete",
+      "conflict_status": "unresolved",
+      "applicability_edges": [
+        {
+          "from": "SOP-OPS-9-V2",
+          "relationship": "APPLIES_TO",
+          "to": "CONVEYOR-C4"
+        },
+        {
+          "from": "SOP-OPS-9-V3",
+          "relationship": "APPLIES_TO",
+          "to": "CONVEYOR-C4"
+        }
+      ],
+      "conflict_edge": {
+        "from": "SOP-OPS-9-V2",
+        "relationship": "SOP_CONFLICT",
+        "to": "SOP-OPS-9-V3",
+        "status": "unresolved"
+      },
+      "claim_evidence": [
+        {
+          "sop_version_id": "SOP-OPS-9-V2",
+          "claim_relationship": "CLAIMS_ROLE",
+          "role_id": "ROLE-FACILITIES-DUTY",
+          "claim_label": "unverified SOP claim",
+          "source_evidence_linked": true,
+          "source_id": "SRC-SOP-CURRENT-V2",
+          "source_title": "Synthetic SOP-OPS-9 Current Text v2",
+          "observed_at": "2026-10-14T16:00:00Z"
+        },
+        {
+          "sop_version_id": "SOP-OPS-9-V3",
+          "claim_relationship": "CLAIMS_ROLE",
+          "role_id": "ROLE-MATERIALS-LEAD",
+          "claim_label": "unverified SOP claim",
+          "source_evidence_linked": true,
+          "source_id": "SRC-SOP-CURRENT-V3",
+          "source_title": "Synthetic SOP-OPS-9 Current Text v3",
+          "observed_at": "2026-10-14T16:04:00Z"
+        }
+      ],
+      "stale_version_excluded_from_c4_witness": {
+        "version_id": "SOP-OPS-9-V1",
+        "source_id": "SRC-SOP-ARCHIVE-9",
+        "source_title": "Synthetic SOP-OPS-9 Archived Text v1",
+        "observed_at": "2026-01-10T12:00:00Z",
+        "referenced_equipment_id": "CONVEYOR-C3",
+        "is_applicable_to_c4": false,
+        "is_joined_to_inc204_conflict_witness": false
+      },
+      "claims_are_current_owner_facts": false,
+      "winner_selected": false,
+      "contact_supplied": false,
+      "direct_incident_to_sop_causal_edge_asserted": false,
+      "procedure_or_clinical_conclusion_supplied": false
+    }
+  },
+  "cases": [
+    {
+      "id": "handover-drift-cold-unknown",
+      "expected": {
+        "cold_without_snapshot": {
+          "historical_snapshot": null,
+          "current_state": "empty/unknown",
+          "current_impact_paths": [],
+          "current_sop_witness": null,
+          "comparison_status": "unknown",
+          "saved_actions": [],
+          "risk_or_conflict_absence_concluded": false
+        },
+        "saved_snapshot_with_empty_or_unavailable_graph": {
+          "historical_snapshot": "#/canonical_snapshot",
+          "historical_snapshot_label": "saved historical evidence",
+          "current_state": "empty/unknown",
+          "current_impact_paths": [],
+          "current_sop_witness": null,
+          "comparison_status": "unknown",
+          "saved_action_unchanged": true,
+          "risk_or_conflict_absence_concluded": false
+        }
+      }
+    },
+    {
+      "id": "handover-drift-reviewed-snapshot",
+      "expected": {
+        "as_of": "2026-10-14T18:30:00Z",
+        "incident_id": "INC-204",
+        "impact_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ]
+        ],
+        "path_evidence": [
+          {
+            "path": [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            "source_ids": [
+              "SRC-INC-204",
+              "SRC-ASSET-C4",
+              "SRC-SERVICE-CATALOG",
+              "SRC-OPS-ROSTER"
+            ],
+            "source_titles": [
+              "Synthetic Incident Register INC-204",
+              "Synthetic Asset State Ledger",
+              "Synthetic Service Dependency Register",
+              "Synthetic Operations Role Roster"
+            ],
+            "observed_at": [
+              "2026-10-14T18:00:00Z",
+              "2026-10-14T18:02:00Z",
+              "2026-10-14T18:03:00Z",
+              "2026-10-14T18:04:00Z"
+            ]
+          },
+          {
+            "path": [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ],
+            "source_ids": [
+              "SRC-INC-204",
+              "SRC-ASSET-C4",
+              "SRC-SERVICE-CATALOG",
+              "SRC-OPS-ROSTER"
+            ],
+            "source_titles": [
+              "Synthetic Incident Register INC-204",
+              "Synthetic Asset State Ledger",
+              "Synthetic Service Dependency Register",
+              "Synthetic Operations Role Roster"
+            ],
+            "observed_at": [
+              "2026-10-14T18:00:00Z",
+              "2026-10-14T18:02:00Z",
+              "2026-10-14T18:03:00Z",
+              "2026-10-14T18:05:00Z"
+            ]
+          }
+        ],
+        "sop_witness": "#/canonical_snapshot/sop_witness",
+        "snapshot": "#/canonical_snapshot",
+        "action_timestamp_field": "confirmed_at",
+        "action_confirmation_timestamp_preserved_separately": true,
+        "action_timestamp_not_replaced_by_snapshot_as_of": true,
+        "action_snapshot_immutable_after_confirmation": true,
+        "direct_incident_to_sop_causal_edge_asserted": false,
+        "winner_selected": false
+      }
+    },
+    {
+      "id": "handover-drift-observed-restoration-delta",
+      "expected": {
+        "as_of": "2026-10-14T19:30:00Z",
+        "current_status": "restored",
+        "current_active_paths": [],
+        "removed_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ]
+        ],
+        "added_paths": [],
+        "new_role_paths": [],
+        "restoration_source_fact": {
+          "event_id": "EVT-C4-RESTORED-01",
+          "source_id": "SRC-ASSET-C4-RESTORE",
+          "event_at": "2026-10-14T19:15:00Z",
+          "status": "observed"
+        },
+        "sop_witness": "#/canonical_snapshot/sop_witness",
+        "sop_conflict_status": "unresolved",
+        "sop_witness_unchanged": true,
+        "historical_snapshot": "#/canonical_snapshot",
+        "saved_action_unchanged": true,
+        "safe_conclusion_asserted": false,
+        "no_operational_risk_conclusion_asserted": false
+      }
+    },
+    {
+      "id": "handover-drift-hypothetical-branch-isolation",
+      "expected": {
+        "as_of": "2026-10-14T18:50:00Z",
+        "branch_id": "BR-C4-RESTORE-DRILL",
+        "branch_status": "hypothetical-restored",
+        "branch_paths": [],
+        "branch_delta_label": "hypothetical",
+        "observed_mainline_status": "observed-impact",
+        "observed_mainline_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ]
+        ],
+        "observed_state_mutated": false,
+        "historical_snapshot": "#/canonical_snapshot",
+        "saved_action_unchanged": true,
+        "branch_is_not_observed_fact": true
+      }
+    },
+    {
+      "id": "handover-drift-isolated-witness-edge-removals",
+      "expected": {
+        "baseline_current_impact_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ]
+        ],
+        "applicability_edge_removal": {
+          "removed_edge": {
+            "from": "SOP-OPS-9-V2",
+            "relationship": "APPLIES_TO",
+            "to": "CONVEYOR-C4",
+            "ownership": "test-owned relation only"
+          },
+          "current_linkage_status": "incomplete/unknown",
+          "conflict_conclusion": null,
+          "complete_current_witness_returned": false,
+          "current_impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "current_impact_paths_unchanged": true,
+          "historical_snapshot": "#/canonical_snapshot",
+          "saved_snapshot_unchanged": true,
+          "saved_action_unchanged": true,
+          "current_path_evidence": [
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:04:00Z"
+              ]
+            },
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-MATERIALS-LOGISTICS",
+                "ROLE-MATERIALS-DUTY"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:05:00Z"
+              ]
+            }
+          ],
+          "current_path_evidence_unchanged": true,
+          "incident_linked_sop_review_proposal_returned": false,
+          "no_resolved_or_absent_conclusion": true
+        },
+        "conflict_edge_removal": {
+          "removed_edge": {
+            "from": "SOP-OPS-9-V2",
+            "relationship": "SOP_CONFLICT",
+            "to": "SOP-OPS-9-V3",
+            "status": "unresolved",
+            "ownership": "test-owned relation only"
+          },
+          "current_linkage_status": "unknown",
+          "conflict_conclusion": null,
+          "complete_current_witness_returned": false,
+          "source_claims_preserved": true,
+          "current_impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "current_impact_paths_unchanged": true,
+          "historical_snapshot": "#/canonical_snapshot",
+          "saved_snapshot_unchanged": true,
+          "saved_action_unchanged": true,
+          "current_path_evidence": [
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:04:00Z"
+              ]
+            },
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-MATERIALS-LOGISTICS",
+                "ROLE-MATERIALS-DUTY"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:05:00Z"
+              ]
+            }
+          ],
+          "current_path_evidence_unchanged": true,
+          "incident_linked_sop_review_proposal_returned": false,
+          "no_resolved_or_absent_conclusion": true
+        },
+        "reseed_restores_exact_current_witness": true,
+        "historical_snapshot_remains_canonical": true
+      }
+    },
+    {
+      "id": "handover-drift-restricted-source-invariance",
+      "expected": {
+        "viewer_scope": "operations",
+        "restricted_probe": {
+          "version_id": "SOP-RESTRICTED-PROBE-91",
+          "claimed_role_id": "ROLE-RESTRICTED-PROBE-91",
+          "source_id": "SRC-RESTRICTED-SOP-PROBE-91",
+          "source_title": "Restricted synthetic SOP-impact probe 91",
+          "source_text": "Restricted synthetic SOP claim: role probe 91.",
+          "department_id": "DEPT-RESTRICTED-PROBE-91",
+          "relationship_id": "REL-RESTRICTED-SOP-PROBE-91",
+          "path": [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-RESTRICTED-PROBE-91",
+            "ROLE-RESTRICTED-PROBE-91"
+          ],
+          "acl": "restricted"
+        },
+        "operations_snapshot_delta_response_semantically_identical_before_after": true,
+        "historical_snapshot_unchanged": true,
+        "current_delta_unchanged": true,
+        "restricted_probe_literals_disclosed": [],
+        "hidden_count_or_existence_disclosed": false,
+        "hidden_relationship_path_or_dependent_paraphrase_disclosed": false,
+        "hidden_path_disclosed": false
+      }
+    },
+    {
+      "id": "handover-drift-read-only-boundary",
+      "expected": {
+        "graph_mutations": 0,
+        "confirmed_action_file_mutations": 0,
+        "saved_action_before_after_identical": true,
+        "explicit_confirmation_performed": false,
+        "automatic_confirmation": false,
+        "messages_sent": false,
+        "calls_made": false,
+        "tickets_created": false,
+        "external_writes": [],
+        "clinical_action_proposed": false,
+        "source_truth_resolved": false,
+        "work_claimed_performed": false
+      }
+    },
+    {
+      "id": "handover-drift-time-validation",
+      "expected": {
+        "offset_input": "2026-10-14T20:30:00+02:00",
+        "normalized_as_of": "2026-10-14T18:30:00Z",
+        "normalized_result": "#/canonical_snapshot",
+        "malformed_timestamp": "not-a-timestamp",
+        "malformed_rejected": true,
+        "rejection_precedes_graph_mutation": true,
+        "rejection_precedes_action_mutation": true,
+        "desktop_mobile_api_and_browser_semantics_agree": true
+      }
+    },
+    {
+      "id": "handover-drift-repeat-reconnect-persistence",
+      "expected": {
+        "seed_runs": 2,
+        "node_delta_after_second_seed": 0,
+        "relationship_delta_after_second_seed": 0,
+        "duplicate_fixture_ids": [],
+        "repeated_query_result": "#/canonical_snapshot",
+        "fresh_falkordb_client_required": true,
+        "restarted_app_required": true,
+        "reconnected_snapshot": "#/canonical_snapshot",
+        "reconnected_delta_matches_fixed_observed_delta": true,
+        "historical_snapshot_and_action_timestamp_preserved": true,
+        "saved_action_unchanged_after_restart": true,
+        "unique_task_owned_graph_required": true,
+        "cleanup_deletes_only_owned_graph": true,
+        "cleanup_stops_only_task_owned_processes": true,
+        "no_owned_process_left_running": true
+      }
+    }
+  ],
+  "handover_witness_oracle_review": {
+    "status": "accepted-source-and-matrix-pinned",
+    "expected_results_file": "tests/handover-brief-expected-results.json",
+    "expected_results_sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1",
+    "adversarial_matrix_file": "tests/handover-brief-adversarial-matrix.json",
+    "adversarial_matrix_sha256": "d084f31a1b542670ab99818852cba8e1141bfb56688845c439b01f5ac1d89003",
+    "tracked_main_commit_checked": "9a16defb295c32d95a73406bc3faefcae793716e",
+    "independent_fresh_review_required": true,
+    "reason": "The accepted handover-witness expected-results oracle and its matrix are now tracked at the pinned main commit and are compared literally by this validator."
+  }
+}
