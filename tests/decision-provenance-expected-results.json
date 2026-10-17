@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent nine-group oracle for the synthetic decision-register docket, frozen before its query or UI behavior.",
+  "oracle_policy": "Expected values are pinned to the immutable decision-provenance packet and cross-checked against unchanged SOP-impact and handover-brief source oracles. Candidate responses never supply or amend expectations.",
+  "pinned_sources": [
+    {
+      "id": "decision-provenance-packet",
+      "path": "planner-22e10d27ab804d3e872feefec257ae38.md",
+      "sha256": "992dba1b3dbbf4ee51e7c04a6fc1aa865a9460b84c1795fefd5931198bc5e1a0",
+      "outcome_lines": [49, 50, 51, 52, 53, 54, 55, 56, 57]
+    },
+    {
+      "id": "sop-impact-source-oracle",
+      "path": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "id": "handover-brief-source-oracle",
+      "path": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    }
+  ],
+  "frozen_hash_manifest": "tests/decision-provenance-frozen-hashes.json",
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "real_staff_or_contacts": false,
+    "database_requirement": "A later behavior verifier must use actual FalkorDB; this artifact oracle does not claim live query execution.",
+    "external_writes": false,
+    "candidate_output_is_oracle": false,
+    "unknown_semantics": "Missing graph evidence is unknown/incomplete, never proof that a decision, claim, source, conflict, owner, or risk is absent or resolved.",
+    "citation_semantics": "A source citation requires the corresponding node-to-node EVIDENCED_BY edge; properties alone do not establish provenance.",
+    "acl_semantics": "The operations projection is invariant under a connected restricted-source injection and reveals no inaccessible fact or existence signal."
+  },
+  "baseline": {
+    "root_id": "REGISTER-OPS-DECISIONS-01",
+    "root_tracking_edge": {
+      "from": "REGISTER-OPS-DECISIONS-01",
+      "relationship": "TRACKS",
+      "to": "DEC-OPS-9-REVIEW-01"
+    },
+    "docket_row_count": 1,
+    "decision_record": {
+      "id": "DEC-OPS-9-REVIEW-01",
+      "title": "SOP-OPS-9 claim reconciliation review",
+      "recorded_state": "open-unresolved",
+      "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+      "record_source": {
+        "id": "SRC-DEC-OPS-9-REVIEW-01",
+        "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+        "observed_at": "2026-10-14T16:05:00Z",
+        "evidence_link": {
+          "from": "DEC-OPS-9-REVIEW-01",
+          "relationship": "EVIDENCED_BY",
+          "to": "SRC-DEC-OPS-9-REVIEW-01"
+        }
+      }
+    },
+    "considered_edges": [
+      {
+        "from": "DEC-OPS-9-REVIEW-01",
+        "relationship": "CONSIDERS",
+        "to": "SOP-OPS-9-V2"
+      },
+      {
+        "from": "DEC-OPS-9-REVIEW-01",
+        "relationship": "CONSIDERS",
+        "to": "SOP-OPS-9-V3"
+      }
+    ],
+    "conflict_edge": {
+      "from": "SOP-OPS-9-V2",
+      "relationship": "SOP_CONFLICT",
+      "to": "SOP-OPS-9-V3",
+      "status": "unresolved"
+    },
+    "claims": [
+      {
+        "version_id": "SOP-OPS-9-V2",
+        "claim_edge": {
+          "from": "SOP-OPS-9-V2",
+          "relationship": "CLAIMS_ROLE",
+          "to": "ROLE-FACILITIES-DUTY"
+        },
+        "role_id": "ROLE-FACILITIES-DUTY",
+        "claim_label": "unverified SOP claim",
+        "source": {
+          "id": "SRC-SOP-CURRENT-V2",
+          "title": "Synthetic SOP-OPS-9 Current Text v2",
+          "observed_at": "2026-10-14T16:00:00Z",
+          "evidence_link": {
+            "from": "SOP-OPS-9-V2",
+            "relationship": "EVIDENCED_BY",
+            "to": "SRC-SOP-CURRENT-V2"
+          }
+        },
+        "is_current_owner_fact": false
+      },
+      {
+        "version_id": "SOP-OPS-9-V3",
+        "claim_edge": {
+          "from": "SOP-OPS-9-V3",
+          "relationship": "CLAIMS_ROLE",
+          "to": "ROLE-MATERIALS-LEAD"
+        },
+        "role_id": "ROLE-MATERIALS-LEAD",
+        "claim_label": "unverified SOP claim",
+        "source": {
+          "id": "SRC-SOP-CURRENT-V3",
+          "title": "Synthetic SOP-OPS-9 Current Text v3",
+          "observed_at": "2026-10-14T16:04:00Z",
+          "evidence_link": {
+            "from": "SOP-OPS-9-V3",
+            "relationship": "EVIDENCED_BY",
+            "to": "SRC-SOP-CURRENT-V3"
+          }
+        },
+        "is_current_owner_fact": false
+      }
+    ],
+    "source_order": [
+      "SRC-DEC-OPS-9-REVIEW-01",
+      "SRC-SOP-CURRENT-V2",
+      "SRC-SOP-CURRENT-V3"
+    ],
+    "current_owner_selected": false,
+    "procedure_selected": false,
+    "contact_supplied": false,
+    "action_proposed": false,
+    "existing_incident_impact_paths": [
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+    ]
+  },
+  "test_setup_only": {
+    "note": "The following distinctive decoy and restricted tripwires are synthetic test inputs only, not expected visible output or facts sourced from candidate behavior.",
+    "disconnected_decoy": {
+      "decision_id": "DEC-OPS-9-DECOY-91",
+      "version_id": "SOP-OPS-9-DECOY-91",
+      "role_id": "ROLE-OPS-9-DECOY-91",
+      "source_id": "SRC-OPS-9-DECOY-91"
+    },
+    "restricted_branch": {
+      "acl": "restricted",
+      "decision_id": "DEC-RESTRICTED-OPS-77",
+      "decision_title": "Restricted Decision Docket Canary 77",
+      "version_id": "SOP-RESTRICTED-77",
+      "role_id": "ROLE-RESTRICTED-OPS-77",
+      "source_id": "SRC-RESTRICTED-OPS-77",
+      "source_title": "Restricted Synthetic Decision Source 77",
+      "source_body": "Restricted-only docket note: north annex diversion remains unverified."
+    }
+  },
+  "cases": [
+    {
+      "id": "empty-unknown",
+      "expected": {
+        "docket_rows": [],
+        "state": "unknown",
+        "evidence_state": "no-evidence",
+        "decision_id_title_source_exposed": false,
+        "visible_count_exposed": false,
+        "existence_hint_exposed": false,
+        "no_decision_concluded": false,
+        "current_owner_claimed": false,
+        "conflict_resolution_concluded": false
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-1"],
+      "source_oracle_refs": ["tests/handover-brief-expected-results.json#cold-empty-unknown"]
+    },
+    {
+      "id": "exact-one-record-baseline",
+      "expected": {
+        "root_id": "REGISTER-OPS-DECISIONS-01",
+        "docket_row_count": 1,
+        "decision_record": {
+          "id": "DEC-OPS-9-REVIEW-01",
+          "title": "SOP-OPS-9 claim reconciliation review",
+          "recorded_state": "open-unresolved",
+          "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+          "record_source": {
+            "id": "SRC-DEC-OPS-9-REVIEW-01",
+            "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+            "observed_at": "2026-10-14T16:05:00Z",
+            "evidence_relationship": "EVIDENCED_BY"
+          }
+        },
+        "considered_edges": [
+          {"from": "DEC-OPS-9-REVIEW-01", "relationship": "CONSIDERS", "to": "SOP-OPS-9-V2"},
+          {"from": "DEC-OPS-9-REVIEW-01", "relationship": "CONSIDERS", "to": "SOP-OPS-9-V3"}
+        ],
+        "conflict_edge": {"from": "SOP-OPS-9-V2", "relationship": "SOP_CONFLICT", "to": "SOP-OPS-9-V3", "status": "unresolved"},
+        "claims": [
+          {"version_id": "SOP-OPS-9-V2", "role_id": "ROLE-FACILITIES-DUTY", "claim_label": "unverified SOP claim", "source_id": "SRC-SOP-CURRENT-V2", "source_title": "Synthetic SOP-OPS-9 Current Text v2", "observed_at": "2026-10-14T16:00:00Z", "evidence_relationship": "EVIDENCED_BY", "is_current_owner_fact": false},
+          {"version_id": "SOP-OPS-9-V3", "role_id": "ROLE-MATERIALS-LEAD", "claim_label": "unverified SOP claim", "source_id": "SRC-SOP-CURRENT-V3", "source_title": "Synthetic SOP-OPS-9 Current Text v3", "observed_at": "2026-10-14T16:04:00Z", "evidence_relationship": "EVIDENCED_BY", "is_current_owner_fact": false}
+        ],
+        "source_order": ["SRC-DEC-OPS-9-REVIEW-01", "SRC-SOP-CURRENT-V2", "SRC-SOP-CURRENT-V3"],
+        "selected_version": null,
+        "current_owner_selected": false,
+        "contact_supplied": false,
+        "procedure_selected": false,
+        "action_proposed": false,
+        "synthetic_fiction_label_required": true
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-2"],
+      "source_oracle_refs": ["tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"]
+    },
+    {
+      "id": "considers-v2-edge-removed",
+      "expected": {
+        "remove_only_edge": {"from": "DEC-OPS-9-REVIEW-01", "relationship": "CONSIDERS", "to": "SOP-OPS-9-V2"},
+        "decision_record_state": "incomplete/unknown",
+        "complete_two_claim_witness_present": false,
+        "v3_promoted_or_selected": false,
+        "conflict_reported_resolved_or_absent": false,
+        "existing_incident_impact_paths_unchanged": true,
+        "existing_incident_impact_paths": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ]
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-3"],
+      "source_oracle_refs": ["tests/handover-brief-expected-results.json#inc204-observed-paths-and-provenance", "tests/sop-impact-expected-results.json#sop-impact-observed-outage-paths"]
+    },
+    {
+      "id": "decision-evidence-link-removed",
+      "expected": {
+        "remove_only_edge": {"from": "DEC-OPS-9-REVIEW-01", "relationship": "EVIDENCED_BY", "to": "SRC-DEC-OPS-9-REVIEW-01"},
+        "source_node_id_title_properties_remain": true,
+        "decision_id_title_state_and_record_source_suppressed": true,
+        "result_state": "unknown",
+        "result_evidence_state": "no-evidence",
+        "property_only_provenance_accepted": false,
+        "existing_sop_impact_output_unchanged": true
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-4"],
+      "source_oracle_refs": ["tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"]
+    },
+    {
+      "id": "v2-claim-evidence-link-removed",
+      "expected": {
+        "remove_only_edge": {"from": "SOP-OPS-9-V2", "relationship": "EVIDENCED_BY", "to": "SRC-SOP-CURRENT-V2"},
+        "v2_claim_and_source_reconstructed_from_properties": false,
+        "visible_claims": [
+          {"version_id": "SOP-OPS-9-V3", "role_id": "ROLE-MATERIALS-LEAD", "claim_label": "unverified SOP claim", "source_id": "SRC-SOP-CURRENT-V3", "source_title": "Synthetic SOP-OPS-9 Current Text v3", "observed_at": "2026-10-14T16:04:00Z", "evidence_relationship": "EVIDENCED_BY"}
+        ],
+        "decision_record_state": "incomplete/unknown",
+        "v3_selected_as_winner": false,
+        "conflict_status": "unresolved",
+        "existing_incident_impact_paths_unchanged": true,
+        "existing_incident_impact_paths": [
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+          ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+        ],
+        "sop_impact_may_omit_only_unsupported_v2_claim": true
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-5"],
+      "source_oracle_refs": ["tests/sop-impact-expected-results.json#sop-impact-conflict-provenance", "tests/handover-brief-expected-results.json#inc204-observed-paths-and-provenance"]
+    },
+    {
+      "id": "disconnected-decoy-excluded",
+      "expected": {
+        "decoy_has_root_tracks_path": false,
+        "disconnected_decoy_row_returned": false,
+        "docket_row_count": 1,
+        "baseline_projection_semantically_unchanged": true
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-6"],
+      "source_oracle_refs": ["tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"]
+    },
+    {
+      "id": "restricted-source-operations-invariance",
+      "expected": {
+        "viewer_scope": "operations",
+        "fixture_acl": "restricted",
+        "full_operations_api_projection_semantically_identical": true,
+        "visible_count_fields_identical": true,
+        "browser_text_and_accessibility_tree_semantically_identical": true,
+        "restricted_ids_titles_facts_counts_existence_relationships_paths_or_paraphrases_disclosed": false,
+        "restricted_source_tripwires_disclosed": []
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-7"],
+      "source_oracle_refs": ["tests/sop-impact-expected-results.json#sop-impact-denied-source-invariance", "tests/handover-brief-expected-results.json#denied-source-nondisclosure"]
+    },
+    {
+      "id": "idempotent-reseed-restores-baseline",
+      "expected": {
+        "fixture_loads": 2,
+        "duplicate_fixed_node_ids_after_second_load": 0,
+        "duplicate_fixed_relationships_after_second_load": 0,
+        "exact_one_record_baseline_restored_after_each_owned_mutation": true,
+        "source_order_and_all_observation_times_restored": true
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-8"],
+      "source_oracle_refs": ["tests/sop-impact-expected-results.json#sop-impact-reseed-reconnect", "tests/handover-brief-expected-results.json#idempotent-reseed-and-fresh-client-equality"]
+    },
+    {
+      "id": "fresh-client-read-only-owned-cleanup",
+      "expected": {
+        "fresh_client_required": true,
+        "fresh_client_projection_matches_exact_baseline": true,
+        "query_or_browser_graph_node_writes": 0,
+        "query_or_browser_graph_relationship_writes": 0,
+        "local_action_writes": 0,
+        "cleanup_deletes_only_task_owned_unique_graph_and_state": true,
+        "cleanup_stops_only_task_owned_processes": true
+      },
+      "planner_refs": ["decision-provenance-packet#outcome-9"],
+      "source_oracle_refs": ["tests/handover-brief-expected-results.json#idempotent-reseed-and-fresh-client-equality", "tests/sop-impact-expected-results.json#sop-impact-reseed-reconnect"]
+    }
+  ]
+}

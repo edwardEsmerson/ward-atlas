@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/decision-provenance-expected-results.json",
+  "oracle_policy": "Every matrix case maps one-to-one to a literal outcome in the pinned decision-provenance packet. Test setup is fixed independently; candidate output never supplies expected values.",
+  "groups": [
+    {
+      "group_id": "empty-unknown",
+      "setup": "Use a fresh task-owned empty FalkorDB graph and render/query the operations docket before seeding.",
+      "attack_or_edge_case": "An empty graph is misrepresented as evidence that no decision or conflict exists, or leaks a hidden count/identifier.",
+      "pinned_assertions": [
+        {"id": "empty.no-docket-row", "assertion": "The cold docket returns exactly zero decision rows."},
+        {"id": "empty.generic-unknown", "assertion": "The cold response uses unknown and no-evidence semantics."},
+        {"id": "empty.no-decision-identifiers", "assertion": "No decision ID, title, or source is exposed."},
+        {"id": "empty.no-count-or-existence", "assertion": "No count, existence hint, or empty-state identifier is exposed."},
+        {"id": "empty.no-negative-conclusion", "assertion": "The response does not conclude that no decision or conflict exists or is resolved."},
+        {"id": "empty.no-owner-conclusion", "assertion": "No current owner or conflict-resolution conclusion is asserted."}
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:49"]
+    },
+    {
+      "group_id": "exact-one-record-baseline",
+      "setup": "Seed only the pinned register fixture, traverse from REGISTER-OPS-DECISIONS-01, and collect every source witness and timestamp in stable source order.",
+      "attack_or_edge_case": "A static status badge, disconnected record, property-only citation, claim-role substitution, or stale timestamp can imitate the baseline without the finite graph witness.",
+      "pinned_assertions": [
+        {"id": "baseline.root-track-edge", "assertion": "The root TRACKS edge reaches exactly DEC-OPS-9-REVIEW-01."},
+        {"id": "baseline.one-record-only", "assertion": "Exactly one docket record is returned."},
+        {"id": "baseline.record-state-source", "assertion": "The exact record title, open-unresolved state, statement, and decision-register Evidence node are returned."},
+        {"id": "baseline.record-evidence-edge", "assertion": "The record source citation is supported by DEC-OPS-9-REVIEW-01 -[:EVIDENCED_BY]-> SRC-DEC-OPS-9-REVIEW-01."},
+        {"id": "baseline.considered-versions", "assertion": "The docket explicitly considers SOP-OPS-9-V2 and SOP-OPS-9-V3."},
+        {"id": "baseline.v2-claim-provenance", "assertion": "V2 claim, ROLE-FACILITIES-DUTY, source ID/title, 16:00Z time, and EVIDENCED_BY edge are exact."},
+        {"id": "baseline.v3-claim-provenance", "assertion": "V3 claim, ROLE-MATERIALS-LEAD, source ID/title, 16:04Z time, and EVIDENCED_BY edge are exact."},
+        {"id": "baseline.unresolved-conflict", "assertion": "The exact V2-to-V3 SOP_CONFLICT edge remains unresolved."},
+        {"id": "baseline.no-authority-or-action", "assertion": "Neither claim is promoted to current-owner fact; no version, procedure, contact, or action is selected."}
+      ],
+      "nonzero_assertion_count": 9,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:50"]
+    },
+    {
+      "group_id": "considers-v2-edge-removed",
+      "setup": "On the owned seeded graph, remove only DEC-OPS-9-REVIEW-01 -[:CONSIDERS]-> SOP-OPS-9-V2; keep node properties, all source nodes/edges, remaining docket edges, and incident graph untouched.",
+      "attack_or_edge_case": "A surviving V3 claim is incorrectly promoted or the conflict is declared resolved when one considered-version edge is absent.",
+      "pinned_assertions": [
+        {"id": "considered.only-v2-edge-removed", "assertion": "The sole mutation is the exact docket-to-V2 CONSIDERS relationship."},
+        {"id": "considered.incomplete-unknown", "assertion": "The docket witness becomes incomplete/unknown."},
+        {"id": "considered.no-complete-pair", "assertion": "No complete two-claim provenance witness is returned."},
+        {"id": "considered.no-v3-promotion", "assertion": "V3 is not selected or promoted as authoritative."},
+        {"id": "considered.no-resolution-conclusion", "assertion": "The missing edge is not reported as a resolved or absent disagreement."},
+        {"id": "considered.impact-paths-preserved", "assertion": "Both exact preexisting INC-204 impact paths remain unchanged."}
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:51"]
+    },
+    {
+      "group_id": "decision-evidence-link-removed",
+      "setup": "On the owned seeded graph remove only DEC-OPS-9-REVIEW-01 -[:EVIDENCED_BY]-> SRC-DEC-OPS-9-REVIEW-01 while preserving decision/source nodes and all their properties.",
+      "attack_or_edge_case": "Stored record properties are mistaken for a provenance edge and disclose the record identity/state without its own evidence link.",
+      "pinned_assertions": [
+        {"id": "record-evidence.only-own-edge-removed", "assertion": "Only the decision's own EVIDENCED_BY edge is removed."},
+        {"id": "record-evidence.source-properties-retained", "assertion": "The source node and decision ID/title/state properties remain in the graph."},
+        {"id": "record-evidence.generic-unknown", "assertion": "The docket projection becomes generic unknown/no-evidence."},
+        {"id": "record-evidence.suppress-record-facts", "assertion": "Decision ID, title, state, and record-source facts are suppressed."},
+        {"id": "record-evidence.reject-property-citation", "assertion": "Properties alone are not accepted as a citation or provenance witness."},
+        {"id": "record-evidence.sop-impact-unchanged", "assertion": "The unrelated existing SOP-impact projection remains semantically unchanged."}
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:52"]
+    },
+    {
+      "group_id": "v2-claim-evidence-link-removed",
+      "setup": "On the owned seeded graph remove only SOP-OPS-9-V2 -[:EVIDENCED_BY]-> SRC-SOP-CURRENT-V2; retain all properties, source nodes, conflict edge, incident graph and V3 evidence.",
+      "attack_or_edge_case": "V2 is cited from properties, or the sole supported V3 branch is incorrectly treated as the winner.",
+      "pinned_assertions": [
+        {"id": "claim-evidence.only-v2-edge-removed", "assertion": "Only the exact V2-to-source EVIDENCED_BY relationship is removed."},
+        {"id": "claim-evidence.no-v2-property-reconstruction", "assertion": "The V2 claim/source is not reconstructed from node properties."},
+        {"id": "claim-evidence.v3-source-backed-claim-remains", "assertion": "The exact V3 claim, role, source ID/title/time, and evidence edge remain visible."},
+        {"id": "claim-evidence.incomplete-unknown", "assertion": "The docket state is incomplete/unknown."},
+        {"id": "claim-evidence.no-v3-winner", "assertion": "The surviving V3 claim is not selected as a winner and the conflict stays unresolved."},
+        {"id": "claim-evidence.incident-paths-unchanged", "assertion": "The original two INC-204 paths remain exact and unchanged."},
+        {"id": "claim-evidence.only-unsupported-v2-omitted", "assertion": "Existing SOP-impact may omit only the unsupported V2 claim, not alter incident paths or resolve conflict."}
+      ],
+      "nonzero_assertion_count": 7,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:53"]
+    },
+    {
+      "group_id": "disconnected-decoy-excluded",
+      "setup": "Add the fixed synthetic decoy component from test_setup_only without any path from REGISTER-OPS-DECISIONS-01, and query the same root-scoped docket.",
+      "attack_or_edge_case": "Global scans or lexical matches pull an untracked decision into the finite register result.",
+      "pinned_assertions": [
+        {"id": "decoy.no-root-tracks-path", "assertion": "The decoy has no path from the register root through TRACKS."},
+        {"id": "decoy.not-returned", "assertion": "No decoy decision, claim, or source appears in the docket rows."},
+        {"id": "decoy.baseline-identical", "assertion": "The one-record baseline projection is semantically unchanged."}
+      ],
+      "nonzero_assertion_count": 3,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:54"]
+    },
+    {
+      "group_id": "restricted-source-operations-invariance",
+      "setup": "Record the complete operations API, visible count fields, rendered browser text and accessibility tree. Add the fixed connected restricted decision/claim/source fixture, then repeat those reads and compare semantically.",
+      "attack_or_edge_case": "Direct or derived disclosure leaks a restricted title/fact, existence/count signal, relationship, path, or paraphrase into API or accessible UI output.",
+      "pinned_assertions": [
+        {"id": "acl.operations-projection-identical", "assertion": "The full operations API projection before and after injection is semantically identical."},
+        {"id": "acl.counts-identical", "assertion": "All visible count fields are unchanged."},
+        {"id": "acl.browser-accessibility-identical", "assertion": "Browser text and the complete accessibility tree are semantically unchanged."},
+        {"id": "acl.no-identifiers-or-source-text", "assertion": "No restricted ID, title, or source body is disclosed."},
+        {"id": "acl.no-count-existence-or-relationship", "assertion": "No hidden count, existence, relationship, or graph path is disclosed."},
+        {"id": "acl.no-derived-paraphrase", "assertion": "No restricted fact or dependent paraphrase is disclosed."}
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:55"]
+    },
+    {
+      "group_id": "idempotent-reseed-restores-baseline",
+      "setup": "Seed the unique owned graph, apply each task-owned adversarial edge removal, invoke the fixture loader twice, and inspect IDs, relationship multiplicity, source ordering and timestamps.",
+      "attack_or_edge_case": "Repeated fixture loading duplicates graph records/edges or fails to restore exact fixed provenance after a mutation.",
+      "pinned_assertions": [
+        {"id": "reseed.two-loads", "assertion": "The fixture loader runs twice against the same owned graph."},
+        {"id": "reseed.no-duplicate-identifiers", "assertion": "The second load creates zero duplicate fixed node IDs."},
+        {"id": "reseed.no-duplicate-relationships", "assertion": "The second load creates zero duplicate fixed relationships."},
+        {"id": "reseed.exact-baseline-restored", "assertion": "Each owned mutation is restored to the exact one-record baseline."},
+        {"id": "reseed.source-order-and-times", "assertion": "All three evidence sources return in exact order with their original timestamps."}
+      ],
+      "nonzero_assertion_count": 5,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:56"]
+    },
+    {
+      "group_id": "fresh-client-read-only-owned-cleanup",
+      "setup": "After seeding and read assertions, close the client, reconnect with a new FalkorDB client, compare the exact snapshot, exercise only read endpoints/browser reads, and run cleanup for the test-owned resources.",
+      "attack_or_edge_case": "A warm client masks lost evidence, read paths write state, or cleanup deletes/stops resources that the test does not own.",
+      "pinned_assertions": [
+        {"id": "fresh-client.new-connection", "assertion": "The final snapshot is read using a newly created client connection."},
+        {"id": "fresh-client.exact-snapshot", "assertion": "The fresh-client snapshot exactly matches the pinned baseline."},
+        {"id": "fresh-client.zero-graph-writes", "assertion": "Read/query/browser paths add zero graph nodes and relationships."},
+        {"id": "fresh-client.zero-local-action-writes", "assertion": "Read/query/browser paths write no local action file or action record."},
+        {"id": "fresh-client.owned-graph-state-cleanup", "assertion": "Cleanup deletes only this task's unique graph and state."},
+        {"id": "fresh-client.owned-process-cleanup", "assertion": "Cleanup stops only processes started by this task."}
+      ],
+      "nonzero_assertion_count": 6,
+      "planner_refs": ["planner-22e10d27ab804d3e872feefec257ae38.md:57"]
+    }
+  ]
+}
