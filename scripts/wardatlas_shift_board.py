@@ -77,6 +77,8 @@ SHIFT_EDGES = [
     _edge("DEPT-RECEIVING-DOCK", "OWNED_BY", "ROLE-DOCK-SWING", "REL-DOCK-OWNER-R2", effective_from=DOCK_EFFECTIVE, effective_to="9999-12-31T23:59:59Z", source_id="SRC-DOCK-ROSTER-R2", access="operations"),
     _edge("ROLE-DOCK-DUTY", "EVIDENCED_BY", "SRC-DOCK-ROSTER-R1", "REL-DOCK-DUTY-R1", access="operations"),
     _edge("ROLE-DOCK-SWING", "EVIDENCED_BY", "SRC-DOCK-ROSTER-R2", "REL-DOCK-SWING-R2", access="operations"),
+    _edge("ROLE-STERILE-OPS-COORD", "EVIDENCED_BY", "SRC-OPS-ROSTER", "REL-CSS-ROLE-ROSTER-SOURCE", access="operations"),
+    _edge("ROLE-MATERIALS-DUTY", "EVIDENCED_BY", "SRC-OPS-ROSTER", "REL-MATERIALS-ROLE-ROSTER-SOURCE", access="operations"),
     _edge("SRC-DOCK-ROSTER-R2", "SUPERSEDES", "SRC-DOCK-ROSTER-R1", "REL-DOCK-R2-SUPERSEDES-R1", access="operations"),
     _edge("HND-DOCK-2020", "CITES_SOURCE", "SRC-DOCK-ROSTER-R1", "REL-HND-DOCK-2020-R1", access="operations"),
     _edge("TKT-DOCK-88", "CITES_SOURCE", "SRC-DOCK-ROSTER-R1", "REL-TKT-DOCK-88-R1", access="operations"),
@@ -182,6 +184,7 @@ CONVEYOR_EVENT_QUERY = """
 MATCH (i:Incident {id: 'INC-204'})-[rel:HAS_STATE_EVENT]->(event:StateEvent)-[ev:EVIDENCED_BY]->(src:Evidence)
 WHERE i.access = 'operations' AND rel.access = 'operations' AND event.access = 'operations'
   AND ev.access = 'operations' AND src.access = 'operations'
+  AND event.event_kind = 'observed' AND event.branch_id IS NULL
 RETURN event.id AS event_id, event.value AS value, event.event_at AS event_at,
        src.id AS source_id, src.title AS source_title, src.observed_at AS source_observed_at,
        'observed source fact' AS evidence_label
@@ -202,6 +205,7 @@ CONVEYOR_PATH_QUERY = """
 MATCH (i:Incident {id: 'INC-204'})-[aff:AFFECTS]->(e:Equipment {id: 'CONVEYOR-C4'})
       -[sup:SUPPORTS]->(s:Service {id: 'SVC-MATERIAL-TRANSFER'})
       -[serves:SERVES]->(d:Department)-[owns:OWNED_BY]->(r:Role),
+      (r)-[roster:EVIDENCED_BY]->(rsrc:Evidence),
       (i)-[iev:EVIDENCED_BY]->(isrc:Evidence),
       (e)-[eev:EVIDENCED_BY]->(esrc:Evidence),
       (s)-[sev:EVIDENCED_BY]->(ssrc:Evidence)
@@ -209,7 +213,9 @@ WHERE owns.current = true
   AND i.access = 'operations' AND e.access = 'operations' AND s.access = 'operations'
   AND d.access = 'operations' AND r.access = 'operations'
   AND aff.access = 'operations' AND sup.access = 'operations' AND serves.access = 'operations'
-  AND owns.access = 'operations' AND iev.access = 'operations' AND eev.access = 'operations'
+  AND owns.access = 'operations' AND roster.access = 'operations' AND rsrc.access = 'operations'
+  AND owns.source_id = rsrc.id
+  AND iev.access = 'operations' AND eev.access = 'operations'
   AND sev.access = 'operations' AND isrc.access = 'operations' AND esrc.access = 'operations'
   AND ssrc.access = 'operations'
 RETURN i.id AS incident_id, e.id AS equipment_id, s.id AS service_id,
@@ -220,7 +226,7 @@ RETURN i.id AS incident_id, e.id AS equipment_id, s.id AS service_id,
        esrc.observed_at AS equipment_observed_at,
        ssrc.id AS service_source_id, ssrc.title AS service_source_title,
        ssrc.observed_at AS service_observed_at,
-       owns.source_id AS ownership_source_id, owns.source_title AS ownership_source_title,
+       rsrc.id AS ownership_source_id, rsrc.title AS ownership_source_title,
        owns.observed_at AS ownership_observed_at
 ORDER BY d.id
 """.strip()

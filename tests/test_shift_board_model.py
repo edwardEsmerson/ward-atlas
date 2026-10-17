@@ -35,10 +35,15 @@ class ShiftBoardModelTests(unittest.TestCase):
         for rel in ("AFFECTS", "SUPPORTS", "SERVES", "OWNED_BY", "EVIDENCED_BY"):
             self.assertIn(f":{rel}", query)
         self.assertIn("src.access = 'operations'", query)
+        from wardatlas_shift_board import CONVEYOR_EVENT_QUERY, CONVEYOR_PATH_QUERY
+        self.assertIn("event.event_kind = 'observed'", CONVEYOR_EVENT_QUERY)
+        self.assertIn("event.branch_id IS NULL", CONVEYOR_EVENT_QUERY)
+        self.assertIn("rsrc.access = 'operations'", CONVEYOR_PATH_QUERY)
+        self.assertIn("owns.source_id = rsrc.id", CONVEYOR_PATH_QUERY)
 
     def test_seed_and_branch_reset_are_idempotent_and_narrow(self):
         queries = seed_shift_board_queries()
-        self.assertEqual(len(queries), 32)
+        self.assertEqual(len(queries), 34)
         node_ids = [line.split("id: \"", 1)[1].split("\"", 1)[0] for line in queries if line.startswith("MERGE (n:")]
         edge_ids = [line.split("MERGE (a)-[r:", 1)[1].split("{id: \"", 1)[1].split("\"", 1)[0] for line in queries if line.startswith("MATCH ") and "MERGE (a)-[r:" in line]
         self.assertEqual(len(node_ids), len(set(node_ids)))

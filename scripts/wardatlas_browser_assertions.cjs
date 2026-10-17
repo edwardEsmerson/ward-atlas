@@ -32,11 +32,13 @@ if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hos
   try {
     const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
     check('desktop app responds successfully', response && response.status() === 200, response && response.status());
-    await page.getByRole('heading', { name: 'One outage. Two accountable paths.' }).waitFor();
     await page.locator('#shift-board-empty').waitFor({ state: 'visible' });
-    check('cold browser board visibly says empty/unknown without default incident cases', await page.locator('#shift-board-badge').innerText() === 'Empty · unknown' && await page.locator('#dock-case').isHidden() && await page.locator('#conveyor-case').isHidden(), await page.locator('#shift-board-empty').innerText());
-    check('cold browser has no invented incident, source, role, or review rows', await page.locator('#dock-sources').innerText().then(text => text === '') && await page.locator('#dock-review').innerText().then(text => text === ''), await page.locator('#shift-board-empty').innerText());
+    await page.getByRole('heading', { name: 'A board with no defaults.' }).waitFor();
+    check('cold browser board visibly says empty/unknown without default incident cases', await page.locator('#shift-board-badge').innerText() === 'Empty · unknown' && await page.locator('#dock-case').isHidden() && await page.locator('#conveyor-case').isHidden() && await page.locator('#legacy-grid').isHidden(), await page.locator('#shift-board-empty').innerText());
+    const coldBody = await page.locator('body').innerText();
+    check('cold browser has no invented incident, source, role, review, or SOP identifier', await page.locator('#dock-sources').innerText().then(text => text === '') && await page.locator('#dock-review').innerText().then(text => text === '') && !/INC-\d+|SRC-|ROLE-|HND-|TKT-|SOP-/.test(coldBody) && (await page.locator('#incident-status').innerText()).toLowerCase() === 'no graph-backed incident', coldBody);
     await page.getByRole('button', { name: 'Reset synthetic scenario' }).click();
+    await page.getByRole('heading', { name: 'One outage. Two accountable paths.' }).waitFor();
     await page.locator('#dock-case').waitFor({ state: 'visible' });
     await page.locator('#conveyor-case').waitFor({ state: 'visible' });
     await page.getByText('INC-204 · OPEN', { exact: true }).waitFor();

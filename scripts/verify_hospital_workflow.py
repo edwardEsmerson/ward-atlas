@@ -126,7 +126,7 @@ def validate_docs() -> list[str]:
         "tests/shift-board-adversarial-matrix.json",
         "INC-207",
         "BR-C4-RESTORE-DRILL",
-        "/workspace/evidence/integrate-graph-backed-shift-board/e449917f25da42488622367ede4583eb/ui-eighth/wardatlas-workflow.json",
+        "/workspace/evidence/integrate-graph-backed-shift-board/e449917f25da42488622367ede4583eb/ui-review-fix/wardatlas-workflow.json",
         "Redis 8.0.5",
         "FalkorDB 6.0.2",
         "27 assertions",
@@ -542,6 +542,39 @@ class HospitalWorkflowVerifier:
             },
             conveyor_1830["evidence_semantics"],
         )
+        # Deliberately mislink the pinned hypothetical event onto the observed
+        # event relation with a visible source. Event-kind/branch filters must
+        # still keep it out of mainline history. Remove only these two owned
+        # adversarial relationships immediately afterward.
+        self.db.graph_query(
+            "ui-mislink-hypothetical-event-to-mainline",
+            "MATCH (i:Incident {id: 'INC-204'}), (event:StateEvent {id: 'EVT-BR-RESTORE-01'}) MERGE (i)-[r:HAS_STATE_EVENT {access: 'operations'}]->(event)",
+        )
+        self.db.graph_query(
+            "ui-mislink-hypothetical-event-source",
+            "MATCH (event:StateEvent {id: 'EVT-BR-RESTORE-01'}), (src:Evidence {id: 'SRC-ASSET-C4-OUTAGE'}) MERGE (event)-[r:EVIDENCED_BY {access: 'operations'}]->(src)",
+        )
+        linked_hypothetical_rows = self.db.graph_rows("ui-filter-hypothetical-mainline", CONVEYOR_EVENT_QUERY)
+        _, board_with_mislinked_hypothetical = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_at_1830"]["at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "a hypothetical event mislinked to the mainline with visible source evidence is still excluded",
+            {row["event_id"] for row in linked_hypothetical_rows} == {"EVT-C4-UNAVAILABLE-01", "EVT-C4-RESTORED-01"}
+            and len(linked_hypothetical_rows) == 2
+            and board_with_mislinked_hypothetical["conveyor"] == observed["conveyor"],
+            {"mainline_event_ids": [row["event_id"] for row in linked_hypothetical_rows], "board_unchanged": board_with_mislinked_hypothetical["conveyor"] == observed["conveyor"]},
+        )
+        self.db.graph_query(
+            "ui-unlink-hypothetical-event-mainline",
+            "MATCH (i:Incident {id: 'INC-204'})-[r:HAS_STATE_EVENT]->(event:StateEvent {id: 'EVT-BR-RESTORE-01'}) DELETE r",
+        )
+        self.db.graph_query(
+            "ui-unlink-hypothetical-source",
+            "MATCH (event:StateEvent {id: 'EVT-BR-RESTORE-01'})-[r:EVIDENCED_BY]->(:Evidence {id: 'SRC-ASSET-C4-OUTAGE'}) DELETE r",
+        )
 
         # The two cases share the graph, but actual variable-length graph
         # traversals must not connect the dock revision to the conveyor event.
@@ -639,6 +672,39 @@ class HospitalWorkflowVerifier:
             and denied_exp["denied_identifier_title_fact_count_existence_path_or_paraphrase_disclosed"] is False
             and denied_exp["hidden_counts_or_existence_disclosed"] is False,
             {"forbidden_literals_found": [literal for literal in hidden if literal in denied_serialized], "top_level_fields": sorted(denied_after)},
+        )
+        self.db.graph_query(
+            "ui-point-ops-owner-edge-at-denied-source",
+            "MATCH (:Department {id: 'DEPT-CENTRAL-STERILE'})-[owns:OWNED_BY {id: 'REL-CSS-CURRENT'}]->(:Role {id: 'ROLE-STERILE-OPS-COORD'}) SET owns.source_id = 'SRC-RESTRICTED-92', owns.source_title = 'Restricted Continuity Annex 92', owns.observed_at = '2026-10-14T18:20:00Z'",
+        )
+        self.db.graph_query(
+            "ui-add-denied-role-evidence-link",
+            "MATCH (role:Role {id: 'ROLE-STERILE-OPS-COORD'}), (src:Evidence {id: 'SRC-RESTRICTED-92'}) MERGE (role)-[r:EVIDENCED_BY {access: 'operations'}]->(src)",
+        )
+        _, denied_owner_edge = self.shift_board_request()
+        denied_owner_serialized = json.dumps(denied_owner_edge, sort_keys=True)
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "an operations-labeled ownership edge cannot expose a restricted provenance node or its dependent path",
+            [row["path"] for row in denied_owner_edge["conveyor"]["paths"]] == conveyor_exp["observed_at_1830"]["paths"][1:]
+            and all(literal not in denied_owner_serialized for literal in hidden)
+            and "Restricted Continuity Annex 92" not in denied_owner_serialized,
+            denied_owner_edge["conveyor"]["paths"],
+        )
+        self.db.graph_query(
+            "ui-remove-denied-role-evidence-link",
+            "MATCH (:Role {id: 'ROLE-STERILE-OPS-COORD'})-[r:EVIDENCED_BY]->(:Evidence {id: 'SRC-RESTRICTED-92'}) DELETE r",
+        )
+        self.db.graph_query(
+            "ui-restore-ops-owner-provenance",
+            "MATCH (:Department {id: 'DEPT-CENTRAL-STERILE'})-[owns:OWNED_BY {id: 'REL-CSS-CURRENT'}]->(:Role {id: 'ROLE-STERILE-OPS-COORD'}) SET owns.source_id = 'SRC-OPS-ROSTER', owns.source_title = 'Synthetic Operations Role Roster', owns.observed_at = '2026-10-14T18:04:00Z'",
+        )
+        _, restored_owner_source = self.shift_board_request()
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "restoring the owned operations provenance restores the exact visible evidence output",
+            restored_owner_source == denied_after,
+            {"restored_equals_original_visible": restored_owner_source == denied_after},
         )
         denied_scope_status, denied_scope_body = self.get("/api/shift-board?scope=restricted")
         self.shift_check(
@@ -768,7 +834,7 @@ class HospitalWorkflowVerifier:
             "cold-empty-board",
             "desktop browser initially renders the cold graph as empty/unknown before an explicit reseed",
             browser_checks.get("cold browser board visibly says empty/unknown without default incident cases", False)
-            and browser_checks.get("cold browser has no invented incident, source, role, or review rows", False),
+            and browser_checks.get("cold browser has no invented incident, source, role, review, or SOP identifier", False),
             {name: passed for name, passed in browser_checks.items() if name.startswith("cold browser")},
         )
         self.shift_check(
@@ -818,7 +884,6 @@ class HospitalWorkflowVerifier:
                 f"shift-board adversarial case {case_id} has a nonzero executed assertion count",
                 len(assertion_names) > 0,
                 {"assertion_count": len(assertion_names), "assertions": assertion_names},
-                shift_case=case_id,
             )
         if self.args.verify_morning_status_and_feature_matrix:
             self.docs = validate_docs()

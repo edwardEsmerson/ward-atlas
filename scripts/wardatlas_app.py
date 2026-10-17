@@ -171,6 +171,7 @@ APP_HTML = r'''<!doctype html>
     .branch-box p { margin:5px 0 0; color:#c4c8bd; font-size:10px; line-height:1.5; }
     .shift-unknown { color:#f1c278; }
     .shift-case[hidden] { display:none; }
+    #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
     @media (max-width:900px) { .grid { grid-template-columns:1fr; } .hero { grid-template-columns:1fr; align-items:start; } .incident-card { max-width:420px; } }
     @media (max-width:760px) { .shift-cases { grid-template-columns:1fr; } }
@@ -185,8 +186,8 @@ APP_HTML = r'''<!doctype html>
     </header>
     <main>
       <section class="hero" aria-labelledby="main-title">
-        <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">One outage. Two accountable paths.</h1><p>Trace the conveyor outage through service dependencies to the operating roles that are explicitly current. Inspect the evidence behind each hop before preparing a local handover.</p></div>
-        <aside class="incident-card"><div class="status">Open operations incident</div><strong id="incident-title">INC-204 · Loading briefing</strong><p id="incident-summary">Synthetic material-transfer conveyor outage. No patient or clinical information.</p></aside>
+        <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
+        <aside class="incident-card"><div id="incident-status" class="status">No graph-backed incident</div><strong id="incident-title">No incident in graph</strong><p id="incident-summary">Empty/unknown is not evidence of safety or no operational risk.</p></aside>
       </section>
       <section class="card shift-board" aria-labelledby="shift-board-title">
         <div class="card-head"><div><div class="eyebrow">Integrated board · two separate synthetic cases</div><h2 id="shift-board-title">Shift changes, with provenance</h2></div><span id="shift-board-badge" class="tag blue">Loading live graph…</span></div>
@@ -212,7 +213,7 @@ APP_HTML = r'''<!doctype html>
         </div>
         <div id="shift-board-notice" class="notice" aria-live="polite"></div>
       </section>
-      <div class="grid">
+      <div id="legacy-grid" class="grid" hidden>
         <div class="stack">
           <section class="card" aria-labelledby="graph-title">
             <div class="card-head"><div><div class="eyebrow">Live FalkorDB relationship path</div><h2 id="graph-title">Impact map</h2></div><span id="impact-count" class="tag">Waiting for graph</span></div>
@@ -343,6 +344,10 @@ APP_HTML = r'''<!doctype html>
     }
     function renderBriefing(data, graph) {
       briefing=data;
+      $('legacy-grid').hidden=!data.incident;
+      $('main-title').textContent=data.incident?'One outage. Two accountable paths.':'A board with no defaults.';
+      $('hero-description').textContent=data.incident?'Trace the conveyor outage through service dependencies to the operating roles that are explicitly current. Inspect the evidence behind each hop before preparing a local handover.':'The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.';
+      $('incident-status').textContent=data.incident?'Open operations incident':'No graph-backed incident';
       $('incident-title').textContent=data.incident ? `${data.incident.id} · ${data.incident.status.toUpperCase()}` : 'No open incident in graph';
       $('incident-summary').textContent=data.incident ? `${data.incident.equipment_name} is unavailable. Synthetic operations evidence only; no patient or clinical information.` : 'The graph is empty. Reset the synthetic scenario to load the fictional outage.';
       $('impact-count').textContent=`${data.impact_paths.length} impact paths`;
