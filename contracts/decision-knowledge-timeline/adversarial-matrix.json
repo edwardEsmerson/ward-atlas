@@ -1,0 +1,789 @@
+{
+  "schema_version": 1,
+  "oracle_file": "contracts/decision-knowledge-timeline/expected-results.json",
+  "purpose": "Traceable adversarial map from each of twelve packet groups to nonzero literal expected-results JSON pointers.",
+  "oracle_policy": "Candidate output is never used to populate or amend assertions.",
+  "groups": [
+    {
+      "group_id": "cold-empty-unknown",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:56"
+      ],
+      "source_oracle_refs": [
+        "tests/handover-brief-expected-results.json#cold-empty-unknown",
+        "tests/decision-provenance-expected-results.json#empty-unknown"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "cold.generic-unknown",
+          "assertion": "cold generic unknown",
+          "expected_pointer": "/cases/0/expected/board_state"
+        },
+        {
+          "id": "cold.no-claim-rows",
+          "assertion": "cold no claim rows",
+          "expected_pointer": "/cases/0/expected/projection/claims"
+        },
+        {
+          "id": "cold.no-record",
+          "assertion": "cold no record",
+          "expected_pointer": "/cases/0/expected/projection/decision_record"
+        },
+        {
+          "id": "cold.no-visible-ids",
+          "assertion": "cold no visible ids",
+          "expected_pointer": "/cases/0/expected/exposed_ids"
+        },
+        {
+          "id": "cold.no-visible-titles",
+          "assertion": "cold no visible titles",
+          "expected_pointer": "/cases/0/expected/exposed_titles"
+        },
+        {
+          "id": "cold.no-count-fields",
+          "assertion": "cold no count fields",
+          "expected_pointer": "/cases/0/expected/exposed_count_fields"
+        },
+        {
+          "id": "cold.no-count-or-existence",
+          "assertion": "cold no count or existence",
+          "expected_pointer": "/cases/0/expected/existence_hint_exposed"
+        },
+        {
+          "id": "cold.no-negative-conclusion",
+          "assertion": "cold no negative conclusion",
+          "expected_pointer": "/cases/0/expected/no-decision-or-conflict-absence-concluded"
+        }
+      ],
+      "nonzero_assertion_count": 8
+    },
+    {
+      "group_id": "before-first-observation",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:57"
+      ],
+      "source_oracle_refs": [
+        "tests/handover-brief-expected-results.json#cold-empty-unknown",
+        "tests/sop-impact-expected-results.json#sop-impact-cold-empty"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "before.time",
+          "assertion": "before time",
+          "expected_pointer": "/cases/1/expected/known_at"
+        },
+        {
+          "id": "before.generic-unknown",
+          "assertion": "before generic unknown",
+          "expected_pointer": "/cases/1/expected/board_state"
+        },
+        {
+          "id": "before.no-sources",
+          "assertion": "before no sources",
+          "expected_pointer": "/cases/1/expected/source_or_version_rows"
+        },
+        {
+          "id": "before.no-decision-ids",
+          "assertion": "before no decision ids",
+          "expected_pointer": "/cases/1/expected/exposed_ids"
+        },
+        {
+          "id": "before.no-count-fields",
+          "assertion": "before no count fields",
+          "expected_pointer": "/cases/1/expected/exposed_count_fields"
+        },
+        {
+          "id": "before.no-count-or-existence",
+          "assertion": "before no count or existence",
+          "expected_pointer": "/cases/1/expected/existence_hint_exposed"
+        },
+        {
+          "id": "before.not-negative",
+          "assertion": "before not negative",
+          "expected_pointer": "/cases/1/expected/no-decision-or-conflict-absence-concluded"
+        }
+      ],
+      "nonzero_assertion_count": 7
+    },
+    {
+      "group_id": "v2-observation-boundary",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:58"
+      ],
+      "source_oracle_refs": [
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance",
+        "tests/decision-provenance-expected-results.json#exact-one-record-baseline"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "v2.exact-cutoff",
+          "assertion": "v2 exact cutoff",
+          "expected_pointer": "/cases/2/expected/projection/known_at"
+        },
+        {
+          "id": "v2.only-source-id",
+          "assertion": "v2 only source id",
+          "expected_pointer": "/cases/2/expected/visible_source_order"
+        },
+        {
+          "id": "v2.source-path",
+          "assertion": "v2 source path",
+          "expected_pointer": "/cases/2/expected/claim_discovery_source"
+        },
+        {
+          "id": "v2.claim-source-time",
+          "assertion": "v2 claim source time",
+          "expected_pointer": "/cases/2/expected/projection/claims/0/source/observed_at"
+        },
+        {
+          "id": "v2.claim-edge",
+          "assertion": "v2 claim edge",
+          "expected_pointer": "/cases/2/expected/projection/claims/0/claim_edge"
+        },
+        {
+          "id": "v2.claim-role",
+          "assertion": "v2 claim role",
+          "expected_pointer": "/cases/2/expected/projection/claims/0/role_id"
+        },
+        {
+          "id": "v2.applicability-edge",
+          "assertion": "v2 applicability edge",
+          "expected_pointer": "/cases/2/expected/projection/claims/0/applicability_edge"
+        },
+        {
+          "id": "v2.source-id-title",
+          "assertion": "v2 source id title",
+          "expected_pointer": "/cases/2/expected/projection/claims/0/source"
+        },
+        {
+          "id": "v2.evidence-edge",
+          "assertion": "v2 evidence edge",
+          "expected_pointer": "/cases/2/expected/projection/claims/0/source/evidence_link"
+        },
+        {
+          "id": "v2.record-hidden",
+          "assertion": "v2 record hidden",
+          "expected_pointer": "/cases/2/expected/record_or_considers_disclosed"
+        },
+        {
+          "id": "v2.no-conflict-conclusion",
+          "assertion": "v2 no conflict conclusion",
+          "expected_pointer": "/cases/2/expected/conflict_concluded"
+        }
+      ],
+      "nonzero_assertion_count": 11
+    },
+    {
+      "group_id": "v2-unchanged-before-v3",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:59"
+      ],
+      "source_oracle_refs": [
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "v2-later.time",
+          "assertion": "v2 later time",
+          "expected_pointer": "/cases/3/expected/projection/known_at"
+        },
+        {
+          "id": "v2-later.full-projection",
+          "assertion": "v2 later full projection",
+          "expected_pointer": "/cases/3/expected/projection"
+        },
+        {
+          "id": "v2-later.same-projection",
+          "assertion": "v2 later same projection",
+          "expected_pointer": "/cases/3/expected/semantically_equal_to"
+        },
+        {
+          "id": "v2-later.exact-source",
+          "assertion": "v2 later exact source",
+          "expected_pointer": "/cases/3/expected/visible_source_order"
+        },
+        {
+          "id": "v2-later.no-future-leak",
+          "assertion": "v2 later no future leak",
+          "expected_pointer": "/cases/3/expected/no-later-source_or_record_leak"
+        }
+      ],
+      "nonzero_assertion_count": 5
+    },
+    {
+      "group_id": "v3-and-graph-derived-conflict",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:60"
+      ],
+      "source_oracle_refs": [
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "v3.exact-cutoff",
+          "assertion": "v3 exact cutoff",
+          "expected_pointer": "/cases/4/expected/projection/known_at"
+        },
+        {
+          "id": "v3.v2-and-v3-sources",
+          "assertion": "v3 v2 and v3 sources",
+          "expected_pointer": "/cases/4/expected/visible_source_order"
+        },
+        {
+          "id": "v3.v3-evidence-time",
+          "assertion": "v3 v3 evidence time",
+          "expected_pointer": "/cases/4/expected/projection/claims/1/source/observed_at"
+        },
+        {
+          "id": "v3.v3-claim-edge",
+          "assertion": "v3 v3 claim edge",
+          "expected_pointer": "/cases/4/expected/projection/claims/1/claim_edge"
+        },
+        {
+          "id": "v3.v3-applicability-edge",
+          "assertion": "v3 v3 applicability edge",
+          "expected_pointer": "/cases/4/expected/projection/claims/1/applicability_edge"
+        },
+        {
+          "id": "v3.v3-source-id-title",
+          "assertion": "v3 v3 source id title",
+          "expected_pointer": "/cases/4/expected/projection/claims/1/source"
+        },
+        {
+          "id": "v3.conflict-kind",
+          "assertion": "v3 conflict kind",
+          "expected_pointer": "/cases/4/expected/conflict_kind"
+        },
+        {
+          "id": "v3.conflict-edge",
+          "assertion": "v3 conflict edge",
+          "expected_pointer": "/cases/4/expected/projection/conflict/edge"
+        },
+        {
+          "id": "v3.record-hidden",
+          "assertion": "v3 record hidden",
+          "expected_pointer": "/cases/4/expected/record_or_considers_disclosed"
+        },
+        {
+          "id": "v3.not-authoritative",
+          "assertion": "v3 not authoritative",
+          "expected_pointer": "/cases/4/expected/conflict_is_authoritative_rule_or_source_quote"
+        }
+      ],
+      "nonzero_assertion_count": 10
+    },
+    {
+      "group_id": "pre-record-evidence-no-existence-leak",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:61"
+      ],
+      "source_oracle_refs": [
+        "tests/decision-provenance-expected-results.json#empty-unknown",
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "pre-record.time",
+          "assertion": "pre record time",
+          "expected_pointer": "/cases/5/expected/projection/known_at"
+        },
+        {
+          "id": "pre-record.full-projection",
+          "assertion": "pre record full projection",
+          "expected_pointer": "/cases/5/expected/projection"
+        },
+        {
+          "id": "pre-record.same-projection",
+          "assertion": "pre record same projection",
+          "expected_pointer": "/cases/5/expected/semantically_equal_to"
+        },
+        {
+          "id": "pre-record.no-identity",
+          "assertion": "pre record no identity",
+          "expected_pointer": "/cases/5/expected/exposed_record_literals"
+        },
+        {
+          "id": "pre-record.no-count",
+          "assertion": "pre record no count",
+          "expected_pointer": "/cases/5/expected/exposed_count_fields"
+        },
+        {
+          "id": "pre-record.no-existence-hint",
+          "assertion": "pre record no existence hint",
+          "expected_pointer": "/cases/5/expected/existence_hint_exposed"
+        },
+        {
+          "id": "pre-record.not-absence-claim",
+          "assertion": "pre record not absence claim",
+          "expected_pointer": "/cases/5/expected/no-record-exists_conclusion"
+        },
+        {
+          "id": "pre-record.record-suppressed",
+          "assertion": "pre record record suppressed",
+          "expected_pointer": "/cases/5/expected/record_id_title_state_source_and_considers_suppressed"
+        }
+      ],
+      "nonzero_assertion_count": 8
+    },
+    {
+      "group_id": "record-source-boundary",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:62"
+      ],
+      "source_oracle_refs": [
+        "tests/decision-provenance-expected-results.json#exact-one-record-baseline",
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "record.cutoff",
+          "assertion": "record cutoff",
+          "expected_pointer": "/cases/6/expected/projection/known_at"
+        },
+        {
+          "id": "record.exact-id",
+          "assertion": "record exact id",
+          "expected_pointer": "/cases/6/expected/projection/decision_record/id"
+        },
+        {
+          "id": "record.own-source-edge",
+          "assertion": "record own source edge",
+          "expected_pointer": "/cases/6/expected/projection/decision_record/source/evidence_link"
+        },
+        {
+          "id": "record.source-time",
+          "assertion": "record source time",
+          "expected_pointer": "/cases/6/expected/projection/decision_record/source/observed_at"
+        },
+        {
+          "id": "record.state",
+          "assertion": "record state",
+          "expected_pointer": "/cases/6/expected/projection/decision_record/recorded_state"
+        },
+        {
+          "id": "record.register-tracks-edge",
+          "assertion": "record register tracks edge",
+          "expected_pointer": "/cases/6/expected/projection/decision_record/register_edge"
+        },
+        {
+          "id": "record.register-source-path",
+          "assertion": "record register source path",
+          "expected_pointer": "/cases/6/expected/projection/decision_record/provenance_path"
+        },
+        {
+          "id": "record.considers-v2-v3",
+          "assertion": "record considers v2 v3",
+          "expected_pointer": "/cases/6/expected/projection/decision_considers_edges"
+        },
+        {
+          "id": "record.both-claims-known",
+          "assertion": "record both claims known",
+          "expected_pointer": "/cases/6/expected/considered_links_only_to_independently_evidence-known_claims"
+        },
+        {
+          "id": "record.no-selection",
+          "assertion": "record no selection",
+          "expected_pointer": "/cases/6/expected/selected_version"
+        },
+        {
+          "id": "record.no-action",
+          "assertion": "record no action",
+          "expected_pointer": "/cases/6/expected/action_proposed"
+        }
+      ],
+      "nonzero_assertion_count": 11
+    },
+    {
+      "group_id": "v3-observation-time-shift",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:63"
+      ],
+      "source_oracle_refs": [
+        "tests/decision-provenance-expected-results.json#exact-one-record-baseline",
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "shift.cutoff",
+          "assertion": "shift cutoff",
+          "expected_pointer": "/cases/7/expected/v3_observed_at_mutated_to"
+        },
+        {
+          "id": "shift.16-05-full-projection",
+          "assertion": "shift 16 05 full projection",
+          "expected_pointer": "/cases/7/expected/at_16_05"
+        },
+        {
+          "id": "shift.16-06-full-projection",
+          "assertion": "shift 16 06 full projection",
+          "expected_pointer": "/cases/7/expected/at_16_06"
+        },
+        {
+          "id": "shift.16-05-full-claims",
+          "assertion": "shift 16 05 full claims",
+          "expected_pointer": "/cases/7/expected/at_16_05/claims"
+        },
+        {
+          "id": "shift.16-05-v2-only",
+          "assertion": "shift 16 05 v2 only",
+          "expected_pointer": "/cases/7/expected/at_16_05/claims/0/version_id"
+        },
+        {
+          "id": "shift.16-05.record-retained",
+          "assertion": "shift 16 05 record retained",
+          "expected_pointer": "/cases/7/expected/at_16_05/decision_record/recorded_state"
+        },
+        {
+          "id": "shift.16-05.considers-v2-only",
+          "assertion": "shift 16 05 considers v2 only",
+          "expected_pointer": "/cases/7/expected/at_16_05/decision_considers_edges"
+        },
+        {
+          "id": "shift.16-05.incomplete",
+          "assertion": "shift 16 05 incomplete",
+          "expected_pointer": "/cases/7/expected/at_16_05/claim_context_state"
+        },
+        {
+          "id": "shift.16-05.forbidden-v3-literals",
+          "assertion": "shift 16 05 forbidden v3 literals",
+          "expected_pointer": "/cases/7/expected/at_16_05_forbidden_v3_literals"
+        },
+        {
+          "id": "shift.16-05.forbidden-v3-edges",
+          "assertion": "shift 16 05 forbidden v3 edges",
+          "expected_pointer": "/cases/7/expected/at_16_05_forbidden_v3_relationships"
+        },
+        {
+          "id": "shift.16-05.forbidden-v3-paths",
+          "assertion": "shift 16 05 forbidden v3 paths",
+          "expected_pointer": "/cases/7/expected/at_16_05_forbidden_v3_paths"
+        },
+        {
+          "id": "shift.16-05.no-v3-count-path",
+          "assertion": "shift 16 05 no v3 count path",
+          "expected_pointer": "/cases/7/expected/at_16_05_v3_count_or_path_exposed"
+        },
+        {
+          "id": "shift.16-05.no-conflict",
+          "assertion": "shift 16 05 no conflict",
+          "expected_pointer": "/cases/7/expected/at_16_05_conflict_edge_exposed"
+        },
+        {
+          "id": "shift.16-06-v3-source-time",
+          "assertion": "shift 16 06 v3 source time",
+          "expected_pointer": "/cases/7/expected/at_16_06/claims/1/source/observed_at"
+        },
+        {
+          "id": "shift.16-06-considers-return",
+          "assertion": "shift 16 06 considers return",
+          "expected_pointer": "/cases/7/expected/at_16_06/decision_considers_edges"
+        },
+        {
+          "id": "shift.existing-paths-unchanged",
+          "assertion": "shift existing paths unchanged",
+          "expected_pointer": "/cases/7/expected/existing_incident_impact_paths_unchanged"
+        }
+      ],
+      "nonzero_assertion_count": 16
+    },
+    {
+      "group_id": "separate-evidence-edge-removals",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:64"
+      ],
+      "source_oracle_refs": [
+        "tests/decision-provenance-expected-results.json#decision-evidence-link-removed",
+        "tests/decision-provenance-expected-results.json#v2-claim-evidence-link-removed",
+        "tests/sop-impact-expected-results.json#sop-impact-conflict-provenance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "remove-v3.only-edge",
+          "assertion": "remove v3 only edge",
+          "expected_pointer": "/cases/8/expected/v3_source_evidence_edge_removal/removed_edge"
+        },
+        {
+          "id": "remove-v3-v2-remains",
+          "assertion": "remove v3 v2 remains",
+          "expected_pointer": "/cases/8/expected/v3_source_evidence_edge_removal/projection/claims/0/version_id"
+        },
+        {
+          "id": "remove-v3.considers-v2-only",
+          "assertion": "remove v3 considers v2 only",
+          "expected_pointer": "/cases/8/expected/v3_source_evidence_edge_removal/projection/decision_considers_edges"
+        },
+        {
+          "id": "remove-v3.no-v3-or-conflict",
+          "assertion": "remove v3 no v3 or conflict",
+          "expected_pointer": "/cases/8/expected/v3_source_evidence_edge_removal/v3_or_conflict_exposed"
+        },
+        {
+          "id": "remove-v3.record-state-retained",
+          "assertion": "remove v3 record state retained",
+          "expected_pointer": "/cases/8/expected/v3_source_evidence_edge_removal/record_state_retained"
+        },
+        {
+          "id": "remove-v3.incomplete",
+          "assertion": "remove v3 incomplete",
+          "expected_pointer": "/cases/8/expected/v3_source_evidence_edge_removal/claim_context"
+        },
+        {
+          "id": "remove-record.own-edge",
+          "assertion": "remove record own edge",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/removed_edge"
+        },
+        {
+          "id": "remove-record.facts-suppressed",
+          "assertion": "remove record facts suppressed",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/record_facts_suppressed"
+        },
+        {
+          "id": "remove-record.preserved-claims",
+          "assertion": "remove record preserved claims",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/projection/claims"
+        },
+        {
+          "id": "remove-record.preserved-conflict",
+          "assertion": "remove record preserved conflict",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/projection/conflict"
+        },
+        {
+          "id": "remove-record.timeline-not-unknown",
+          "assertion": "remove record timeline not unknown",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/projection/generic_unknown"
+        },
+        {
+          "id": "remove-record.no-property-citation",
+          "assertion": "remove record no property citation",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/property_only_provenance_accepted"
+        },
+        {
+          "id": "remove-record.generic-unknown",
+          "assertion": "remove record generic unknown",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/generic_unknown_no_record_facts"
+        },
+        {
+          "id": "remove-record.exact-unknown-outcome",
+          "assertion": "remove record exact unknown outcome",
+          "expected_pointer": "/cases/8/expected/decision_record_source_edge_removal/record_lookup_result"
+        },
+        {
+          "id": "remove.edges.preserve-impact",
+          "assertion": "remove edges preserve impact",
+          "expected_pointer": "/cases/8/expected/existing_incident_impact_paths_unchanged"
+        }
+      ],
+      "nonzero_assertion_count": 15
+    },
+    {
+      "group_id": "decoy-and-restricted-invariance",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:65"
+      ],
+      "source_oracle_refs": [
+        "tests/decision-provenance-expected-results.json#disconnected-decoy-excluded",
+        "tests/decision-provenance-expected-results.json#restricted-source-operations-invariance",
+        "tests/sop-impact-expected-results.json#sop-impact-denied-source-invariance"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "acl.baseline-full-projection",
+          "assertion": "acl baseline full projection",
+          "expected_pointer": "/cases/9/expected/clean_operations_projection"
+        },
+        {
+          "id": "acl.decoy-full-projection",
+          "assertion": "acl decoy full projection",
+          "expected_pointer": "/cases/9/expected/after_disconnected_decoy_projection"
+        },
+        {
+          "id": "acl.restricted-full-projection",
+          "assertion": "acl restricted full projection",
+          "expected_pointer": "/cases/9/expected/after_connected_restricted_injection_projection"
+        },
+        {
+          "id": "acl.decoy-invariant",
+          "assertion": "acl decoy invariant",
+          "expected_pointer": "/cases/9/expected/decoy_projection_semantically_identical"
+        },
+        {
+          "id": "acl.full-view-invariant",
+          "assertion": "acl full view invariant",
+          "expected_pointer": "/cases/9/expected/operations_projection_invariant"
+        },
+        {
+          "id": "acl.browser-accessibility-invariant",
+          "assertion": "acl browser accessibility invariant",
+          "expected_pointer": "/cases/9/expected/browser_text_and_accessibility_invariant"
+        },
+        {
+          "id": "acl.no-leak",
+          "assertion": "acl no leak",
+          "expected_pointer": "/cases/9/expected/restricted_ids_titles_facts_counts_existence_edges_paths_or_paraphrases_exposed"
+        },
+        {
+          "id": "acl.no-tripwires",
+          "assertion": "acl no tripwires",
+          "expected_pointer": "/cases/9/expected/restricted_literals_disclosed"
+        },
+        {
+          "id": "acl.no-hidden-count",
+          "assertion": "acl no hidden count",
+          "expected_pointer": "/cases/9/expected/hidden_count_or_existence_disclosed"
+        }
+      ],
+      "nonzero_assertion_count": 9
+    },
+    {
+      "group_id": "timestamp-normalization-and-rejection",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:66"
+      ],
+      "source_oracle_refs": [
+        "tests/handover-brief-expected-results.json#timestamp-normalization-and-pre-mutation-rejection",
+        "tests/sop-impact-expected-results.json#sop-impact-time-browser-local-boundary"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "time.offset-input",
+          "assertion": "time offset input",
+          "expected_pointer": "/cases/10/expected/valid_offset_input"
+        },
+        {
+          "id": "time.utc-normalization",
+          "assertion": "time utc normalization",
+          "expected_pointer": "/cases/10/expected/normalized_known_at"
+        },
+        {
+          "id": "time.full-result",
+          "assertion": "time full result",
+          "expected_pointer": "/cases/10/expected/normalized_projection"
+        },
+        {
+          "id": "time.same-result",
+          "assertion": "time same result",
+          "expected_pointer": "/cases/10/expected/offset_projection_matches"
+        },
+        {
+          "id": "time.malformed-rejected",
+          "assertion": "time malformed rejected",
+          "expected_pointer": "/cases/10/expected/malformed_rejected"
+        },
+        {
+          "id": "time.naive-rejected",
+          "assertion": "time naive rejected",
+          "expected_pointer": "/cases/10/expected/naive_rejected"
+        },
+        {
+          "id": "time.reject-before-graph-write",
+          "assertion": "time reject before graph write",
+          "expected_pointer": "/cases/10/expected/rejection_precedes_graph_mutation"
+        },
+        {
+          "id": "time.reject-before-action-write",
+          "assertion": "time reject before action write",
+          "expected_pointer": "/cases/10/expected/rejection_precedes_local_action_mutation"
+        },
+        {
+          "id": "time.no-local-clock-fallback",
+          "assertion": "time no local clock fallback",
+          "expected_pointer": "/cases/10/expected/falls_back_to_local_or_current_time"
+        }
+      ],
+      "nonzero_assertion_count": 9
+    },
+    {
+      "group_id": "reseed-reconnect-read-only-browser-cleanup",
+      "setup": "Use only the named frozen synthetic sources and an isolated read-only source-time projection; mutate only explicitly test-owned edge/time data where stated.",
+      "attack_or_edge_case": "Adversarially verify the packet's cutoff, provenance path, non-disclosure, unknown semantics, or repeatability boundary for this group.",
+      "planner_refs": [
+        "planner-24567af7e5ee4642a9b81ba8ce6f184c.md:67"
+      ],
+      "source_oracle_refs": [
+        "tests/decision-provenance-expected-results.json#idempotent-reseed-restores-baseline",
+        "tests/decision-provenance-expected-results.json#fresh-client-read-only-owned-cleanup",
+        "tests/sop-impact-expected-results.json#sop-impact-reseed-reconnect"
+      ],
+      "pinned_assertions": [
+        {
+          "id": "repeat.two-seeds",
+          "assertion": "repeat two seeds",
+          "expected_pointer": "/cases/11/expected/fixture_seed_runs"
+        },
+        {
+          "id": "repeat.zero-node-delta",
+          "assertion": "repeat zero node delta",
+          "expected_pointer": "/cases/11/expected/second_seed_node_delta"
+        },
+        {
+          "id": "repeat.zero-edge-delta",
+          "assertion": "repeat zero edge delta",
+          "expected_pointer": "/cases/11/expected/second_seed_relationship_delta"
+        },
+        {
+          "id": "repeat.baseline-full-projection",
+          "assertion": "repeat baseline full projection",
+          "expected_pointer": "/cases/11/expected/exact_projection_after_reseed"
+        },
+        {
+          "id": "repeat.fresh-client",
+          "assertion": "repeat fresh client",
+          "expected_pointer": "/cases/11/expected/fresh_client_required"
+        },
+        {
+          "id": "repeat.reconnected-full-projection",
+          "assertion": "repeat reconnected full projection",
+          "expected_pointer": "/cases/11/expected/fresh_client_projection"
+        },
+        {
+          "id": "repeat.zero-graph-node-writes",
+          "assertion": "repeat zero graph node writes",
+          "expected_pointer": "/cases/11/expected/query_and_browser_graph_node_writes"
+        },
+        {
+          "id": "repeat.zero-edge-writes",
+          "assertion": "repeat zero edge writes",
+          "expected_pointer": "/cases/11/expected/query_and_browser_graph_relationship_writes"
+        },
+        {
+          "id": "repeat.zero-action-writes",
+          "assertion": "repeat zero action writes",
+          "expected_pointer": "/cases/11/expected/query_and_browser_local_action_writes"
+        },
+        {
+          "id": "repeat.api-desktop-mobile",
+          "assertion": "repeat api desktop mobile",
+          "expected_pointer": "/cases/11/expected/desktop_api_browser_projection_semantically_equal"
+        },
+        {
+          "id": "repeat.owned-cleanup",
+          "assertion": "repeat owned cleanup",
+          "expected_pointer": "/cases/11/expected/cleanup_deletes_only_task_owned_unique_graph_and_state"
+        }
+      ],
+      "nonzero_assertion_count": 11
+    }
+  ]
+}

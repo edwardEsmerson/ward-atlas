@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen source identities for the source-observation-time decision timeline; no candidate response or fixture supplies expected values.",
+  "oracle_sources": [
+    {
+      "id": "decision-provenance-packet",
+      "path": "planner-22e10d27ab804d3e872feefec257ae38.md",
+      "sha256": "992dba1b3dbbf4ee51e7c04a6fc1aa865a9460b84c1795fefd5931198bc5e1a0",
+      "kind": "accepted-planner-packet"
+    },
+    {
+      "id": "decision-provenance-expected-results",
+      "path": "tests/decision-provenance-expected-results.json",
+      "sha256": "4143bbc135b32ed6fb89444f2c32b01bfd5ca89d50127cea5e4099fdffed5c5d",
+      "kind": "accepted-source-oracle"
+    },
+    {
+      "id": "decision-provenance-adversarial-matrix",
+      "path": "tests/decision-provenance-adversarial-matrix.json",
+      "sha256": "256048400ee304f59884ecf3393f9a59e30d76f29281c9c6ea5378740dd71ad3",
+      "kind": "accepted-source-matrix"
+    },
+    {
+      "id": "sop-impact-expected-results",
+      "path": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca",
+      "kind": "accepted-source-oracle"
+    },
+    {
+      "id": "handover-brief-expected-results",
+      "path": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1",
+      "kind": "accepted-source-oracle"
+    }
+  ],
+  "task_packet": {
+    "id": "decision-knowledge-timeline-task-packet",
+    "path": "planner-24567af7e5ee4642a9b81ba8ce6f184c/plans/planner-24567af7e5ee4642a9b81ba8ce6f184c.md",
+    "sha256": "178a30a13d16a049a02caf45d7ba7715ce22c65adf265a5bb3a9508800ad28b3",
+    "outcome_lines": [
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67
+    ],
+    "role": "acceptance-map-only-not-product-output"
+  },
+  "policy": "The accepted decision-provenance packet and the unchanged decision-provenance, SOP-impact, and handover expected-results/matrix files are the only value oracles. The task packet identifies the 12 required cases; its packet hash is checked separately from source-oracle hashes."
+}
