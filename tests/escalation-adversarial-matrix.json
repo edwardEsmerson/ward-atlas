@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/escalation-expected-results.json",
+  "oracle_policy": "Every group maps to nonzero, fixed assertions in the candidate-independent escalation oracle and one exact planner outcome. No assertion derives a value from candidate behavior.",
+  "required_group_count": 9,
+  "groups": [
+    {
+      "group_id": "cold-empty-unknown",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:75",
+      "attack_or_edge_case": "Query a unique, cold, empty graph before any fixture seed.",
+      "setup": "Use a new task-owned graph with zero nodes and relationships; request the pinned 18:30Z synthetic incident view.",
+      "assertions": [
+        {"id":"cold.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"cold.no-routes","pointer":"/expected/routes","equals":[]},
+        {"id":"cold.zero-route-count","pointer":"/expected/route_count","equals":0},
+        {"id":"cold.empty-unknown-label","pointer":"/expected/board_state","equals":"empty/unknown"},
+        {"id":"cold.no-invented-coordinator","pointer":"/expected/coordinator_role_invented","equals":false},
+        {"id":"cold.no-no-escalation-conclusion","pointer":"/expected/no_escalation_need_concluded","equals":false}
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "A warm/default coordinator is returned, or empty evidence is misrepresented as proof that no escalation is needed."
+    },
+    {
+      "group_id": "outage-day-coordinator-paths",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:76",
+      "attack_or_edge_case": "Follow both active INC-204 department paths through their explicit day ESCALATES_TO edges at 18:30Z.",
+      "setup": "Seed only the pinned synthetic graph. Compare the exact two impact paths, terminal role paths, relationship IDs, source titles, source IDs, and observed times.",
+      "assertions": [
+        {"id":"day.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"day.exact-incident-equipment-service","pointer":"/expected/incident_id","equals":"INC-204"},
+        {"id":"day.exact-two-impact-paths","pointer":"/expected/impact_paths","equals_case_value":true},
+        {"id":"day.exact-two-routes","pointer":"/expected/routes","equals_case_value":true},
+        {"id":"day.sterile-relationship-id","pointer":"/expected/routes/0/escalation_relationship/id","equals":"REL-ESC-STERILE-DAY"},
+        {"id":"day.materials-relationship-id","pointer":"/expected/routes/1/escalation_relationship/id","equals":"REL-ESC-MATERIALS-DAY"},
+        {"id":"day.exact-day-terminal-role","pointer":"/expected/routes/0/coordinator_role_id","equals":"ROLE-OPS-DAY-COORD"},
+        {"id":"day.materials-exact-terminal-role","pointer":"/expected/routes/1/coordinator_role_id","equals":"ROLE-OPS-DAY-COORD"},
+        {"id":"day.all-five-source-witnesses-on-both-routes","pointer":"/expected/routes/0/provenance","equals_case_value":true},
+        {"id":"day.exact-escalation-source-title","pointer":"/expected/routes/1/provenance/4/title","equals":"Synthetic Operations Day Escalation Roster"},
+        {"id":"day.exact-escalation-source-observation","pointer":"/expected/routes/1/provenance/4/observed_at","equals":"2026-10-14T17:50:00Z"},
+        {"id":"day.no-contact-or-action","pointer":"/expected/contact_supplied","equals":false}
+      ],
+      "nonzero_assertion_count": 12,
+      "failure_detected": "A hard-coded route, missing original provenance, guessed assignment, wrong source/time, or missing explicit graph relationship passes as escalation."
+    },
+    {
+      "group_id": "effective-shift-boundary",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:77",
+      "attack_or_edge_case": "Query one minute before and exactly at the 19:00Z boundary with half-open day/night validity intervals.",
+      "setup": "Keep the INC-204 outage active. Query at 18:59Z and 19:00Z, then compare paths, owner roles, relationship IDs, escalation sources, and interval endpoints.",
+      "assertions": [
+        {"id":"boundary.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"boundary.before-time","pointer":"/expected/before_boundary/as_of","equals":"2026-10-14T18:59:00Z"},
+        {"id":"boundary.before-is-day-route","pointer":"/expected/before_boundary/routes_ref","equals":"#/cases/1/expected/routes"},
+        {"id":"boundary.at-time","pointer":"/expected/at_boundary/as_of","equals":"2026-10-14T19:00:00Z"},
+        {"id":"boundary.sterile-night-edge-id","pointer":"/expected/at_boundary/routes/0/escalation_relationship/id","equals":"REL-ESC-STERILE-NIGHT"},
+        {"id":"boundary.materials-night-edge-id","pointer":"/expected/at_boundary/routes/1/escalation_relationship/id","equals":"REL-ESC-MATERIALS-NIGHT"},
+        {"id":"boundary.night-destination","pointer":"/expected/at_boundary/routes/0/coordinator_role_id","equals":"ROLE-OPS-NIGHT-COORD"},
+        {"id":"boundary.night-source-title","pointer":"/expected/at_boundary/routes/0/provenance/4/title","equals":"Synthetic Operations Night Escalation Roster"},
+        {"id":"boundary.night-source-observation","pointer":"/expected/at_boundary/routes/1/provenance/4/observed_at","equals":"2026-10-14T17:51:00Z"},
+        {"id":"boundary.day-interval-is-half-open","pointer":"/expected/day_interval/semantics","equals":"half-open [valid_from, valid_to)"},
+        {"id":"boundary.night-start-exactly-at-19","pointer":"/expected/night_interval/valid_from","equals":"2026-10-14T19:00:00Z"},
+        {"id":"boundary.impact-paths-and-current-roles-stay-fixed","pointer":"/expected/unchanged_impact_paths_departments_and_current_roles","equals":true}
+      ],
+      "nonzero_assertion_count": 12,
+      "failure_detected": "Inclusive end-time overlap, a one-minute gap, wrong relationship IDs, wrong night evidence, or an unrelated incident-path change crosses the boundary incorrectly."
+    },
+    {
+      "group_id": "observed-restoration-removes-routes",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:78",
+      "attack_or_edge_case": "Query at the observed restoration timestamp while a separate SOP conflict remains present.",
+      "setup": "Use the accepted restoration event at 19:15Z; do not use the hypothetical 18:45Z branch or infer resolution from restoration.",
+      "assertions": [
+        {"id":"restore.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"restore.exact-observed-time","pointer":"/expected/as_of","equals":"2026-10-14T19:15:00Z"},
+        {"id":"restore.exact-event-id","pointer":"/expected/restoration/event_id","equals":"EVT-C4-RESTORED-01"},
+        {"id":"restore.exact-source-id","pointer":"/expected/restoration/source_id","equals":"SRC-ASSET-C4-RESTORE"},
+        {"id":"restore.available-state","pointer":"/expected/restoration/equipment_status","equals":"available"},
+        {"id":"restore.no-impact-paths","pointer":"/expected/impact_paths","equals":[]},
+        {"id":"restore.no-escalation-routes","pointer":"/expected/routes","equals":[]},
+        {"id":"restore-sop-conflict-remains-unresolved","pointer":"/expected/sop_conflict_status","equals":"unresolved"},
+        {"id":"restore-not-a-safety-conclusion","pointer":"/expected/safe_or_no_risk_conclusion","equals":false}
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "A route persists past observed restoration, a hypothetical event substitutes for observation, or restoration is reported as proof of safety / SOP resolution."
+    },
+    {
+      "group_id": "escalation-edge-removal-unknown",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:79",
+      "attack_or_edge_case": "Remove only the Materials day escalation relationship and reseed the same owned graph.",
+      "setup": "Record the full baseline, delete only REL-ESC-MATERIALS-DAY, query, reseed, and compare exact routes and underlying impact paths.",
+      "assertions": [
+        {"id":"edge.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"edge.only-exact-materials-relationship-removed","pointer":"/expected/remove_only_relationship","equals_case_value":true},
+        {"id":"edge-materials-route-becomes-unknown","pointer":"/expected/after_removal/missing_route/escalation_status","equals":"unknown"},
+        {"id":"edge.no-complete-materials-route","pointer":"/expected/after_removal/missing_route/complete_escalation_route_returned","equals":false},
+        {"id":"edge-sterile-route-remains","pointer":"/expected/after_removal/routes_ref","equals":"#/cases/1/expected/routes/0"},
+        {"id":"edge-both-impact-paths-remain","pointer":"/expected/after_removal/underlying_impact_paths_unchanged","equals":true},
+        {"id":"edge-no-other-edge-removed","pointer":"/expected/after_removal/other_relationships_removed","equals":[]},
+        {"id":"edge-existing-board-is-unchanged","pointer":"/expected/after_removal/existing_board_results_unchanged","equals":true},
+        {"id":"edge-reseed-restores-exact-baseline","pointer":"/expected/reseed/restores_exact_baseline","equals":true}
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "Text or another role reconstructs a removed edge, a non-owned relationship is deleted, the incident path/other time changes, or reseed does not restore baseline."
+    },
+    {
+      "group_id": "missing-escalation-source-unknown",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:80",
+      "attack_or_edge_case": "Remove only the evidence link from the Materials day escalation edge to its source record.",
+      "setup": "Retain REL-ESC-MATERIALS-DAY and its endpoint roles, remove its test-owned edge-to-source evidence relationship, then query and reseed.",
+      "assertions": [
+        {"id":"evidence.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"evidence-only-owned-link-removed","pointer":"/expected/removed_evidence_link","equals_case_value":true},
+        {"id":"evidence-route-is-incomplete-unknown","pointer":"/expected/after_removal/missing_route/escalation_status","equals":"incomplete/unknown"},
+        {"id":"evidence-route-retains-exact-edge-and-source-tripwires","pointer":"/expected/after_removal/missing_route","equals_case_value":true},
+        {"id":"evidence-no-text-reconstruction","pointer":"/expected/after_removal/role_text_cannot_reconstruct_route","equals":true},
+        {"id":"evidence-no-other-roster-reconstruction","pointer":"/expected/after_removal/other_roster_cannot_reconstruct_route","equals":true},
+        {"id":"evidence-claims-role-is-not-fallback","pointer":"/expected/after_removal/sop_claims_role_cannot_reconstruct_route","equals":true},
+        {"id":"evidence-impact-path-unchanged","pointer":"/expected/after_removal/underlying_impact_paths_unchanged","equals":true},
+        {"id":"evidence-reseed-restores-exact-result","pointer":"/expected/reseed_restores_exact_baseline","equals":true}
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "An unproven escalation edge is returned as complete or reconstructed from role labels, a different roster, a claim, or unchanged incident paths."
+    },
+    {
+      "group_id": "denied-source-invariance",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:81",
+      "attack_or_edge_case": "Inject a distinctive restricted route and source, then compare the complete operations response before and after.",
+      "setup": "Add only the pinned restricted synthetic edge/source probe connected to the Materials duty role; inspect all visible values and side channels under operations scope.",
+      "assertions": [
+        {"id":"acl.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"acl.operations-viewer","pointer":"/expected/viewer_scope","equals":"operations"},
+        {"id":"acl-complete-response-invariant","pointer":"/expected/operations_response_semantically_identical_before_after","equals":true},
+        {"id":"acl-response-before-is-pinned-baseline","pointer":"/expected/visible_response_before_ref","equals":"#/cases/1/expected"},
+        {"id":"acl-response-after-is-identical-baseline","pointer":"/expected/visible_response_after_ref","equals":"#/cases/1/expected"},
+        {"id":"acl-visible-route-count-before","pointer":"/expected/visible_route_count_before","equals":2},
+        {"id":"acl-no-visible-count-or-route-delta","pointer":"/expected/visible_route_count_after","equals":2},
+        {"id":"acl-restricted-role-tripwire","pointer":"/expected/restricted_probe/to_role_id","equals":"ROLE-RESTRICTED-OPS-COORD-PROBE-93"},
+        {"id":"acl-restricted-source-title-tripwire","pointer":"/expected/restricted_probe/source_title","equals":"Restricted Synthetic Operations Escalation Roster Probe 93"},
+        {"id":"acl-no-id-title-fact-count-existence-edge-path-or-paraphrase-leak","pointer":"/expected/restricted_identifier_title_fact_count_existence_relationship_path_or_paraphrase_disclosed","equals":false}
+      ],
+      "nonzero_assertion_count": 10,
+      "failure_detected": "Restricted content leaks through visible paths, source metadata, counts, existence, relationships, or a dependent paraphrase."
+    },
+    {
+      "group_id": "sop-claim-separation-and-time-validation",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:82",
+      "attack_or_edge_case": "Try to substitute conflicting SOP role claims for roster assignments; remove SOP witness edges; query equivalent offset time and malformed time.",
+      "setup": "Retain the pinned unresolved V2/V3 claims, compare route output with and without the SOP witness, normalize +02:00 to UTC, and inspect graph/action state before and after malformed input.",
+      "assertions": [
+        {"id":"sop-time.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"sop.claim-witness-is-unresolved","pointer":"/expected/sop_conflict/status","equals":"unresolved"},
+        {"id":"sop.v2-claim-role-and-source","pointer":"/expected/sop_claims/0","equals_case_value":true},
+        {"id":"sop.v3-claim-role-and-source","pointer":"/expected/sop_claims/1","equals_case_value":true},
+        {"id":"sop-claims-are-not-assignments","pointer":"/expected/sop_claims_are_escalation_assignments","equals":false},
+        {"id":"sop-no-assignment-from-claims","pointer":"/expected/escalation_assignments_from_sop_claims","equals":[]},
+        {"id":"sop-witness-removal-does-not-change-route","pointer":"/expected/sop_witness_change_alters_escalation_routes","equals":false},
+        {"id":"time.exact-offset-input","pointer":"/expected/offset_input","equals":"2026-10-14T20:30:00+02:00"},
+        {"id":"time.offset-normalizes-to-1830z","pointer":"/expected/offset_normalized_as_of","equals":"2026-10-14T18:30:00Z"},
+        {"id":"time.offset-result-is-exact-baseline","pointer":"/expected/offset_result_routes_ref","equals":"#/cases/1/expected/routes"},
+        {"id":"time.malformed-exact-probe-rejected-before-mutation","pointer":"/expected/malformed_timestamp_rejected","equals":true},
+        {"id":"time.no-graph-or-action-mutation-on-rejection","pointer":"/expected/rejection_precedes_graph_or_action_mutation","equals":true}
+      ],
+      "nonzero_assertion_count": 12,
+      "failure_detected": "CLAIMS_ROLE is treated as an assignment, SOP witness presence affects the route, offset conversion changes the result, or malformed time mutates state."
+    },
+    {
+      "group_id": "reseed-reconnect-browser-read-only",
+      "planner_ref": "planner-51d0c80bef174057bc10db9a64ec3d74.md:83",
+      "attack_or_edge_case": "Repeat seed, create a fresh FalkorDB client/restart the app, compare desktop/mobile/API output, and inspect all owned side effects and cleanup.",
+      "setup": "Use a run-unique graph and loopback processes started by this verifier. Query, seed twice, reconnect, query again, and stop/delete only verifier-owned resources.",
+      "assertions": [
+        {"id":"repeat.full-outcome","pointer":"/expected","equals_case_value":true},
+        {"id":"repeat.two-fixture-loads","pointer":"/expected/seed_runs","equals":2},
+        {"id":"repeat.no-duplicate-nodes","pointer":"/expected/duplicate_node_delta_after_second_seed","equals":0},
+        {"id":"repeat.no-duplicate-relationships","pointer":"/expected/duplicate_relationship_delta_after_second_seed","equals":0},
+        {"id":"repeat-fresh-client-required","pointer":"/expected/fresh_falkordb_client_required","equals":true},
+        {"id":"repeat-reconnected-result-is-exact-baseline","pointer":"/expected/reconnected_result_ref","equals":"#/cases/1/expected"},
+        {"id":"repeat.desktop-and-mobile-agree-with-api","pointer":"/expected/api_browser_role_paths_and_sources_agree","equals":true},
+        {"id":"repeat-query-has-no-graph-or-action-writes","pointer":"/expected/read_only_route_query_action_writes","equals":0},
+        {"id":"repeat-no-messages-calls-or-tickets","pointer":"/expected/external_writes","equals":[]},
+        {"id":"repeat-cleanup-owned-graph-only","pointer":"/expected/cleanup_deletes_only_task_owned_graph","equals":true},
+        {"id":"repeat-cleanup-owned-processes-only","pointer":"/expected/cleanup_stops_only_task_owned_processes","equals":true}
+      ],
+      "nonzero_assertion_count": 11,
+      "failure_detected": "Reseed duplicates fixtures, warm-client-only behavior hides reconnect drift, API/browser differ, reads perform work, or cleanup touches a non-owned graph/process."
+    }
+  ]
+}
