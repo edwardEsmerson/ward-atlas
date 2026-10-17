@@ -88,7 +88,15 @@ if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hos
     check('stale role is not represented as current ownership', !hidden.includes('ROLE-OLD-STERILE-ROTATION'));
 
     const beforeReset = await page.locator('#impact-count').innerText();
-    await page.getByRole('button', { name: 'Reset synthetic scenario' }).click();
+    const resetButton = page.getByRole('button', { name: 'Reset synthetic scenario' });
+    await resetButton.click();
+    // The path count is already 2 before reset, so waiting only for the same
+    // value can race the async reset handler and let it clear a newer preview.
+    await page.waitForFunction(() => {
+      const button = document.querySelector('#reset');
+      const notice = document.querySelector('#notice');
+      return button && !button.disabled && notice?.textContent === 'Synthetic scenario reseeded from deterministic fixtures.';
+    }, null, { timeout: 20000 });
     await page.waitForFunction(() => document.querySelector('#impact-count')?.textContent === '2 impact paths');
     check('in-app reset reseeds the same pinned paths', beforeReset === '2 impact paths' && await page.locator('#impact-count').innerText() === '2 impact paths');
 

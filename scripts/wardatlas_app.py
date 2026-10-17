@@ -34,7 +34,7 @@ from wardatlas_sop_impact import (
     STALE_QUERY,
     assemble_response as assemble_sop_impact_response,
 )
-from wardatlas_handover import has_complete_sop_witness, snapshot_from_impact, source_ids_from_snapshot
+from wardatlas_handover import compare_graph_witness, has_complete_sop_witness, snapshot_from_impact, source_ids_from_snapshot
 from wardatlas_shift_board import (
     BRANCH_AT,
     BRANCH_EVENT_QUERY,
@@ -161,6 +161,19 @@ APP_HTML = r'''<!doctype html>
     .handover-source { color:#a9c2bb; font-size:9px; line-height:1.5; overflow-wrap:anywhere; padding:2px 0; }
     .handover-claim { border-top:1px solid #344b43; padding:6px 0; color:#d4e1dd; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
     .handover-claim strong { color:#f0d9a9; }
+    .drift-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px; }
+    .drift-controls .button { font-size:10px; padding:8px 10px; }
+    .drift-comparison { margin-top:12px; border:1px solid #5b533d; border-radius:10px; padding:12px; background:#211f1b; min-width:0; }
+    .drift-comparison[hidden] { display:none; }
+    .drift-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; }
+    .drift-pane { min-width:0; border:1px solid #4a493a; border-radius:8px; padding:10px; background:#171f21; }
+    .drift-pane h4 { margin:0 0 8px; color:#f0d391; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .drift-pane h5 { margin:11px 0 5px; color:#c3d0c9; font-size:9px; letter-spacing:.06em; text-transform:uppercase; }
+    .drift-status { color:#f1d28f; font-size:10px; line-height:1.5; overflow-wrap:anywhere; }
+    .drift-path { overflow-wrap:anywhere; border-left:2px solid var(--mint); padding:7px 8px; margin:7px 0; background:#102d2680; color:#d8e9e2; font-size:10px; line-height:1.55; }
+    .drift-path.removed { border-left-color:var(--red); background:#3a252280; }
+    .drift-provenance { display:block; margin-top:4px; color:#9fb8b0; font-size:9px; line-height:1.5; overflow-wrap:anywhere; }
+    .drift-unknown { color:var(--amber); font-size:10px; line-height:1.5; }
     .safety { margin-top:18px; padding:13px 15px; border:1px solid #314650; border-radius:11px; color:#a9bec0; font-size:11px; line-height:1.55; background:#111f29; }
     .safety strong { color:#d3e2dc; }
     .notice { min-height:20px; margin-top:10px; color:#f1c278; font-size:12px; }
@@ -207,7 +220,7 @@ APP_HTML = r'''<!doctype html>
     #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
     @media (max-width:900px) { .grid { grid-template-columns:1fr; } .hero { grid-template-columns:1fr; align-items:start; } .incident-card { max-width:420px; } }
-    @media (max-width:760px) { .shift-cases { grid-template-columns:1fr; } }
+    @media (max-width:760px) { .shift-cases { grid-template-columns:1fr; } .drift-grid { grid-template-columns:1fr; } }
     @media (max-width:560px) { .shell { padding:13px 13px 35px; } .topbar { align-items:flex-start; } .top-actions { flex-direction:column-reverse; align-items:flex-end; gap:8px; } .pill { font-size:10px; padding:7px 9px; } .button { padding:9px 10px; font-size:12px; } .hero { padding:25px 0 17px; gap:17px; } h1 { font-size:35px; } .hero p { font-size:13px; } .card { padding:15px; border-radius:12px; } .card-head { flex-direction:column; } .path-row { grid-template-columns:1fr; } .role-label { text-align:left; max-width:none; } .footer { flex-direction:column; } .shift-case { padding:12px; } .shift-controls { align-items:stretch; } .shift-controls select { max-width:100%; } }
   </style>
 </head>
@@ -490,11 +503,78 @@ APP_HTML = r'''<!doctype html>
       }
       return root;
     }
+    function renderDriftPath(container, row, removed=false) {
+      const path=element('div',removed?'drift-path removed':'drift-path',row.path.join('  →  '));
+      const provenance=row.provenance;
+      if(provenance) {
+        const evidence=(provenance.source_ids||[]).map((id,index)=>`${id} · ${provenance.source_titles?.[index]||'title unknown'} · observed ${provenance.observed_at?.[index]||'time unknown'}`).join(' → ');
+        path.append(element('small','drift-provenance',evidence||'Path provenance unavailable / unknown.'));
+      } else path.append(element('small','drift-provenance','Path provenance unavailable / unknown.'));
+      container.append(path);
+    }
+    function renderDriftComparison(root,data) {
+      root.replaceChildren(); root.dataset.comparison=JSON.stringify(data); root.dataset.actionId=data.action?.id||'';
+      const grid=element('div','drift-grid');
+      const observed=element('section','drift-pane');
+      observed.append(element('h4','',`Observed graph · ${data.observed.as_of} · ${data.observed.current_state}`));
+      observed.append(element('div','drift-status',`Comparison · ${data.comparison_status}. Historical evidence remains saved at ${data.historical_snapshot?.as_of||'unknown time'}; this view is read-only.`));
+      observed.append(element('h5','','Added paths'));
+      if(!data.observed.added_paths.length) observed.append(element('p','subtle',data.observed.path_delta.status==='unknown'?'Current path delta is unknown; no additions are inferred.':'No added paths.'));
+      for(const row of data.observed.added_paths) renderDriftPath(observed,row,false);
+      observed.append(element('h5','','Removed paths'));
+      if(!data.observed.removed_paths.length) observed.append(element('p','subtle',data.observed.path_delta.status==='unknown'?'Current path delta is unknown; no removals are inferred.':'No removed paths.'));
+      for(const row of data.observed.removed_paths) renderDriftPath(observed,row,true);
+      if(data.observed.restoration_source_fact) {
+        const fact=data.observed.restoration_source_fact;
+        observed.append(element('div','drift-status',`Observed restoration · ${fact.event_id} · ${fact.source_id} · event ${fact.event_at}${fact.source_title?` · ${fact.source_title}`:''}${fact.source_observed_at?` · source observed ${fact.source_observed_at}`:''}`));
+      }
+      observed.append(element('h5','','Separate SOP witness'));
+      const witness=data.observed.sop_witness;
+      if(!witness) observed.append(element('div','drift-unknown','Current SOP witness is empty / unknown; the saved historical witness is preserved.'));
+      else {
+        observed.append(element('div','drift-status',`${witness.linkage_status} · ${witness.conflict_status}${data.observed.sop_witness_unchanged?' · unchanged from reviewed evidence':''}`));
+        if(witness.conflict_edge) observed.append(element('div','drift-provenance',`${witness.conflict_edge.from} —[${witness.conflict_edge.relationship} · ${witness.conflict_edge.status}]→ ${witness.conflict_edge.to}`));
+        for(const claim of witness.claim_evidence||[]) observed.append(element('div','drift-provenance',`${claim.sop_version_id} · ${claim.claim_label} · ${claim.role_id} · ${claim.source_id} · ${claim.source_title} · observed ${claim.observed_at}`));
+        if(!witness.conflict_edge) observed.append(element('div','drift-unknown','Missing witness edge means unknown, not resolved or absent.'));
+      }
+      const branch=element('section','drift-pane');
+      branch.append(element('h4','',`Hypothetical branch · ${data.hypothetical_branch.as_of} · ${data.hypothetical_branch.status}`));
+      branch.append(element('div','drift-status',`${data.hypothetical_branch.branch_id||'Branch unknown'} · HYPOTHETICAL ONLY · ${data.hypothetical_branch.event?.event_id||'no branch event'}`));
+      branch.append(element('h5','','Branch impact paths'));
+      if(!data.hypothetical_branch.paths.length) branch.append(element('p','subtle','No branch paths in this hypothetical state. This is not an observed restoration or a safety conclusion.'));
+      for(const row of data.hypothetical_branch.paths) renderDriftPath(branch,row,false);
+      branch.append(element('h5','','Observed mainline at the same instant'));
+      branch.append(element('div','drift-status',`${data.hypothetical_branch.observed_mainline_status} · ${data.hypothetical_branch.observed_mainline_paths.length} paths · observed state mutated: ${data.hypothetical_branch.observed_state_mutated}`));
+      for(const row of data.hypothetical_branch.observed_mainline_paths) renderDriftPath(branch,row,false);
+      branch.append(element('div','drift-provenance',`SOP witness unchanged from saved snapshot: ${data.hypothetical_branch.sop_witness_unchanged}. No saved action was rewritten.`));
+      grid.append(observed,branch); root.append(grid);
+      root.setAttribute('aria-label','Read-only comparison of saved handover evidence with observed and hypothetical graph state');
+    }
     function renderActions(actions) {
       $('saved-count').textContent=`${actions.length} saved`;
       const root=$('saved'); root.replaceChildren();
       if(!actions.length) { root.append(element('div','empty','No confirmed handovers yet.')); return; }
-      for(const item of actions.slice().reverse()) { const card=element('div','saved-item'); card.append(element('strong','',`${item.id} · ${item.incident_id}`)); card.append(element('p','',`Confirmed ${item.confirmed_at}. Stored only in local app state.`)); if(item.snapshot) card.append(renderHandoverSnapshot(item.snapshot,true)); root.append(card); }
+      for(const item of actions.slice().reverse()) {
+        const card=element('div','saved-item'); card.append(element('strong','',`${item.id} · ${item.incident_id}`));
+        card.append(element('p','',`Confirmed ${item.confirmed_at}. Stored only in local app state.`));
+        if(item.snapshot) {
+          card.append(renderHandoverSnapshot(item.snapshot,true));
+          const controls=element('div','drift-controls');
+          const compare=element('button','button','Compare with live graph'); compare.type='button'; compare.dataset.compareAction=item.id;
+          const result=element('div','drift-comparison'); result.dataset.compareResult=item.id; result.hidden=true; result.setAttribute('aria-live','polite');
+          compare.addEventListener('click',async()=>{
+            compare.disabled=true; result.hidden=false; result.replaceChildren(element('div','subtle','Reading current operations graph…'));
+            try {
+              const params=new URLSearchParams({scope:'operations',action_id:item.id});
+              const comparison=await api(`/api/handover/compare?${params.toString()}`);
+              renderDriftComparison(result,comparison);
+            } catch(e) { result.replaceChildren(element('div','drift-unknown',`Comparison unavailable / unknown: ${e.message}. Saved evidence is unchanged.`)); }
+            finally { compare.disabled=false; }
+          });
+          controls.append(compare); card.append(controls,result);
+        }
+        root.append(card);
+      }
     }
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('dock-time').addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
@@ -1007,6 +1087,34 @@ class WardAtlasService:
             del self.pending[token]
             return action
 
+    def compare_handover(
+        self,
+        action_id: str | None = None,
+        observed_at: str = CONVEYOR_RESTORED_AT,
+        branch_at: str = BRANCH_AT,
+    ) -> dict:
+        """Compare a saved witness with current graph facts without any writes."""
+        # Normalize all caller-supplied time before reading action state or
+        # issuing graph queries, so malformed input is a side-effect-free 400.
+        observed_at = normalize_timestamp(observed_at)
+        branch_at = normalize_timestamp(branch_at)
+        actions = self.saved_actions()
+        if action_id is None:
+            action = actions[-1] if actions else None
+        else:
+            if not isinstance(action_id, str) or not action_id or len(action_id) > 80:
+                raise ValueError("Confirmed handover identifier is invalid.")
+            action = next((item for item in actions if item.get("id") == action_id), None)
+            if action is None:
+                raise LookupError("Confirmed handover not found.")
+            if not isinstance(action.get("snapshot"), dict):
+                raise ValueError("Confirmed handover has no saved graph witness.")
+
+        observed_impact = self.sop_impact(observed_at)
+        branch_board = self.shift_board(DOCK_EFFECTIVE, branch_at, branch_at)
+        branch_impact = self.sop_impact(branch_at)
+        return compare_graph_witness(action, observed_impact, branch_board, branch_impact)
+
 
 class WardAtlasHTTPServer(ThreadingHTTPServer):
     allow_reuse_address = True
@@ -1071,7 +1179,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/handover/compare"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -1096,14 +1204,36 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
                 data = service.sop_impact(values.get("as_of", [CONVEYOR_OUTAGE_AT])[0])
                 self._send(200, data)
+            elif parsed.path == "/api/handover/compare":
+                values = parse_qs(parsed.query, keep_blank_values=True)
+                for key in ("action_id", "observed_at", "branch_at"):
+                    if key in values and len(values[key]) != 1:
+                        raise ValueError("Each comparison parameter must be supplied exactly once.")
+                action_id = values.get("action_id", [None])[0]
+                if action_id == "":
+                    raise ValueError("Confirmed handover identifier is invalid.")
+                data = service.compare_handover(
+                    action_id,
+                    values.get("observed_at", [CONVEYOR_RESTORED_AT])[0],
+                    values.get("branch_at", [BRANCH_AT])[0],
+                )
+                self._send(200, data)
             elif parsed.path == "/api/actions":
                 items = service.saved_actions()
                 self._send(200, {"actions": items, "count": len(items), "storage": "local-only"})
             else:
                 self._error(404, "Not found.")
-        except ValueError:
-            if parsed.path in {"/api/shift-board", "/api/sop-impact"}:
-                self._error(400, "Invalid timestamp; use an explicit ISO-8601 offset.")
+        except LookupError:
+            if parsed.path == "/api/handover/compare":
+                self._error(404, "Confirmed handover not found.")
+            else:
+                self._error(503, "Local graph or action state is unavailable.")
+        except ValueError as exc:
+            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/handover/compare"}:
+                message = str(exc)
+                if parsed.path != "/api/handover/compare" and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
+                    message = "Invalid timestamp; use an explicit ISO-8601 offset."
+                self._error(400, message or "Invalid timestamp; use an explicit ISO-8601 offset.")
             else:
                 self._error(503, "Local graph or action state is unavailable.")
         except Exception:
