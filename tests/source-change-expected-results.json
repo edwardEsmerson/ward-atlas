@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent outcomes for an append-only synthetic roster revision and explicitly linked operational review candidates.",
+  "planner_packet": "/workspace/worktrees/planner-9b1a51761889446c8b5525bde02bc5d6/plans/planner-9b1a51761889446c8b5525bde02bc5d6.md",
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "Actual FalkorDB 6.0.2; Redis-only behavior is not a passing substitute.",
+    "graph_ownership": "Each check uses an explicitly named unique graph and may delete only that graph.",
+    "source_history": "Append-only; revisions and assignments are never overwritten.",
+    "coverage_status": "explicit_edges_only",
+    "unlinked_artifact_status": "unknown"
+  },
+  "fixture": {
+    "incident_id": "INC-207",
+    "equipment_id": "EQ-DOCK-CART-2",
+    "service_id": "SVC-INBOUND-TRANSFER",
+    "department_id": "DEPT-RECEIVING-DOCK",
+    "role_before_id": "ROLE-DOCK-DUTY",
+    "role_after_id": "ROLE-DOCK-SWING",
+    "source_before_id": "SRC-DOCK-ROSTER-R1",
+    "source_after_id": "SRC-DOCK-ROSTER-R2",
+    "source_after_title": "Synthetic Dock Operations Roster Revision 2",
+    "observed_at": "2026-10-14T20:18:00Z",
+    "effective_at": "2026-10-14T20:30:00Z",
+    "supersedes": "SRC-DOCK-ROSTER-R1",
+    "handover_id": "HND-DOCK-2020",
+    "ticket_id": "TKT-DOCK-88",
+    "lexical_only_handover_id": "HND-DOCK-LEXICAL-ONLY",
+    "restricted_source_id": "SRC-RESTRICTED-DOCK-99",
+    "restricted_source_title": "Restricted Dock Continuity Annex 99",
+    "restricted_fact": "Restricted-only note: logistics bay status unresolved.",
+    "restricted_equipment_id": "EQ-RESTRICTED-DOCK-99",
+    "restricted_department_id": "DEPT-RESTRICTED-DOCK-99",
+    "restricted_role_id": "ROLE-RESTRICTED-DOCK-OWNER"
+  },
+  "expected_paths": {
+    "before": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-DUTY"],
+    "after": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"]
+  },
+  "expected_review_candidates": ["HND-DOCK-2020", "TKT-DOCK-88"],
+  "scenarios": [
+    {
+      "id": "source-empty-graph",
+      "expected": {"source_rows": 0, "role_paths": [], "review_candidates": [], "coverage_status": "explicit_edges_only", "unlinked_artifact_status": "unknown"},
+      "oracle": "The fixed empty graph expectation; no defaults or hidden fixtures are permitted."
+    },
+    {
+      "id": "dock-role-path-before-effective-time",
+      "expected": {"as_of": "2026-10-14T20:29:00Z", "role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-DUTY"], "review_candidates": []},
+      "oracle": "The exact path and effective-time boundary are fixed independently of candidate output."
+    },
+    {
+      "id": "dock-role-path-after-effective-time",
+      "expected": {"as_of": "2026-10-14T20:30:00Z", "role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"], "source_versions": [{"source_id": "SRC-DOCK-ROSTER-R1", "observed_at": "2026-10-14T19:00:00Z"}, {"source_id": "SRC-DOCK-ROSTER-R2", "observed_at": "2026-10-14T20:18:00Z", "effective_at": "2026-10-14T20:30:00Z", "supersedes": "SRC-DOCK-ROSTER-R1"}]},
+      "oracle": "Only the final role changes at the pinned effective time; both source revisions and provenance timestamps remain inspectable."
+    },
+    {
+      "id": "explicit-linked-review-queue",
+      "expected": {"review_candidates": ["HND-DOCK-2020", "TKT-DOCK-88"], "unchanged_handover_role_id": "ROLE-DOCK-DUTY", "unchanged_handover_source_id": "SRC-DOCK-ROSTER-R1", "excluded_lexical_only_id": "HND-DOCK-LEXICAL-ONLY", "coverage_status": "explicit_edges_only", "unlinked_artifact_status": "unknown"},
+      "oracle": "Only explicit source/citation dependencies qualify. Existing handover content is not rewritten; lexical similarity is not dependency evidence."
+    },
+    {
+      "id": "unresolved-sop-conflict-preserved",
+      "expected": {"conflicting_versions": ["SOP-OPS-9-V2", "SOP-OPS-9-V3"], "conflict_status": "unresolved", "winner_selected": false, "actions_proposed": []},
+      "oracle": "The source update does not resolve or act on the existing disagreement."
+    },
+    {
+      "id": "restricted-source-nondisclosure",
+      "expected": {"viewer_scope": "operations", "hidden_literals": ["SRC-RESTRICTED-DOCK-99", "Restricted Dock Continuity Annex 99", "Restricted-only note: logistics bay status unresolved.", "EQ-RESTRICTED-DOCK-99", "DEPT-RESTRICTED-DOCK-99", "ROLE-RESTRICTED-DOCK-OWNER"], "visible_output_unchanged": true, "hidden_counts_or_existence_disclosed": false},
+      "oracle": "Operations output is invariant to the fixed restricted fixture and reveals no hidden IDs, titles, facts, counts, paths, dependent paraphrases, or existence."
+    },
+    {
+      "id": "append-only-idempotent-edge-counterfactual",
+      "expected": {"second_ingest_node_delta": 0, "second_ingest_relationship_delta": 0, "removed_citation_candidate_absent": true, "old_handover_unchanged": true, "both_source_versions_preserved": true},
+      "oracle": "Repeat ingestion is idempotent, while deleting an explicitly owned citation edge removes only its dependent candidate."
+    },
+    {
+      "id": "reconnect-time-normalization-and-rejection",
+      "expected": {"reconnect_same_result": true, "offset_input": "2026-10-14T22:30:00+02:00", "normalized_as_of": "2026-10-14T20:30:00Z", "offset_role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"], "malformed_time_rejected_before_mutation": true, "missing_effective_time_rejected_before_mutation": true, "no_external_effects": true},
+      "oracle": "A fresh connection is stable, explicit offsets normalize to UTC, malformed/missing effective times fail before any owned graph mutation, and behavior remains local-only."
+    }
+  ]
+}
