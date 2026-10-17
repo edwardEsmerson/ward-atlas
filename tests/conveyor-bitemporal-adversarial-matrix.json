@@ -1,0 +1,499 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/conveyor-bitemporal-expected-results.json",
+  "oracle_policy": "Every group maps to explicit fixed JSON pointers in the immutable expected-results oracle and one numbered packet outcome; candidate output is never an expected value.",
+  "cases": [
+    {
+      "id": "conveyor-cold-empty-unknown",
+      "scenario_id": "conveyor-cold-empty-unknown",
+      "attack_or_edge_case": "An empty owned graph has no facts; unknown does not establish availability, safety, or absence of operational risk.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 1; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "conveyor-cold-empty-unknown.state-status",
+          "expected_pointer": "/cases/0/expected/state_status"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.selected-event",
+          "expected_pointer": "/cases/0/expected/selected_event"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.selected-event-source",
+          "expected_pointer": "/cases/0/expected/selected_event_source"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.impact-paths",
+          "expected_pointer": "/cases/0/expected/impact_paths"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.path-evidence",
+          "expected_pointer": "/cases/0/expected/path_evidence"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.availability-conclusion",
+          "expected_pointer": "/cases/0/expected/availability_conclusion"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.risk-absence-conclusion",
+          "expected_pointer": "/cases/0/expected/risk_absence_conclusion"
+        },
+        {
+          "id": "conveyor-cold-empty-unknown.event-or-source-existence-hint-emitted",
+          "expected_pointer": "/cases/0/expected/event_or_source_existence_hint_emitted"
+        }
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "The pinned packet outcome 1, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:15"
+      ]
+    },
+    {
+      "id": "conveyor-legacy-compatibility",
+      "scenario_id": "conveyor-legacy-compatibility",
+      "attack_or_edge_case": "Omitting conveyor_known_at preserves the accepted one-axis event, path, source, and history projection at both fixed times.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 2; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "conveyor-legacy-compatibility.known-at",
+          "expected_pointer": "/cases/1/expected/known_at"
+        },
+        {
+          "id": "conveyor-legacy-compatibility.knowledge-semantics",
+          "expected_pointer": "/cases/1/expected/knowledge_semantics"
+        },
+        {
+          "id": "conveyor-legacy-compatibility.at-1830",
+          "expected_pointer": "/cases/1/expected/at_1830"
+        },
+        {
+          "id": "conveyor-legacy-compatibility.at-1930",
+          "expected_pointer": "/cases/1/expected/at_1930"
+        },
+        {
+          "id": "conveyor-legacy-compatibility.legacy-query-shape-unchanged",
+          "expected_pointer": "/cases/1/expected/legacy_query_shape_unchanged"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "The pinned packet outcome 2, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:16"
+      ]
+    },
+    {
+      "id": "outage-known-before-restoration",
+      "scenario_id": "outage-known-before-restoration",
+      "attack_or_edge_case": "At a fixed valid time, 19:14Z knowledge retains the source-backed outage and both accepted ordered paths; the SOP conflict remains an independent unresolved witness.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 3; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "outage-known-before-restoration.conveyor-at",
+          "expected_pointer": "/cases/2/expected/conveyor_at"
+        },
+        {
+          "id": "outage-known-before-restoration.conveyor-known-at",
+          "expected_pointer": "/cases/2/expected/conveyor_known_at"
+        },
+        {
+          "id": "outage-known-before-restoration.state-status",
+          "expected_pointer": "/cases/2/expected/state_status"
+        },
+        {
+          "id": "outage-known-before-restoration.selected-event",
+          "expected_pointer": "/cases/2/expected/selected_event"
+        },
+        {
+          "id": "outage-known-before-restoration.impact-paths",
+          "expected_pointer": "/cases/2/expected/impact_paths"
+        },
+        {
+          "id": "outage-known-before-restoration.path-evidence",
+          "expected_pointer": "/cases/2/expected/path_evidence"
+        },
+        {
+          "id": "outage-known-before-restoration.independent-sop-witness",
+          "expected_pointer": "/cases/2/expected/independent_sop_witness"
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "The pinned packet outcome 3, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:17"
+      ]
+    },
+    {
+      "id": "restoration-known-at-same-valid-time",
+      "scenario_id": "restoration-known-at-same-valid-time",
+      "attack_or_edge_case": "At the same valid time, 19:16Z knowledge exposes the accepted restoration, removes active outage paths, and leaves the separate SOP disagreement unresolved.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 4; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "restoration-known-at-same-valid-time.conveyor-at",
+          "expected_pointer": "/cases/3/expected/conveyor_at"
+        },
+        {
+          "id": "restoration-known-at-same-valid-time.conveyor-known-at",
+          "expected_pointer": "/cases/3/expected/conveyor_known_at"
+        },
+        {
+          "id": "restoration-known-at-same-valid-time.state-status",
+          "expected_pointer": "/cases/3/expected/state_status"
+        },
+        {
+          "id": "restoration-known-at-same-valid-time.selected-event",
+          "expected_pointer": "/cases/3/expected/selected_event"
+        },
+        {
+          "id": "restoration-known-at-same-valid-time.active-paths",
+          "expected_pointer": "/cases/3/expected/active_paths"
+        },
+        {
+          "id": "restoration-known-at-same-valid-time.independent-sop-witness",
+          "expected_pointer": "/cases/3/expected/independent_sop_witness"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "The pinned packet outcome 4, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:18"
+      ]
+    },
+    {
+      "id": "per-path-evidence-cutoff",
+      "scenario_id": "per-path-evidence-cutoff",
+      "attack_or_edge_case": "At the inclusive 18:04Z cutoff the outage state and first role edge are known; the second OWNED_BY observation at 18:05Z is excluded without implying coverage completeness.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 5; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "per-path-evidence-cutoff.conveyor-at",
+          "expected_pointer": "/cases/4/expected/conveyor_at"
+        },
+        {
+          "id": "per-path-evidence-cutoff.conveyor-known-at",
+          "expected_pointer": "/cases/4/expected/conveyor_known_at"
+        },
+        {
+          "id": "per-path-evidence-cutoff.selected-event",
+          "expected_pointer": "/cases/4/expected/selected_event"
+        },
+        {
+          "id": "per-path-evidence-cutoff.impact-paths",
+          "expected_pointer": "/cases/4/expected/impact_paths"
+        },
+        {
+          "id": "per-path-evidence-cutoff.path-evidence",
+          "expected_pointer": "/cases/4/expected/path_evidence"
+        },
+        {
+          "id": "per-path-evidence-cutoff.path-ownership-evidence-uses-relationship-observed-at",
+          "expected_pointer": "/cases/4/expected/path_ownership_evidence_uses_relationship_observed_at"
+        },
+        {
+          "id": "per-path-evidence-cutoff.returned-path-provenance-times",
+          "expected_pointer": "/cases/4/expected/returned_path_provenance_times"
+        },
+        {
+          "id": "per-path-evidence-cutoff.excluded-later-ownership",
+          "expected_pointer": "/cases/4/expected/excluded_later_ownership"
+        },
+        {
+          "id": "per-path-evidence-cutoff.later-role-path-emitted",
+          "expected_pointer": "/cases/4/expected/later_role_path_emitted"
+        },
+        {
+          "id": "per-path-evidence-cutoff.later-ownership-evidence-emitted",
+          "expected_pointer": "/cases/4/expected/later_ownership_evidence_emitted"
+        },
+        {
+          "id": "per-path-evidence-cutoff.missing-path-count-emitted",
+          "expected_pointer": "/cases/4/expected/missing_path_count_emitted"
+        },
+        {
+          "id": "per-path-evidence-cutoff.completeness-claim-emitted",
+          "expected_pointer": "/cases/4/expected/completeness_claim_emitted"
+        }
+      ],
+      "nonzero_assertion_count": 12,
+      "failure_detected": "The pinned packet outcome 5, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:19"
+      ]
+    },
+    {
+      "id": "no-known-event-unknown-no-leak",
+      "scenario_id": "no-known-event-unknown-no-leak",
+      "attack_or_edge_case": "Before either event source is known, return only unknown; do not imply availability/no risk or leak hidden event/source identity or existence.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 6; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "no-known-event-unknown-no-leak.conveyor-at",
+          "expected_pointer": "/cases/5/expected/conveyor_at"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.conveyor-known-at",
+          "expected_pointer": "/cases/5/expected/conveyor_known_at"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.state-status",
+          "expected_pointer": "/cases/5/expected/state_status"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.selected-event",
+          "expected_pointer": "/cases/5/expected/selected_event"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.selected-event-source",
+          "expected_pointer": "/cases/5/expected/selected_event_source"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.impact-paths",
+          "expected_pointer": "/cases/5/expected/impact_paths"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.forbidden-disclosure-categories",
+          "expected_pointer": "/cases/5/expected/forbidden_disclosure_categories"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.availability-conclusion",
+          "expected_pointer": "/cases/5/expected/availability_conclusion"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.no-risk-conclusion",
+          "expected_pointer": "/cases/5/expected/no_risk_conclusion"
+        },
+        {
+          "id": "no-known-event-unknown-no-leak.unseen-event-or-source-hint-emitted",
+          "expected_pointer": "/cases/5/expected/unseen_event_or_source_hint_emitted"
+        }
+      ],
+      "nonzero_assertion_count": 10,
+      "failure_detected": "The pinned packet outcome 6, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:20"
+      ]
+    },
+    {
+      "id": "outage-event-edge-removal",
+      "scenario_id": "outage-event-edge-removal",
+      "attack_or_edge_case": "Removing only the INC-204-to-outage-event edge makes that historical query unknown; no static or text fallback may reconstruct its source-backed event.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 7; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "outage-event-edge-removal.remove-only-edge",
+          "expected_pointer": "/cases/6/expected/remove_only_edge"
+        },
+        {
+          "id": "outage-event-edge-removal.after-removal",
+          "expected_pointer": "/cases/6/expected/after_removal"
+        },
+        {
+          "id": "outage-event-edge-removal.reseed-restores-exact-baseline",
+          "expected_pointer": "/cases/6/expected/reseed_restores_exact_baseline"
+        }
+      ],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "The pinned packet outcome 7, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:21"
+      ]
+    },
+    {
+      "id": "restoration-evidence-edge-removal",
+      "scenario_id": "restoration-evidence-edge-removal",
+      "attack_or_edge_case": "Without the restoration EVIDENCED_BY link the unsupported restoration is excluded and the last source-backed outage and paths remain.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 8; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "restoration-evidence-edge-removal.remove-only-edge",
+          "expected_pointer": "/cases/7/expected/remove_only_edge"
+        },
+        {
+          "id": "restoration-evidence-edge-removal.after-removal",
+          "expected_pointer": "/cases/7/expected/after_removal"
+        },
+        {
+          "id": "restoration-evidence-edge-removal.reseed-restores-exact-baseline",
+          "expected_pointer": "/cases/7/expected/reseed_restores_exact_baseline"
+        }
+      ],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "The pinned packet outcome 8, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:22"
+      ]
+    },
+    {
+      "id": "observed-versus-hypothetical-branch",
+      "scenario_id": "observed-versus-hypothetical-branch",
+      "attack_or_edge_case": "The 18:50Z restoration drill stays explicitly hypothetical; the selected known-time cutoff applies only to observed mainline evidence and does not mutate it.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 9; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "observed-versus-hypothetical-branch.branch-at",
+          "expected_pointer": "/cases/8/expected/branch_at"
+        },
+        {
+          "id": "observed-versus-hypothetical-branch.conveyor-known-at",
+          "expected_pointer": "/cases/8/expected/conveyor_known_at"
+        },
+        {
+          "id": "observed-versus-hypothetical-branch.branch",
+          "expected_pointer": "/cases/8/expected/branch"
+        },
+        {
+          "id": "observed-versus-hypothetical-branch.observed-mainline",
+          "expected_pointer": "/cases/8/expected/observed_mainline"
+        },
+        {
+          "id": "observed-versus-hypothetical-branch.legacy-current-knowledge-mainline-paths",
+          "expected_pointer": "/cases/8/expected/legacy_current_knowledge_mainline_paths"
+        },
+        {
+          "id": "observed-versus-hypothetical-branch.branch-changes-observed-history",
+          "expected_pointer": "/cases/8/expected/branch_changes_observed_history"
+        },
+        {
+          "id": "observed-versus-hypothetical-branch.hypothetical-event-in-mainline",
+          "expected_pointer": "/cases/8/expected/hypothetical_event_in_mainline"
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "The pinned packet outcome 9, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:23"
+      ]
+    },
+    {
+      "id": "restricted-source-invariance",
+      "scenario_id": "restricted-source-invariance",
+      "attack_or_edge_case": "Adding the accepted restricted synthetic event/source fixture leaves every pinned operations response invariant and exposes no hidden or dependent information.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 10; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "restricted-source-invariance.viewer-scope",
+          "expected_pointer": "/cases/9/expected/viewer_scope"
+        },
+        {
+          "id": "restricted-source-invariance.axis-pairs",
+          "expected_pointer": "/cases/9/expected/axis_pairs"
+        },
+        {
+          "id": "restricted-source-invariance.full-selected-event-response-and-accessible-event-panel-invariant-before-after",
+          "expected_pointer": "/cases/9/expected/full_selected_event_response_and_accessible_event_panel_invariant_before_after"
+        },
+        {
+          "id": "restricted-source-invariance.hidden-id-title-fact-count-existence-relationship-path-or-paraphrase-disclosed",
+          "expected_pointer": "/cases/9/expected/hidden_id_title_fact_count_existence_relationship_path_or_paraphrase_disclosed"
+        }
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "The pinned packet outcome 10, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:24"
+      ]
+    },
+    {
+      "id": "time-validation-and-offset-normalization",
+      "scenario_id": "time-validation-and-offset-normalization",
+      "attack_or_edge_case": "Equivalent UTC-offset instants yield the same fixed outcome; malformed or timezone-naive values reject before mutation on either axis.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 11; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "time-validation-and-offset-normalization.canonical-pair",
+          "expected_pointer": "/cases/10/expected/canonical_pair"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.offset-pair",
+          "expected_pointer": "/cases/10/expected/offset_pair"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.normalized-pair",
+          "expected_pointer": "/cases/10/expected/normalized_pair"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.offset-result-matches-case",
+          "expected_pointer": "/cases/10/expected/offset_result_matches_case"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.malformed-conveyor-at",
+          "expected_pointer": "/cases/10/expected/malformed_conveyor_at"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.timezone-naive-conveyor-known-at",
+          "expected_pointer": "/cases/10/expected/timezone_naive_conveyor_known_at"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.both-invalid-axes-rejected-before-graph-or-output-mutation",
+          "expected_pointer": "/cases/10/expected/both_invalid_axes_rejected_before_graph_or_output_mutation"
+        },
+        {
+          "id": "time-validation-and-offset-normalization.local-time-fallback",
+          "expected_pointer": "/cases/10/expected/local_time_fallback"
+        }
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "The pinned packet outcome 11, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:25"
+      ]
+    },
+    {
+      "id": "repeat-reconnect-read-only-and-cleanup",
+      "scenario_id": "repeat-reconnect-read-only-and-cleanup",
+      "attack_or_edge_case": "Repeat seed and a fresh reconnect reproduce the fixed source-backed result; time reads are read-only, and cleanup is limited to resources owned by this check.",
+      "setup": "Use an isolated synthetic INC-204/FalkorDB test graph and execute packet outcome 12; mutate only relationships expressly owned by this test.",
+      "pinned_assertions": [
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.repeat-seed-duplicate-nodes",
+          "expected_pointer": "/cases/11/expected/repeat_seed_duplicate_nodes"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.repeat-seed-duplicate-relationships",
+          "expected_pointer": "/cases/11/expected/repeat_seed_duplicate_relationships"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.after-reconnect-result-matches",
+          "expected_pointer": "/cases/11/expected/after_reconnect_result_matches"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.query-graph-writes",
+          "expected_pointer": "/cases/11/expected/query_graph_writes"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.query-action-writes",
+          "expected_pointer": "/cases/11/expected/query_action_writes"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.messages-sent",
+          "expected_pointer": "/cases/11/expected/messages_sent"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.calls-made",
+          "expected_pointer": "/cases/11/expected/calls_made"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.tickets-created",
+          "expected_pointer": "/cases/11/expected/tickets_created"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.external-writes",
+          "expected_pointer": "/cases/11/expected/external_writes"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.desktop-mobile-api-results-agree",
+          "expected_pointer": "/cases/11/expected/desktop_mobile_api_results_agree"
+        },
+        {
+          "id": "repeat-reconnect-read-only-and-cleanup.cleanup-deletes-only-task-owned-graph-and-stops-only-owned-processes",
+          "expected_pointer": "/cases/11/expected/cleanup_deletes_only_task_owned_graph_and_stops_only_owned_processes"
+        }
+      ],
+      "nonzero_assertion_count": 11,
+      "failure_detected": "The pinned packet outcome 12, its fixed time/source/path semantics, or its safety/provenance boundary drifts.",
+      "planner_refs": [
+        "planner-4b8f1393a48d40da83d21180edd4667f.md:26"
+      ]
+    }
+  ]
+}

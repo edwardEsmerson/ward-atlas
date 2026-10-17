@@ -1,0 +1,915 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent fixed outcomes for twelve INC-204 event-valid versus evidence-known-time groups, specified before behavior changes.",
+  "oracle_policy": "Literal outcomes come only from the pinned INC-204 decision packet and immutable accepted synthetic original, shift-board, SOP-impact, dock-bitemporal, and handover outcomes. Candidate behavior is never read, copied, or used to amend an expectation.",
+  "pinned_sources": [
+    {
+      "id": "conveyor-bitemporal-packet",
+      "file": "planner-4b8f1393a48d40da83d21180edd4667f/plans/planner-4b8f1393a48d40da83d21180edd4667f.md",
+      "sha256": "34a40eb28fe5ea9283d65708533183f67f657bd107ec1139cb82f073e88b5a85",
+      "outcome_lines": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ]
+    },
+    {
+      "id": "expected-results",
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    },
+    {
+      "id": "shift-board-expected-results",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "sop-impact-expected-results",
+      "file": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "id": "dock-bitemporal-expected-results",
+      "file": "tests/dock-bitemporal-expected-results.json",
+      "sha256": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"
+    },
+    {
+      "id": "handover-brief-expected-results",
+      "file": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    }
+  ],
+  "frozen_preexisting_oracle_hashes": [
+    {
+      "file": "tests/adversarial-matrix.json",
+      "sha256": "6d0edbc69620da85b494185879565c8260c9d2d3fe6afdd5bf56c5acd92205ba"
+    },
+    {
+      "file": "tests/cascade-adversarial-matrix.json",
+      "sha256": "c74431b0c2bebbdc25419bf58d39129d150779e1ef7418b64c80dee6979398db"
+    },
+    {
+      "file": "tests/cascade-expected-results.json",
+      "sha256": "52fd4abe069e850e4ee070b8e6d0f9ed26fff5ad1e5e0c47efb28ad78227581b"
+    },
+    {
+      "file": "tests/dock-bitemporal-adversarial-matrix.json",
+      "sha256": "84127f273043a03299823905bbecc06a755f79cb9a3b34c44793815eda7f5318"
+    },
+    {
+      "file": "tests/dock-bitemporal-expected-results.json",
+      "sha256": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"
+    },
+    {
+      "file": "tests/escalation-adversarial-matrix.json",
+      "sha256": "7e8e6c9813e88544dd61b78e208a48d3edfd48d7b4f3a3b6dbbb1a119c51af17"
+    },
+    {
+      "file": "tests/escalation-expected-results.json",
+      "sha256": "b9db49c9398d76c063ac126b5234024ba32dbac1fb7806b443e4f6508868e929"
+    },
+    {
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    },
+    {
+      "file": "tests/graph-explorer-adversarial-matrix.json",
+      "sha256": "e6559d172b671375be25cb7c6d39d47bb286e9fedd77eab9a1f213803ed2f500"
+    },
+    {
+      "file": "tests/graph-explorer-expected-results.json",
+      "sha256": "d3ecfd1d498a19d7355b09c424e4b0b00c8bb83975421b8ae235cc07ef92d1de"
+    },
+    {
+      "file": "tests/handover-brief-adversarial-matrix.json",
+      "sha256": "d084f31a1b542670ab99818852cba8e1141bfb56688845c439b01f5ac1d89003"
+    },
+    {
+      "file": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    },
+    {
+      "file": "tests/handover-drift-adversarial-matrix.json",
+      "sha256": "439adc3ed2f32c4e310d397ddf671bfb835dbaf8086b4b940f7d7335d22582aa"
+    },
+    {
+      "file": "tests/handover-drift-expected-results.json",
+      "sha256": "76121f6061fe6bec13d007b2dc3f9dadd737809b1be52e895674c7c39e156c1d"
+    },
+    {
+      "file": "tests/review-receipt-adversarial-matrix.json",
+      "sha256": "0d5f0832699daa2ba69a9a4d3cde2225e4d672830fc613070f015c0788302b9a"
+    },
+    {
+      "file": "tests/review-receipt-expected-results.json",
+      "sha256": "382383b65ae8a9984550227c8ad9000d893bcd9e0171298ec3bf6adb7e170972"
+    },
+    {
+      "file": "tests/role-scope-adversarial-matrix.json",
+      "sha256": "2cc162e4f4a01daa81bbc0e8c57d9f7f2bc0a6167c603e8613afa3fbb8b02ee3"
+    },
+    {
+      "file": "tests/role-scope-expected-results.json",
+      "sha256": "fc83b36dd9cfea900a1885816c6b84ffe7a1ab3d5c62d45be87f97a7368a9867"
+    },
+    {
+      "file": "tests/shift-board-adversarial-matrix.json",
+      "sha256": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7"
+    },
+    {
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "file": "tests/sop-impact-adversarial-matrix.json",
+      "sha256": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6"
+    },
+    {
+      "file": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "file": "tests/source-change-adversarial-matrix.json",
+      "sha256": "2afff10adb99964a821291d491169487600f37aa41d7b2d153dc98b463a0da84"
+    },
+    {
+      "file": "tests/source-change-expected-results.json",
+      "sha256": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "Any future behavior check must use actual FalkorDB; this artifact validator does not claim live query behavior.",
+    "candidate_output_is_oracle": false,
+    "external_writes": false,
+    "viewer_scope": "operations",
+    "time_axes": {
+      "conveyor_at": "event valid-time instant",
+      "conveyor_known_at": "source observation-time cutoff"
+    }
+  },
+  "fixture": {
+    "incident_id": "INC-204",
+    "equipment_id": "CONVEYOR-C4",
+    "service_id": "SVC-MATERIAL-TRANSFER",
+    "canonical_paths": [
+      [
+        "INC-204",
+        "CONVEYOR-C4",
+        "SVC-MATERIAL-TRANSFER",
+        "DEPT-CENTRAL-STERILE",
+        "ROLE-STERILE-OPS-COORD"
+      ],
+      [
+        "INC-204",
+        "CONVEYOR-C4",
+        "SVC-MATERIAL-TRANSFER",
+        "DEPT-MATERIALS-LOGISTICS",
+        "ROLE-MATERIALS-DUTY"
+      ]
+    ],
+    "canonical_path_evidence": [
+      {
+        "path": [
+          "INC-204",
+          "CONVEYOR-C4",
+          "SVC-MATERIAL-TRANSFER",
+          "DEPT-CENTRAL-STERILE",
+          "ROLE-STERILE-OPS-COORD"
+        ],
+        "source_ids": [
+          "SRC-INC-204",
+          "SRC-ASSET-C4",
+          "SRC-SERVICE-CATALOG",
+          "SRC-OPS-ROSTER"
+        ],
+        "source_titles": [
+          "Synthetic Incident Register INC-204",
+          "Synthetic Asset State Ledger",
+          "Synthetic Service Dependency Register",
+          "Synthetic Operations Role Roster"
+        ],
+        "observed_at": [
+          "2026-10-14T18:00:00Z",
+          "2026-10-14T18:02:00Z",
+          "2026-10-14T18:03:00Z",
+          "2026-10-14T18:04:00Z"
+        ]
+      },
+      {
+        "path": [
+          "INC-204",
+          "CONVEYOR-C4",
+          "SVC-MATERIAL-TRANSFER",
+          "DEPT-MATERIALS-LOGISTICS",
+          "ROLE-MATERIALS-DUTY"
+        ],
+        "source_ids": [
+          "SRC-INC-204",
+          "SRC-ASSET-C4",
+          "SRC-SERVICE-CATALOG",
+          "SRC-OPS-ROSTER"
+        ],
+        "source_titles": [
+          "Synthetic Incident Register INC-204",
+          "Synthetic Asset State Ledger",
+          "Synthetic Service Dependency Register",
+          "Synthetic Operations Role Roster"
+        ],
+        "observed_at": [
+          "2026-10-14T18:00:00Z",
+          "2026-10-14T18:02:00Z",
+          "2026-10-14T18:03:00Z",
+          "2026-10-14T18:05:00Z"
+        ]
+      }
+    ],
+    "outage_event_id": "EVT-C4-UNAVAILABLE-01",
+    "outage_source_id": "SRC-ASSET-C4-OUTAGE",
+    "outage_event_at": "2026-10-14T18:02:00Z",
+    "restoration_event_id": "EVT-C4-RESTORED-01",
+    "restoration_source_id": "SRC-ASSET-C4-RESTORE",
+    "restoration_event_at": "2026-10-14T19:15:00Z",
+    "branch_id": "BR-C4-RESTORE-DRILL",
+    "branch_event_id": "EVT-BR-RESTORE-01",
+    "branch_event_at": "2026-10-14T18:45:00Z"
+  },
+  "cases": [
+    {
+      "id": "conveyor-cold-empty-unknown",
+      "scenario_id": "conveyor-cold-empty-unknown",
+      "expected": {
+        "request": {
+          "graph": "new empty task-owned graph",
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "conveyor_known_at": "2026-10-14T18:01:00Z"
+        },
+        "state_status": "unknown",
+        "selected_event": null,
+        "selected_event_source": null,
+        "impact_paths": [],
+        "path_evidence": [],
+        "availability_conclusion": false,
+        "risk_absence_conclusion": false,
+        "event_or_source_existence_hint_emitted": false
+      },
+      "evidence_semantics": "An empty owned graph has no facts; unknown does not establish availability, safety, or absence of operational risk.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-1",
+        "tests/expected-results.json#cold-empty-graph",
+        "tests/dock-bitemporal-expected-results.json#dock-bitemporal-cold-empty"
+      ]
+    },
+    {
+      "id": "conveyor-legacy-compatibility",
+      "scenario_id": "conveyor-legacy-compatibility",
+      "expected": {
+        "known_at": "omitted",
+        "knowledge_semantics": "current knowledge (legacy single-axis call)",
+        "at_1830": {
+          "as_of": "2026-10-14T18:30:00Z",
+          "status": "observed-impact",
+          "event_id": "EVT-C4-UNAVAILABLE-01",
+          "source_id": "SRC-ASSET-C4-OUTAGE",
+          "event_at": "2026-10-14T18:02:00Z",
+          "impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "path_evidence": [
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:04:00Z"
+              ]
+            },
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-MATERIALS-LOGISTICS",
+                "ROLE-MATERIALS-DUTY"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:05:00Z"
+              ]
+            }
+          ]
+        },
+        "at_1930": {
+          "as_of": "2026-10-14T19:30:00Z",
+          "status": "restored",
+          "restoration_event_id": "EVT-C4-RESTORED-01",
+          "restoration_source_id": "SRC-ASSET-C4-RESTORE",
+          "restoration_event_at": "2026-10-14T19:15:00Z",
+          "active_paths": [],
+          "historical_at": "2026-10-14T18:30:00Z",
+          "historical_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "historical_evidence_matches_canonical": true
+        },
+        "legacy_query_shape_unchanged": true
+      },
+      "evidence_semantics": "Omitting conveyor_known_at preserves the accepted one-axis event, path, source, and history projection at both fixed times.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-2",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times",
+        "tests/expected-results.json#multi-hop-outage-current-ownership"
+      ]
+    },
+    {
+      "id": "outage-known-before-restoration",
+      "scenario_id": "outage-known-before-restoration",
+      "expected": {
+        "conveyor_at": "2026-10-14T19:30:00Z",
+        "conveyor_known_at": "2026-10-14T19:14:00Z",
+        "state_status": "observed-impact",
+        "selected_event": {
+          "event_id": "EVT-C4-UNAVAILABLE-01",
+          "source_id": "SRC-ASSET-C4-OUTAGE",
+          "event_at": "2026-10-14T18:02:00Z"
+        },
+        "impact_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ]
+        ],
+        "path_evidence": [
+          {
+            "path": [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            "source_ids": [
+              "SRC-INC-204",
+              "SRC-ASSET-C4",
+              "SRC-SERVICE-CATALOG",
+              "SRC-OPS-ROSTER"
+            ],
+            "source_titles": [
+              "Synthetic Incident Register INC-204",
+              "Synthetic Asset State Ledger",
+              "Synthetic Service Dependency Register",
+              "Synthetic Operations Role Roster"
+            ],
+            "observed_at": [
+              "2026-10-14T18:00:00Z",
+              "2026-10-14T18:02:00Z",
+              "2026-10-14T18:03:00Z",
+              "2026-10-14T18:04:00Z"
+            ]
+          },
+          {
+            "path": [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ],
+            "source_ids": [
+              "SRC-INC-204",
+              "SRC-ASSET-C4",
+              "SRC-SERVICE-CATALOG",
+              "SRC-OPS-ROSTER"
+            ],
+            "source_titles": [
+              "Synthetic Incident Register INC-204",
+              "Synthetic Asset State Ledger",
+              "Synthetic Service Dependency Register",
+              "Synthetic Operations Role Roster"
+            ],
+            "observed_at": [
+              "2026-10-14T18:00:00Z",
+              "2026-10-14T18:02:00Z",
+              "2026-10-14T18:03:00Z",
+              "2026-10-14T18:05:00Z"
+            ]
+          }
+        ],
+        "independent_sop_witness": {
+          "conflict_status": "unresolved",
+          "claims_are_current_owner_facts": false,
+          "winner_selected": false
+        }
+      },
+      "evidence_semantics": "At a fixed valid time, 19:14Z knowledge retains the source-backed outage and both accepted ordered paths; the SOP conflict remains an independent unresolved witness.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-3",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times",
+        "tests/expected-results.json#multi-hop-outage-current-ownership",
+        "tests/sop-impact-expected-results.json#sop-impact-observed-outage-paths",
+        "tests/handover-brief-expected-results.json#canonical_snapshot"
+      ]
+    },
+    {
+      "id": "restoration-known-at-same-valid-time",
+      "scenario_id": "restoration-known-at-same-valid-time",
+      "expected": {
+        "conveyor_at": "2026-10-14T19:30:00Z",
+        "conveyor_known_at": "2026-10-14T19:16:00Z",
+        "state_status": "restored",
+        "selected_event": {
+          "event_id": "EVT-C4-RESTORED-01",
+          "source_id": "SRC-ASSET-C4-RESTORE",
+          "event_at": "2026-10-14T19:15:00Z"
+        },
+        "active_paths": [],
+        "independent_sop_witness": {
+          "conflict_status": "unresolved",
+          "claims_are_current_owner_facts": false,
+          "winner_selected": false
+        }
+      },
+      "evidence_semantics": "At the same valid time, 19:16Z knowledge exposes the accepted restoration, removes active outage paths, and leaves the separate SOP disagreement unresolved.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-4",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times",
+        "tests/sop-impact-expected-results.json#sop-impact-restoration-snapshot",
+        "tests/handover-brief-expected-results.json#restoration-keeps-sop-claims-unresolved"
+      ]
+    },
+    {
+      "id": "per-path-evidence-cutoff",
+      "scenario_id": "per-path-evidence-cutoff",
+      "expected": {
+        "conveyor_at": "2026-10-14T19:30:00Z",
+        "conveyor_known_at": "2026-10-14T18:04:00Z",
+        "state_status": "observed-impact",
+        "selected_event": {
+          "event_id": "EVT-C4-UNAVAILABLE-01",
+          "source_id": "SRC-ASSET-C4-OUTAGE",
+          "event_at": "2026-10-14T18:02:00Z"
+        },
+        "impact_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ]
+        ],
+        "path_evidence": [
+          {
+            "path": [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            "source_ids": [
+              "SRC-INC-204",
+              "SRC-ASSET-C4",
+              "SRC-SERVICE-CATALOG",
+              "SRC-OPS-ROSTER"
+            ],
+            "source_titles": [
+              "Synthetic Incident Register INC-204",
+              "Synthetic Asset State Ledger",
+              "Synthetic Service Dependency Register",
+              "Synthetic Operations Role Roster"
+            ],
+            "observed_at": [
+              "2026-10-14T18:00:00Z",
+              "2026-10-14T18:02:00Z",
+              "2026-10-14T18:03:00Z",
+              "2026-10-14T18:04:00Z"
+            ]
+          }
+        ],
+        "path_ownership_evidence_uses_relationship_observed_at": true,
+        "excluded_later_ownership": {
+          "relationship": "OWNED_BY",
+          "role_id": "ROLE-MATERIALS-DUTY",
+          "observed_at": "2026-10-14T18:05:00Z"
+        },
+        "returned_path_provenance_times": [
+          "2026-10-14T18:00:00Z",
+          "2026-10-14T18:02:00Z",
+          "2026-10-14T18:03:00Z",
+          "2026-10-14T18:04:00Z"
+        ],
+        "later_role_path_emitted": false,
+        "later_ownership_evidence_emitted": false,
+        "missing_path_count_emitted": false,
+        "completeness_claim_emitted": false
+      },
+      "evidence_semantics": "At the inclusive 18:04Z cutoff the outage state and first role edge are known; the second OWNED_BY observation at 18:05Z is excluded without implying coverage completeness.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-5",
+        "tests/expected-results.json#expected_evidence_by_path",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times"
+      ]
+    },
+    {
+      "id": "no-known-event-unknown-no-leak",
+      "scenario_id": "no-known-event-unknown-no-leak",
+      "expected": {
+        "conveyor_at": "2026-10-14T19:30:00Z",
+        "conveyor_known_at": "2026-10-14T18:01:00Z",
+        "state_status": "unknown",
+        "selected_event": null,
+        "selected_event_source": null,
+        "impact_paths": [],
+        "path_evidence": [],
+        "forbidden_disclosure_categories": [
+          "outage/restoration event identifiers",
+          "event-source identifiers or titles",
+          "event/source timestamps",
+          "hidden event/source counts",
+          "event/source existence hints"
+        ],
+        "availability_conclusion": false,
+        "no_risk_conclusion": false,
+        "unseen_event_or_source_hint_emitted": false
+      },
+      "evidence_semantics": "Before either event source is known, return only unknown; do not imply availability/no risk or leak hidden event/source identity or existence.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-6",
+        "tests/dock-bitemporal-expected-results.json#dock-bitemporal-crossed-axes-unknown",
+        "tests/expected-results.json#cold-empty-graph"
+      ]
+    },
+    {
+      "id": "outage-event-edge-removal",
+      "scenario_id": "outage-event-edge-removal",
+      "expected": {
+        "baseline": {
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "conveyor_known_at": "2026-10-14T19:14:00Z",
+          "state_status": "observed-impact",
+          "selected_event": {
+            "event_id": "EVT-C4-UNAVAILABLE-01",
+            "source_id": "SRC-ASSET-C4-OUTAGE",
+            "event_at": "2026-10-14T18:02:00Z"
+          },
+          "impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ]
+        },
+        "remove_only_edge": {
+          "from": "INC-204",
+          "relationship": "HAS_STATE_EVENT",
+          "to": "EVT-C4-UNAVAILABLE-01",
+          "ownership": "test-owned edge only"
+        },
+        "after_removal": {
+          "state_status": "unknown",
+          "selected_event": null,
+          "selected_event_source": null,
+          "impact_paths": [],
+          "reconstructed_from_static_or_text": false
+        },
+        "reseed_restores_exact_baseline": true
+      },
+      "evidence_semantics": "Removing only the INC-204-to-outage-event edge makes that historical query unknown; no static or text fallback may reconstruct its source-backed event.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-7",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times"
+      ]
+    },
+    {
+      "id": "restoration-evidence-edge-removal",
+      "scenario_id": "restoration-evidence-edge-removal",
+      "expected": {
+        "baseline": {
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "conveyor_known_at": "2026-10-14T19:16:00Z",
+          "state_status": "restored",
+          "selected_event": {
+            "event_id": "EVT-C4-RESTORED-01",
+            "source_id": "SRC-ASSET-C4-RESTORE",
+            "event_at": "2026-10-14T19:15:00Z"
+          },
+          "active_paths": []
+        },
+        "remove_only_edge": {
+          "from": "EVT-C4-RESTORED-01",
+          "relationship": "EVIDENCED_BY",
+          "to": "SRC-ASSET-C4-RESTORE",
+          "ownership": "test-owned edge only"
+        },
+        "after_removal": {
+          "state_status": "observed-impact",
+          "selected_event": {
+            "event_id": "EVT-C4-UNAVAILABLE-01",
+            "source_id": "SRC-ASSET-C4-OUTAGE",
+            "event_at": "2026-10-14T18:02:00Z"
+          },
+          "impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ],
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-MATERIALS-LOGISTICS",
+              "ROLE-MATERIALS-DUTY"
+            ]
+          ],
+          "restoration_event_or_source_details_emitted": false
+        },
+        "reseed_restores_exact_baseline": true
+      },
+      "evidence_semantics": "Without the restoration EVIDENCED_BY link the unsupported restoration is excluded and the last source-backed outage and paths remain.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-8",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times",
+        "tests/expected-results.json#multi-hop-outage-current-ownership"
+      ]
+    },
+    {
+      "id": "observed-versus-hypothetical-branch",
+      "scenario_id": "observed-versus-hypothetical-branch",
+      "expected": {
+        "branch_at": "2026-10-14T18:50:00Z",
+        "conveyor_known_at": "2026-10-14T18:04:00Z",
+        "branch": {
+          "branch_id": "BR-C4-RESTORE-DRILL",
+          "label": "hypothetical",
+          "event_id": "EVT-BR-RESTORE-01",
+          "event_at": "2026-10-14T18:45:00Z",
+          "status": "hypothetical-restored",
+          "impact_paths": [],
+          "event_is_observed": false
+        },
+        "observed_mainline": {
+          "status": "observed-impact",
+          "impact_paths": [
+            [
+              "INC-204",
+              "CONVEYOR-C4",
+              "SVC-MATERIAL-TRANSFER",
+              "DEPT-CENTRAL-STERILE",
+              "ROLE-STERILE-OPS-COORD"
+            ]
+          ],
+          "path_evidence": [
+            {
+              "path": [
+                "INC-204",
+                "CONVEYOR-C4",
+                "SVC-MATERIAL-TRANSFER",
+                "DEPT-CENTRAL-STERILE",
+                "ROLE-STERILE-OPS-COORD"
+              ],
+              "source_ids": [
+                "SRC-INC-204",
+                "SRC-ASSET-C4",
+                "SRC-SERVICE-CATALOG",
+                "SRC-OPS-ROSTER"
+              ],
+              "source_titles": [
+                "Synthetic Incident Register INC-204",
+                "Synthetic Asset State Ledger",
+                "Synthetic Service Dependency Register",
+                "Synthetic Operations Role Roster"
+              ],
+              "observed_at": [
+                "2026-10-14T18:00:00Z",
+                "2026-10-14T18:02:00Z",
+                "2026-10-14T18:03:00Z",
+                "2026-10-14T18:04:00Z"
+              ]
+            }
+          ]
+        },
+        "legacy_current_knowledge_mainline_paths": [
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-CENTRAL-STERILE",
+            "ROLE-STERILE-OPS-COORD"
+          ],
+          [
+            "INC-204",
+            "CONVEYOR-C4",
+            "SVC-MATERIAL-TRANSFER",
+            "DEPT-MATERIALS-LOGISTICS",
+            "ROLE-MATERIALS-DUTY"
+          ]
+        ],
+        "branch_changes_observed_history": false,
+        "hypothetical_event_in_mainline": false
+      },
+      "evidence_semantics": "The 18:50Z restoration drill stays explicitly hypothetical; the selected known-time cutoff applies only to observed mainline evidence and does not mutate it.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-9",
+        "tests/shift-board-expected-results.json#conveyor-observed-and-hypothetical-times",
+        "tests/expected-results.json#expected_evidence_by_path"
+      ]
+    },
+    {
+      "id": "restricted-source-invariance",
+      "scenario_id": "restricted-source-invariance",
+      "expected": {
+        "viewer_scope": "operations",
+        "restricted_fixture": {
+          "event_id": "EV-C4-RESTRICTED-UPDATE",
+          "source_id": "SRC-RESTRICTED-92",
+          "source_title": "Restricted Continuity Annex 92",
+          "fact_text": "Restricted-only instruction: contact the secure lift coordinator.",
+          "event_effective_at": "2026-10-14T18:20:00Z",
+          "event_value": "available",
+          "event_acl_label": "operations",
+          "source_acl_label": "restricted"
+        },
+        "axis_pairs": [
+          [
+            "2026-10-14T19:30:00Z",
+            "2026-10-14T19:14:00Z"
+          ],
+          [
+            "2026-10-14T19:30:00Z",
+            "2026-10-14T19:16:00Z"
+          ],
+          [
+            "2026-10-14T19:30:00Z",
+            "2026-10-14T18:04:00Z"
+          ],
+          [
+            "2026-10-14T19:30:00Z",
+            "2026-10-14T18:01:00Z"
+          ]
+        ],
+        "full_selected_event_response_and_accessible_event_panel_invariant_before_after": true,
+        "hidden_id_title_fact_count_existence_relationship_path_or_paraphrase_disclosed": false
+      },
+      "evidence_semantics": "Adding the accepted restricted synthetic event/source fixture leaves every pinned operations response invariant and exposes no hidden or dependent information.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-10",
+        "tests/shift-board-expected-results.json#denied-source-nondisclosure",
+        "tests/expected-results.json#denied-source-nondisclosure"
+      ]
+    },
+    {
+      "id": "time-validation-and-offset-normalization",
+      "scenario_id": "time-validation-and-offset-normalization",
+      "expected": {
+        "canonical_pair": {
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "conveyor_known_at": "2026-10-14T19:14:00Z"
+        },
+        "offset_pair": {
+          "conveyor_at": "2026-10-14T21:30:00+02:00",
+          "conveyor_known_at": "2026-10-14T21:14:00+02:00"
+        },
+        "normalized_pair": {
+          "conveyor_at": "2026-10-14T19:30:00Z",
+          "conveyor_known_at": "2026-10-14T19:14:00Z"
+        },
+        "offset_result_matches_case": "outage-known-before-restoration",
+        "malformed_conveyor_at": "not-a-timestamp",
+        "timezone_naive_conveyor_known_at": "2026-10-14T19:14:00",
+        "both_invalid_axes_rejected_before_graph_or_output_mutation": true,
+        "local_time_fallback": false
+      },
+      "evidence_semantics": "Equivalent UTC-offset instants yield the same fixed outcome; malformed or timezone-naive values reject before mutation on either axis.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-11",
+        "tests/dock-bitemporal-expected-results.json#dock-bitemporal-time-validation"
+      ]
+    },
+    {
+      "id": "repeat-reconnect-read-only-and-cleanup",
+      "scenario_id": "repeat-reconnect-read-only-and-cleanup",
+      "expected": {
+        "lifecycle": [
+          "cold-empty",
+          "seed synthetic graph",
+          "query",
+          "reseed same task-owned graph",
+          "fresh client or restarted app",
+          "query after reconnect"
+        ],
+        "repeat_seed_duplicate_nodes": 0,
+        "repeat_seed_duplicate_relationships": 0,
+        "after_reconnect_result_matches": "outage-known-before-restoration",
+        "query_graph_writes": 0,
+        "query_action_writes": 0,
+        "messages_sent": 0,
+        "calls_made": 0,
+        "tickets_created": 0,
+        "external_writes": [],
+        "desktop_mobile_api_results_agree": true,
+        "explicit_confirmation_remains_separate": true,
+        "cleanup_deletes_only_task_owned_graph_and_stops_only_owned_processes": true
+      },
+      "evidence_semantics": "Repeat seed and a fresh reconnect reproduce the fixed source-backed result; time reads are read-only, and cleanup is limited to resources owned by this check.",
+      "oracle_refs": [
+        "conveyor-bitemporal-packet#outcome-12",
+        "tests/expected-results.json#seed-reseed-idempotence",
+        "tests/expected-results.json#reconnect-preserves-results"
+      ]
+    }
+  ]
+}
