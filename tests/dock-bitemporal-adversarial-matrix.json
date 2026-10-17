@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/dock-bitemporal-expected-results.json",
+  "oracle_policy": "Every assertion maps to a fixed field in the immutable candidate-independent oracle and a numbered outcome in the pinned decision packet; candidate output is never a source of expected values.",
+  "cases": [
+    {
+      "id":"dock-bitemporal-cold-empty",
+      "scenario_id":"dock-bitemporal-cold-empty",
+      "attack_or_edge_case":"Query a newly owned cold graph and ensure no warm defaults, role, revision, review item, or no-risk inference appears.",
+      "setup":"Create a unique empty actual-FalkorDB graph and query before seeding.",
+      "pinned_assertions":[
+        {"id":"cold.no-role-path","expected_pointer":"/cases/0/expected/role_path"},
+        {"id":"cold.role-is-unknown","expected_pointer":"/cases/0/expected/role_status"},
+        {"id":"cold.no-source-rows","expected_pointer":"/cases/0/expected/source_versions"},
+        {"id":"cold.no-review-candidates","expected_pointer":"/cases/0/expected/review_candidates"},
+        {"id":"cold.absence-is-not-safety","expected_pointer":"/cases/0/expected/risk_or_currentness_conclusion"}
+      ],
+      "nonzero_assertion_count":5,
+      "failure_detected":"Warm data or a default role invents current ownership, evidence, or absence-of-risk from an empty graph.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:66"]
+    },
+    {
+      "id":"dock-bitemporal-legacy-compatibility",
+      "scenario_id":"dock-bitemporal-legacy-compatibility",
+      "attack_or_edge_case":"Call the existing dock_at=20:29Z path without known_at and compare its historical-effective/current-knowledge result to the accepted board oracle.",
+      "setup":"Seed the pinned synthetic dock fixture and invoke only the pre-existing single-axis call shape.",
+      "pinned_assertions":[
+        {"id":"legacy.no-known-at-parameter","expected_pointer":"/cases/1/expected/request/known_at"},
+        {"id":"legacy.exact-duty-path","expected_pointer":"/cases/1/expected/role_path"},
+        {"id":"legacy.ordered-source-versions","expected_pointer":"/cases/1/expected/source_versions"},
+        {"id":"legacy.exact-explicit-review-candidates","expected_pointer":"/cases/1/expected/review_candidates"},
+        {"id":"legacy.exact-prior-oracle-projection","expected_pointer":"/cases/1/expected/legacy_projection_matches_accepted_shift_board_oracle"}
+      ],
+      "nonzero_assertion_count":5,
+      "failure_detected":"Adding a knowledge-time mode silently changes the existing caller's role, source history, candidate order, or unknown-link semantics.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:67"]
+    },
+    {
+      "id":"dock-bitemporal-early-known-r1-duty",
+      "scenario_id":"dock-bitemporal-early-known-r1-duty",
+      "attack_or_edge_case":"Hold effective time at 20:29Z and set knowledge to 20:17:59Z, one second before R2 observation.",
+      "setup":"Query actual FalkorDB with explicit effective_at and known_at; inspect the complete operations-visible response, not a UI-filtered subset.",
+      "pinned_assertions":[
+        {"id":"early.exact-effective-axis","expected_pointer":"/cases/2/expected/effective_at"},
+        {"id":"early.exact-knowledge-axis","expected_pointer":"/cases/2/expected/known_at"},
+        {"id":"early.duty-role-path","expected_pointer":"/cases/2/expected/role_path"},
+        {"id":"early.only-r1-known","expected_pointer":"/cases/2/expected/source_versions"},
+        {"id":"early.no-r2-or-existence-hint","expected_pointer":"/cases/2/expected/r2_identifier_title_effective_time_count_or_future_revision_wording_visible"}
+      ],
+      "nonzero_assertion_count":5,
+      "failure_detected":"The axes are collapsed, the observation boundary is early, or later-known R2 content/existence leaks into the response.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:68"]
+    },
+    {
+      "id":"dock-bitemporal-known-r2-pending-review",
+      "scenario_id":"dock-bitemporal-known-r2-pending-review",
+      "attack_or_edge_case":"Keep effective_at=20:29Z and advance known_at to 20:19Z so R2 is known but not effective.",
+      "setup":"Query the same graph and same valid time with the later knowledge cutoff; require source-observation filtering and explicit review edges.",
+      "pinned_assertions":[
+        {"id":"known.r2-does-not-change-duty-path","expected_pointer":"/cases/3/expected/role_path"},
+        {"id":"known.exact-effective-axis","expected_pointer":"/cases/3/expected/effective_at"},
+        {"id":"known.exact-knowledge-axis","expected_pointer":"/cases/3/expected/known_at"},
+        {"id":"known.exact-r2-provenance-and-status","expected_pointer":"/cases/3/expected/source_versions"},
+        {"id":"known.exact-two-review-candidates","expected_pointer":"/cases/3/expected/review_candidates"},
+        {"id":"known.candidates-remain-pending-review","expected_pointer":"/cases/3/expected/candidate_disposition"}
+      ],
+      "nonzero_assertion_count":6,
+      "failure_detected":"R2 is hidden after it is known, applied early before its effective time, missing provenance/status, or its exact review queue is guessed or misclassified.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:69"]
+    },
+    {
+      "id":"dock-bitemporal-known-future-effective-swing",
+      "scenario_id":"dock-bitemporal-known-future-effective-swing",
+      "attack_or_edge_case":"Hold known_at at 20:19Z and move effective_at to the exact 20:30Z R2 boundary.",
+      "setup":"Query graph ownership using effective interval at 20:30Z while source visibility remains bounded by the 20:19Z observation cutoff.",
+      "pinned_assertions":[
+        {"id":"future.exact-axis-pair","expected_pointer":"/cases/4/expected/effective_at"},
+        {"id":"future.exact-knowledge-axis","expected_pointer":"/cases/4/expected/known_at"},
+        {"id":"future.swing-role-path","expected_pointer":"/cases/4/expected/role_path"},
+        {"id":"future.r2-evidence-known-by-cutoff","expected_pointer":"/cases/4/expected/source_versions"},
+        {"id":"future.not-effective-at-knowledge-time-claim","expected_pointer":"/cases/4/expected/interpretation"}
+      ],
+      "nonzero_assertion_count":5,
+      "failure_detected":"The query uses knowledge time to select valid ownership or presents a known future-effective role as already effective at knowledge time.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:70"]
+    },
+    {
+      "id":"dock-bitemporal-crossed-axes-unknown",
+      "scenario_id":"dock-bitemporal-crossed-axes-unknown",
+      "attack_or_edge_case":"Request future effective time 20:30Z using only knowledge available at 20:17:59Z.",
+      "setup":"Evaluate the crossed-axis pair on the same seeded graph and inspect all returned IDs, titles, counts, wording, paths, and unknown-state labels.",
+      "pinned_assertions":[
+        {"id":"crossed.exact-axis-pair","expected_pointer":"/cases/5/expected/known_at"},
+        {"id":"crossed.exact-effective-axis","expected_pointer":"/cases/5/expected/effective_at"},
+        {"id":"crossed.no-role-path-or-guessed-role","expected_pointer":"/cases/5/expected/role_path"},
+        {"id":"crossed.only-known-source-r1","expected_pointer":"/cases/5/expected/source_versions"},
+        {"id":"crossed.no-review-candidates","expected_pointer":"/cases/5/expected/review_candidates"},
+        {"id":"crossed.no-r2-existence-hint","expected_pointer":"/cases/5/expected/r2_identifier_title_effective_time_count_or_existence_hint_visible"},
+        {"id":"crossed.unknown-not-duty-or-swing","expected_pointer":"/cases/5/expected/unknown_not_guessed_as_duty_or_swing"}
+      ],
+      "nonzero_assertion_count":7,
+      "failure_detected":"Hindsight exposes R2 or guesses duty/swing even though R1 has expired and R2 was not yet known.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:71"]
+    },
+    {
+      "id":"dock-bitemporal-edge-removal-reseed",
+      "scenario_id":"dock-bitemporal-edge-removal-reseed",
+      "attack_or_edge_case":"Remove each required test-owned relationship independently, then reseed and compare the baseline.",
+      "setup":"On a unique owned graph remove only R2-SUPERSEDES-R1, query; restore; remove only R2's OWNED_BY assignment, query; reseed and compare exact fixed values.",
+      "pinned_assertions":[
+        {"id":"edges.baseline-exact-path-and-candidates","expected_pointer":"/cases/6/expected/baseline"},
+        {"id":"edges.supersedes-removal-removes-candidates","expected_pointer":"/cases/6/expected/remove_only_supersedes_edge"},
+        {"id":"edges.missing-linkage-is-unknown-not-current","expected_pointer":"/cases/6/expected/remove_only_supersedes_edge/linkage_status"},
+        {"id":"edges.ownership-removal-makes-role-unknown","expected_pointer":"/cases/6/expected/remove_only_r2_ownership_edge"},
+        {"id":"edges.reseed-restores-exact-baseline","expected_pointer":"/cases/6/expected/reseed"}
+      ],
+      "nonzero_assertion_count":5,
+      "failure_detected":"Static or lexical fallback ignores explicit edge removal, a mutation has collateral effect, missing linkage is called current, or reseed drifts.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:72"]
+    },
+    {
+      "id":"dock-bitemporal-denied-source-invariance",
+      "scenario_id":"dock-bitemporal-denied-source-invariance",
+      "attack_or_edge_case":"Inject the exact existing restricted dock fixture and compare complete operations-visible responses at all pinned axis pairs before and after.",
+      "setup":"Use the denied-source fixture tripwires from the frozen shift-board oracle; do not treat hidden fixture details as expected output.",
+      "pinned_assertions":[
+        {"id":"acl.operations-scope","expected_pointer":"/cases/7/expected/viewer_scope"},
+        {"id":"acl.all-axis-pairs-covered","expected_pointer":"/cases/7/expected/axis_pairs"},
+        {"id":"acl.full-response-is-invariant","expected_pointer":"/cases/7/expected/full_visible_response_unchanged_before_after_for_each_axis_pair"},
+        {"id":"acl.no-hidden-or-derived-disclosure","expected_pointer":"/cases/7/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed"}
+      ],
+      "nonzero_assertion_count":4,
+      "failure_detected":"Restricted information leaks directly, through an existence/count side channel, a relationship/path, or a dependent paraphrase under any axis pair.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:73"]
+    },
+    {
+      "id":"dock-bitemporal-time-validation",
+      "scenario_id":"dock-bitemporal-time-validation",
+      "attack_or_edge_case":"Normalize nonzero UTC offsets independently on both axes, then submit malformed and timezone-naive inputs on either axis.",
+      "setup":"Compare +02:00 values with canonical UTC output; snapshot graph/output before each invalid submission and require rejection before mutation.",
+      "pinned_assertions":[
+        {"id":"time.offset-input-pair","expected_pointer":"/cases/8/expected/offset_pair"},
+        {"id":"time.normalizes-both-axes","expected_pointer":"/cases/8/expected/normalized_pair"},
+        {"id":"time.offset-result-equals-fixed-r2-pair","expected_pointer":"/cases/8/expected/offset_result_matches_case"},
+        {"id":"time.malformed-effective-and-known-probes","expected_pointer":"/cases/8/expected/malformed_effective_at"},
+        {"id":"time.malformed-known-probe","expected_pointer":"/cases/8/expected/malformed_known_at"},
+        {"id":"time.reject-before-mutation","expected_pointer":"/cases/8/expected/each_malformed_axis_rejected_before_graph_or_output_mutation"},
+        {"id":"time.no-local-fallback","expected_pointer":"/cases/8/expected/naive_local_time_fallback"}
+      ],
+      "nonzero_assertion_count":7,
+      "failure_detected":"Offset semantics differ across axes, malformed timestamps mutate state, or timezone-naive input silently uses a local-time fallback.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:74"]
+    },
+    {
+      "id":"dock-bitemporal-reseed-reconnect-read-only",
+      "scenario_id":"dock-bitemporal-reseed-reconnect-read-only",
+      "attack_or_edge_case":"Cold-start, seed twice, reconnect through a fresh client/restarted app, and inspect all side-effect counters.",
+      "setup":"Use one unique owned graph/process; compare exact result after reseed/reconnect with the pinned known-R2 outcome; inspect graph/action/external-write counts and cleanup ownership.",
+      "pinned_assertions":[
+        {"id":"lifecycle.repeat-seed-is-idempotent","expected_pointer":"/cases/9/expected/repeat_seed_duplicate_nodes"},
+        {"id":"lifecycle.no-duplicate-relationships","expected_pointer":"/cases/9/expected/repeat_seed_duplicate_relationships"},
+        {"id":"lifecycle.fresh-client-result-is-exact","expected_pointer":"/cases/9/expected/after_reconnect_result_matches"},
+        {"id":"lifecycle.time-selection-read-only","expected_pointer":"/cases/9/expected/time_selection_graph_writes"},
+        {"id":"lifecycle.no-action-file-write","expected_pointer":"/cases/9/expected/time_selection_action_writes"},
+        {"id":"lifecycle.no-external-actions","expected_pointer":"/cases/9/expected/messages_sent"},
+        {"id":"lifecycle.no-calls","expected_pointer":"/cases/9/expected/calls_made"},
+        {"id":"lifecycle.no-tickets","expected_pointer":"/cases/9/expected/tickets_created"},
+        {"id":"lifecycle.human-confirmation-separate","expected_pointer":"/cases/9/expected/explicit_confirmation_is_separate_human_action"},
+        {"id":"lifecycle.api-desktop-mobile-agree","expected_pointer":"/cases/9/expected/desktop_and_mobile_api_results_agree"},
+        {"id":"lifecycle.cleanup-only-owned-resources","expected_pointer":"/cases/9/expected/cleanup_deletes_only_task_owned_graph_and_stops_only_owned_process"}
+      ],
+      "nonzero_assertion_count":11,
+      "failure_detected":"Duplicate fixture data, warm-client-only behavior, implicit writes, external actions, cross-lane cleanup, or browser/API disagreement.",
+      "planner_refs":["planner-280b00074097409f80433898c7dcdac8.md:75"]
+    }
+  ]
+}
