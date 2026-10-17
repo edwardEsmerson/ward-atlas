@@ -1,0 +1,433 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/handover-known-time-expected-results.json",
+  "oracle_policy": "Every matrix assertion resolves to a fixed expected-results field and numbered outcome in the pinned handover-time packet; candidate output is never an oracle.",
+  "cases": [
+    {
+      "id": "cold-empty-is-unknown",
+      "scenario_id": "cold-empty-is-unknown",
+      "attack_or_edge_case": "Cold empty graph must not fabricate facts or a safe/current conclusion.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case cold-empty-is-unknown without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "cold.empty-events",
+          "expected_pointer": "/cases/0/expected/event",
+          "assertion": "cold empty events"
+        },
+        {
+          "id": "cold.no-paths",
+          "expected_pointer": "/cases/0/expected/impact_paths",
+          "assertion": "cold no paths"
+        },
+        {
+          "id": "cold.unknown-not-safety",
+          "expected_pointer": "/cases/0/expected/absence_of_risk_concluded",
+          "assertion": "cold unknown not safety"
+        }
+      ],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:54"
+      ]
+    },
+    {
+      "id": "outage-at-1914-snapshot",
+      "scenario_id": "outage-at-1914-snapshot",
+      "attack_or_edge_case": "Hold valid time at 19:30Z and knowledge at 19:14Z.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case outage-at-1914-snapshot without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "outage.exact-time-pair",
+          "expected_pointer": "/cases/1/expected/valid_at",
+          "assertion": "outage exact time pair"
+        },
+        {
+          "id": "outage.event-and-source",
+          "expected_pointer": "/cases/1/expected/event",
+          "assertion": "outage event and source"
+        },
+        {
+          "id": "outage.two-ordered-paths",
+          "expected_pointer": "/cases/1/expected/impact_paths",
+          "assertion": "outage two ordered paths"
+        },
+        {
+          "id": "outage.path-provenance",
+          "expected_pointer": "/cases/1/expected/path_evidence",
+          "assertion": "outage path provenance"
+        },
+        {
+          "id": "outage.sop-witness-unresolved",
+          "expected_pointer": "/cases/1/expected/sop_witness",
+          "assertion": "outage sop witness unresolved"
+        },
+        {
+          "id": "outage.exact-known-time",
+          "expected_pointer": "/cases/1/expected/known_at",
+          "assertion": "outage exact evidence-known-time cutoff"
+        }
+      ],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:55"
+      ]
+    },
+    {
+      "id": "restoration-at-1916-same-valid-time",
+      "scenario_id": "restoration-at-1916-same-valid-time",
+      "attack_or_edge_case": "Advance only knowledge to 19:16Z at valid time 19:30Z.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case restoration-at-1916-same-valid-time without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "restore.exact-source-time",
+          "expected_pointer": "/cases/2/expected/event",
+          "assertion": "restore exact source time"
+        },
+        {
+          "id": "restore.no-impact-paths",
+          "expected_pointer": "/cases/2/expected/active_impact_paths",
+          "assertion": "restore no impact paths"
+        },
+        {
+          "id": "restore.sop-remains-unresolved",
+          "expected_pointer": "/cases/2/expected/sop_witness",
+          "assertion": "restore sop remains unresolved"
+        },
+        {
+          "id": "restore.exact-known-time",
+          "expected_pointer": "/cases/2/expected/known_at",
+          "assertion": "restoration exact evidence-known-time cutoff"
+        }
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:56"
+      ]
+    },
+    {
+      "id": "unknown-at-1801-no-event-leak",
+      "scenario_id": "unknown-at-1801-no-event-leak",
+      "attack_or_edge_case": "Ask at 18:01Z knowledge and inspect the complete selected projection.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case unknown-at-1801-no-event-leak without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "unknown.known-time",
+          "expected_pointer": "/cases/3/expected/known_at",
+          "assertion": "unknown known time"
+        },
+        {
+          "id": "unknown.no-event-facts",
+          "expected_pointer": "/cases/3/expected/event",
+          "assertion": "unknown no event facts"
+        },
+        {
+          "id": "unknown.no-id-title-time-leak",
+          "expected_pointer": "/cases/3/expected/forbidden_event_literals",
+          "assertion": "unknown no id title time leak"
+        },
+        {
+          "id": "unknown.no-existence-side-channel",
+          "expected_pointer": "/cases/3/expected/event_existence_or_count_hint_disclosed",
+          "assertion": "unknown no existence side channel"
+        },
+        {
+          "id": "unknown.sop-still-visible",
+          "expected_pointer": "/cases/3/expected/sop_witness",
+          "assertion": "unknown sop still visible"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:57"
+      ]
+    },
+    {
+      "id": "role-evidence-known-at-cutoff",
+      "scenario_id": "role-evidence-known-at-cutoff",
+      "attack_or_edge_case": "Move only evidence cutoff across the 18:04Z/18:05Z role ownership boundary.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case role-evidence-known-at-cutoff without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "cutoff.only-known-path",
+          "expected_pointer": "/cases/4/expected/visible_paths",
+          "assertion": "cutoff only known path"
+        },
+        {
+          "id": "cutoff.exact-evidence-time",
+          "expected_pointer": "/cases/4/expected/path_evidence",
+          "assertion": "cutoff exact evidence time"
+        },
+        {
+          "id": "cutoff.second-path-at-1805",
+          "expected_pointer": "/cases/4/expected/at_1805_visible_paths",
+          "assertion": "cutoff second path at 1805"
+        },
+        {
+          "id": "cutoff.no-completeness-claim",
+          "expected_pointer": "/cases/4/expected/completeness_claim",
+          "assertion": "cutoff no completeness claim"
+        },
+        {
+          "id": "cutoff.exact-known-time",
+          "expected_pointer": "/cases/4/expected/known_at",
+          "assertion": "path evidence exact knowledge cutoff"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:58"
+      ]
+    },
+    {
+      "id": "outage-link-removal",
+      "scenario_id": "outage-link-removal",
+      "attack_or_edge_case": "Remove only the outage event ownership edge.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case outage-link-removal without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "outage-edge.exact-owned-edge",
+          "expected_pointer": "/cases/5/expected/remove_only_edge",
+          "assertion": "outage edge exact owned edge"
+        },
+        {
+          "id": "outage-edge-removal-unknown",
+          "expected_pointer": "/cases/5/expected/after_removal",
+          "assertion": "outage edge removal unknown"
+        },
+        {
+          "id": "outage-edge-reseed-baseline",
+          "expected_pointer": "/cases/5/expected/reseed_restores_exact_baseline",
+          "assertion": "outage edge reseed baseline"
+        }
+      ],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:59"
+      ]
+    },
+    {
+      "id": "restoration-source-link-removal",
+      "scenario_id": "restoration-source-link-removal",
+      "attack_or_edge_case": "Remove only the restoration source evidence edge.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case restoration-source-link-removal without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "restore-edge.exact-owned-edge",
+          "expected_pointer": "/cases/6/expected/remove_only_edge",
+          "assertion": "restore edge exact owned edge"
+        },
+        {
+          "id": "restore-edge-removal-falls-back-to-outage",
+          "expected_pointer": "/cases/6/expected/after_removal",
+          "assertion": "restore edge removal falls back to outage"
+        },
+        {
+          "id": "restore-edge.reseed",
+          "expected_pointer": "/cases/6/expected/reseed_restores_exact_restoration_baseline",
+          "assertion": "restore edge reseed"
+        }
+      ],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:60"
+      ]
+    },
+    {
+      "id": "sop-witness-independent-mutation",
+      "scenario_id": "sop-witness-independent-mutation",
+      "attack_or_edge_case": "Mutate SOP witness/source edges independently from the event/path.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case sop-witness-independent-mutation without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "sop.mutation-scope",
+          "expected_pointer": "/cases/7/expected/mutations",
+          "assertion": "sop mutation scope"
+        },
+        {
+          "id": "sop.event-path-unchanged",
+          "expected_pointer": "/cases/7/expected/baseline_impact_paths",
+          "assertion": "sop event path unchanged"
+        },
+        {
+          "id": "sop.v3-source-preserved",
+          "expected_pointer": "/cases/7/expected/mutations/2/v3_claim_evidence",
+          "assertion": "sop v3 source preserved"
+        },
+        {
+          "id": "sop.reseed",
+          "expected_pointer": "/cases/7/expected/reseed_restores_exact_sop_witness_and_event",
+          "assertion": "sop reseed"
+        }
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:61"
+      ]
+    },
+    {
+      "id": "hypothetical-branch-never-observed-snapshot",
+      "scenario_id": "hypothetical-branch-never-observed-snapshot",
+      "attack_or_edge_case": "Select the distinct C4 hypothetical restoration branch.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case hypothetical-branch-never-observed-snapshot without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "branch.fixed-branch-ids-times",
+          "expected_pointer": "/cases/8/expected/branch",
+          "assertion": "branch fixed branch ids times"
+        },
+        {
+          "id": "branch.mainline-unchanged",
+          "expected_pointer": "/cases/8/expected/observed_mainline_paths",
+          "assertion": "branch mainline unchanged"
+        },
+        {
+          "id": "branch-not-in-snapshot",
+          "expected_pointer": "/cases/8/expected/branch_in_confirmed_observed_snapshot",
+          "assertion": "branch not in snapshot"
+        },
+        {
+          "id": "branch.knowledge-cutoff",
+          "expected_pointer": "/cases/8/expected/known_at",
+          "assertion": "branch observed baseline uses the pinned knowledge cutoff"
+        },
+        {
+          "id": "branch.valid-time",
+          "expected_pointer": "/cases/8/expected/valid_at",
+          "assertion": "branch mainline valid time is the pinned 18:50Z instant"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:62"
+      ]
+    },
+    {
+      "id": "confirmed-snapshot-is-immutable-and-comparable",
+      "scenario_id": "confirmed-snapshot-is-immutable-and-comparable",
+      "attack_or_edge_case": "Confirm a bitemporal handover and compare it with later-known evidence.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case confirmed-snapshot-is-immutable-and-comparable without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "snapshot.exact-review-draft",
+          "expected_pointer": "/cases/9/expected/draft",
+          "assertion": "snapshot exact review draft"
+        },
+        {
+          "id": "snapshot.explicit-confirmation",
+          "expected_pointer": "/cases/9/expected/confirmation",
+          "assertion": "snapshot explicit confirmation"
+        },
+        {
+          "id": "snapshot.immutable-saved-object",
+          "expected_pointer": "/cases/9/expected/saved_snapshot",
+          "assertion": "snapshot immutable saved object"
+        },
+        {
+          "id": "snapshot.exact-compare-delta",
+          "expected_pointer": "/cases/9/expected/comparison",
+          "assertion": "snapshot exact compare delta"
+        },
+        {
+          "id": "snapshot.delta-does-not-rewrite",
+          "expected_pointer": "/cases/9/expected/saved_snapshot_byte_identical_after_graph_change_and_compare",
+          "assertion": "snapshot delta does not rewrite"
+        }
+      ],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:63"
+      ]
+    },
+    {
+      "id": "restricted-source-full-view-invariance",
+      "scenario_id": "restricted-source-full-view-invariance",
+      "attack_or_edge_case": "Inject an ACL-restricted synthetic source and compare every visible surface.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case restricted-source-full-view-invariance without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "acl.operations-scope",
+          "expected_pointer": "/cases/10/expected/viewer_scope",
+          "assertion": "acl operations scope"
+        },
+        {
+          "id": "acl.probe-is-pinned",
+          "expected_pointer": "/cases/10/expected/restricted_probe",
+          "assertion": "acl probe is pinned"
+        },
+        {
+          "id": "acl.api-snapshot-dom-invariance",
+          "expected_pointer": "/cases/10/expected/complete_relevant_browser_dom_and_accessibility_text_equal_before_after_probe",
+          "assertion": "acl api snapshot dom invariance"
+        },
+        {
+          "id": "acl.no-hidden-derived-leak",
+          "expected_pointer": "/cases/10/expected/hidden_identifier_title_fact_count_existence_relationship_path_or_dependent_paraphrase_disclosed",
+          "assertion": "acl no hidden derived leak"
+        }
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:64"
+      ]
+    },
+    {
+      "id": "offset-validation-reseed-reconnect-read-only-cleanup",
+      "scenario_id": "offset-validation-reseed-reconnect-read-only-cleanup",
+      "attack_or_edge_case": "Normalize offsets, reject invalid times, reseed, reconnect, and clean owned resources.",
+      "setup": "Use a unique task-owned actual-FalkorDB graph and the fixed synthetic INC-204 fixture; exercise case offset-validation-reseed-reconnect-read-only-cleanup without deriving expectations from candidate output.",
+      "pinned_assertions": [
+        {
+          "id": "time.offset-normalization",
+          "expected_pointer": "/cases/11/expected/offset_pair",
+          "assertion": "time offset normalization"
+        },
+        {
+          "id": "time.invalid-both-axes",
+          "expected_pointer": "/cases/11/expected/invalid_probes",
+          "assertion": "time invalid both axes"
+        },
+        {
+          "id": "time.reject-before-mutation",
+          "expected_pointer": "/cases/11/expected/each_invalid_axis_rejected_before_graph_output_or_action_mutation",
+          "assertion": "time reject before mutation"
+        },
+        {
+          "id": "time.reseed-reconnect",
+          "expected_pointer": "/cases/11/expected/reconnected_snapshot_matches",
+          "assertion": "time reseed reconnect"
+        },
+        {
+          "id": "time.read-only-side-effects",
+          "expected_pointer": "/cases/11/expected/time_selection_graph_writes",
+          "assertion": "time read only side effects"
+        },
+        {
+          "id": "time.cleanup-only-owned",
+          "expected_pointer": "/cases/11/expected/cleanup_deletes_only_task_owned_graph_and_stops_only_task_owned_processes",
+          "assertion": "time cleanup only owned"
+        },
+        {
+          "id": "time.normalized-pair",
+          "expected_pointer": "/cases/11/expected/normalized_pair",
+          "assertion": "both offset axes normalize to the pinned UTC pair"
+        }
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "Any deviation from the exact candidate-independent expected fields, missing evidence semantics, unauthorized mutation, or cross-scenario leakage fails.",
+      "planner_refs": [
+        "planner-57ab552b3c3f400c9a5011e66e0b37a2.md:65"
+      ]
+    }
+  ]
+}
