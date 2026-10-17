@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent oracle for a shared synthetic facilities dependency cascade and isolated edge-removal branch.",
+  "oracle_policy": "All IDs, paths, timestamps, labels, branch deltas, isolation requirements, and side-effect boundaries are fixed by the pinned planner packet before query behavior. Candidate output never supplies or amends an expected value.",
+  "pinned_sources": [
+    {
+      "id": "cascade-packet",
+      "path": "plans/planner-8b15037dc21642129e4f0cbd47508f2f.md",
+      "sha256": "a0ab793c8fe21383decf987f3582f3d9f94a89ce68d5afe48efada7fb60cbe11",
+      "outcome_lines": [41, 42, 43, 44, 45, 46, 47, 48]
+    },
+    {
+      "id": "original-planner",
+      "path": "plans/planner-ed8ab68cd001411d97ee43310862ae22.md",
+      "sha256": "01c10540400a08541da696b075d69183bfd62a290caca3f75f8aabdd8dfdd957",
+      "outcome_lines": [29, 30, 31, 32, 33, 34]
+    },
+    {
+      "id": "source-change-planner",
+      "path": "plans/planner-9b1a51761889446c8b5525bde02bc5d6.md",
+      "sha256": "3879d8eb6197f631311c659528b939d96f069702406d3e257b1ab1d84c40e3b7",
+      "outcome_lines": [39, 40, 41, 42, 43, 44, 45, 46]
+    },
+    {
+      "id": "temporal-planner",
+      "path": "plans/planner-13609527bde94e87ae5bcacaa2c86a70.md",
+      "sha256": "cb62e05f8b0307a27f6050aef455ccf7b0df42d8f83a1479124c127187b46464",
+      "outcome_lines": [42, 43, 44, 45, 46, 47, 48, 49, 50]
+    },
+    {
+      "id": "shift-board-planner",
+      "path": "plans/planner-5f75fb17810c463fb9d84bd5821b254f.md",
+      "sha256": "5dd4c50cd2044e016e3593c337a5ccae966cfba8ef74cbcb8d0ffd95eaed55de",
+      "outcome_lines": [31, 32, 33, 34, 35, 36, 37, 38]
+    }
+  ],
+  "existing_product_oracles": [
+    "tests/expected-results.json",
+    "tests/source-change-expected-results.json",
+    "tests/shift-board-expected-results.json"
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "The later behavior check must query actual FalkorDB; this oracle validator makes no live-database claim.",
+    "graph_ownership": "The later behavior check uses a unique task-owned graph and cleans up only resources it started or created.",
+    "scenario_kind": "Non-clinical facilities/logistics tabletop simulation; every branch result is hypothetical, not an observation or a recommended action.",
+    "existing_incident_isolation": ["INC-204", "INC-207"]
+  },
+  "fixture": {
+    "incident_id": "INC-312",
+    "shared_equipment_id": "EQ-FPU-7",
+    "source_id": "SRC-TABLETOP-FPU-7",
+    "outage_branch_id": "BR-FPU-OUTAGE-DRILL",
+    "outage_event_id": "EVT-FPU-OUTAGE-HYP-01",
+    "outage_event_at": "2026-10-15T06:15:00Z",
+    "baseline_available_at": "2026-10-15T06:00:00Z",
+    "evaluation_at": "2026-10-15T06:30:00Z",
+    "isolation_branch_id": "BR-FPU-ISOLATE-DOCK-FEED",
+    "removed_dependency": ["EQ-FPU-7", "EQ-DOCK-CHARGER-2"],
+    "restricted_source_id": "SRC-RESTRICTED-FPU-77"
+  },
+  "canonical_paths": {
+    "dock": ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+    "linen": ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+  },
+  "preserved_existing_outputs": [
+    {
+      "oracle": "original",
+      "scenario_id": "multi-hop-outage-current-ownership",
+      "incident_id": "INC-204",
+      "paths": [
+        ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+        ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+      ]
+    },
+    {
+      "oracle": "temporal",
+      "scenario_id": "temporal-outage-active",
+      "incident_id": "INC-204",
+      "paths": [
+        ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+        ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+      ]
+    },
+    {
+      "oracle": "shift-board-conveyor",
+      "scenario_id": "conveyor-observed-and-hypothetical-times",
+      "incident_id": "INC-204",
+      "paths": [
+        ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+        ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+      ]
+    },
+    {
+      "oracle": "source-change",
+      "scenario_id": "dock-role-path-after-effective-time",
+      "incident_id": "INC-207",
+      "paths": [["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"]]
+    },
+    {
+      "oracle": "shift-board-dock",
+      "scenario_id": "dock-role-time-and-source-evidence.at_effective_time",
+      "incident_id": "INC-207",
+      "paths": [["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"]]
+    },
+    {
+      "oracle": "prior-planner-legacy",
+      "scenario_id": "legacy-multi-hop-outage-ownership",
+      "incident_id": "INC-LIFT-01",
+      "paths": [
+        ["INC-LIFT-01", "EQ-GOODS-LIFT-01", "SVC-LINEN-SUPPLY", "DEPT-LINEN", "ROLE-FACILITIES-DUTY"],
+        ["INC-LIFT-01", "EQ-GOODS-LIFT-01", "SVC-LINEN-SUPPLY", "DEPT-SUPPLY", "ROLE-FACILITIES-DUTY"]
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "cold-empty-graph",
+      "expected": {
+        "impact_paths": [],
+        "scenario_event_count": 0,
+        "state": "empty/unknown",
+        "invented_available_state_service_role_or_safe_outcome": false
+      },
+      "planner_refs": ["cascade-packet#outcome-1"]
+    },
+    {
+      "id": "baseline-mainline",
+      "expected": {
+        "equipment_id": "EQ-FPU-7",
+        "source_id": "SRC-TABLETOP-FPU-7",
+        "observed_state": "available",
+        "observed_at": "2026-10-15T06:00:00Z",
+        "as_of": "2026-10-15T06:30:00Z",
+        "outage_impact_paths": [],
+        "scenario_branch_applied": false
+      },
+      "planner_refs": ["cascade-packet#outcome-2"]
+    },
+    {
+      "id": "shared-dependency-cascade",
+      "expected": {
+        "branch_id": "BR-FPU-OUTAGE-DRILL",
+        "event_id": "EVT-FPU-OUTAGE-HYP-01",
+        "source_id": "SRC-TABLETOP-FPU-7",
+        "event_at": "2026-10-15T06:15:00Z",
+        "as_of": "2026-10-15T06:30:00Z",
+        "path_status": "hypothetical/simulated",
+        "paths": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "role_endpoints": ["ROLE-DOCK-FACILITIES", "ROLE-LINEN-DUTY"],
+        "observed_mainline_mutated": false
+      },
+      "planner_refs": ["cascade-packet#outcome-3"]
+    },
+    {
+      "id": "branch-only-edge-counterfactual",
+      "expected": {
+        "branch_id": "BR-FPU-ISOLATE-DOCK-FEED",
+        "shared_outage_event_id": "EVT-FPU-OUTAGE-HYP-01",
+        "base_branch_id": "BR-FPU-OUTAGE-DRILL",
+        "only_branch_local_change": {
+          "removed_hypothetical_dependency": ["EQ-FPU-7", "EQ-DOCK-CHARGER-2"]
+        },
+        "counterfactual_paths": [["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]],
+        "outage_branch_paths_unchanged": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "mainline_paths": [],
+        "evaluating_or_resetting_branch_mutates_other_branches_or_base": false
+      },
+      "planner_refs": ["cascade-packet#outcome-4"]
+    },
+    {
+      "id": "no-cross-case-contamination",
+      "expected": {
+        "cascade_incident_id": "INC-312",
+        "cascade_equipment_id": "EQ-FPU-7",
+        "unrelated_incidents": ["INC-204", "INC-207"],
+        "path_connects_unrelated_incident_to_cascade_equipment": false,
+        "preserved_existing_outputs": [
+          {
+            "oracle": "original",
+            "scenario_id": "multi-hop-outage-current-ownership",
+            "incident_id": "INC-204",
+            "paths": [
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+            ]
+          },
+          {
+            "oracle": "temporal",
+            "scenario_id": "temporal-outage-active",
+            "incident_id": "INC-204",
+            "paths": [
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+            ]
+          },
+          {
+            "oracle": "shift-board-conveyor",
+            "scenario_id": "conveyor-observed-and-hypothetical-times",
+            "incident_id": "INC-204",
+            "paths": [
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+            ]
+          },
+          {
+            "oracle": "source-change",
+            "scenario_id": "dock-role-path-after-effective-time",
+            "incident_id": "INC-207",
+            "paths": [["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"]]
+          },
+          {
+            "oracle": "shift-board-dock",
+            "scenario_id": "dock-role-time-and-source-evidence.at_effective_time",
+            "incident_id": "INC-207",
+            "paths": [["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"]]
+          },
+          {
+            "oracle": "prior-planner-legacy",
+            "scenario_id": "legacy-multi-hop-outage-ownership",
+            "incident_id": "INC-LIFT-01",
+            "paths": [
+              ["INC-LIFT-01", "EQ-GOODS-LIFT-01", "SVC-LINEN-SUPPLY", "DEPT-LINEN", "ROLE-FACILITIES-DUTY"],
+              ["INC-LIFT-01", "EQ-GOODS-LIFT-01", "SVC-LINEN-SUPPLY", "DEPT-SUPPLY", "ROLE-FACILITIES-DUTY"]
+            ]
+          }
+        ],
+        "existing_incident_outputs_change_after_cascade_load_or_branch_mutation": false
+      },
+      "planner_refs": [
+        "cascade-packet#outcome-5",
+        "original-planner#outcome-1",
+        "source-change-planner#outcome-3",
+        "temporal-planner#outcome-3",
+        "shift-board-planner#outcomes-2,4"
+      ]
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "expected": {
+        "viewer_scope": "operations",
+        "restricted_source_id": "SRC-RESTRICTED-FPU-77",
+        "visible_api_and_visual_graph_before_after_equivalent": true,
+        "denied_identifier_title_fact_count_existence_path_or_dependent_paraphrase_disclosed": false,
+        "denied_source_markers_disclosed": []
+      },
+      "planner_refs": ["cascade-packet#outcome-6"]
+    },
+    {
+      "id": "time-repeat-and-reconnect",
+      "expected": {
+        "offset_input": "2026-10-15T07:30:00+01:00",
+        "normalized_as_of": "2026-10-15T06:30:00Z",
+        "offset_result_matches_utc_result": true,
+        "malformed_timestamp": "2026-10-15T06:61:00Z",
+        "malformed_timestamp_rejected": true,
+        "graph_and_branch_mutated_by_rejected_timestamp": false,
+        "same_bundle_seeded_twice": true,
+        "duplicate_ids_nodes_or_edges_after_second_seed": false,
+        "new_client_connection_required": true,
+        "mainline_paths_after_reconnect": [],
+        "outage_branch_paths_after_reconnect": [
+          ["INC-312", "EQ-FPU-7", "EQ-DOCK-CHARGER-2", "SVC-DOCK-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-FACILITIES"],
+          ["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]
+        ],
+        "isolation_branch_paths_after_reconnect": [["INC-312", "EQ-FPU-7", "EQ-LINEN-CONVEYOR-7", "SVC-LINEN-TRANSFER", "DEPT-LINEN-LOGISTICS", "ROLE-LINEN-DUTY"]]
+      },
+      "planner_refs": ["cascade-packet#outcome-7"]
+    },
+    {
+      "id": "local-only-scope-boundary",
+      "expected": {
+        "writes_limited_to_unique_owned_synthetic_graph": true,
+        "external_writes": [],
+        "messages_calls_tickets_or_service_writes": false,
+        "auto_confirmed_draft_or_action": false,
+        "real_world_action_performed": false,
+        "paths_limited_to_nonclinical_facilities_logistics": true,
+        "diagnosis_treatment_patient_impact_or_clinical_triage_inferred": false,
+        "hospital_safety_claim_made": false,
+        "cleanup_deletes_only_task_owned_graph_and_stops_only_owned_processes": true
+      },
+      "planner_refs": ["cascade-packet#outcome-8"]
+    }
+  ]
+}
