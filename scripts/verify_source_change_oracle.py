@@ -26,8 +26,8 @@ EXPECTED_IDS = [
 ]
 EXPECTED_CANDIDATES = ["HND-DOCK-2020", "TKT-DOCK-88"]
 EXPECTED_SOURCE_VERSIONS = [
-    {"source_id": "SRC-DOCK-ROSTER-R1", "observed_at": "2026-10-14T19:00:00Z"},
-    {"source_id": "SRC-DOCK-ROSTER-R2", "observed_at": "2026-10-14T20:18:00Z", "effective_at": "2026-10-14T20:30:00Z", "supersedes": "SRC-DOCK-ROSTER-R1"},
+    {"source_id": "SRC-DOCK-ROSTER-R1", "title": "Synthetic Dock Operations Roster Revision 1", "observed_at": "2026-10-14T19:00:00Z"},
+    {"source_id": "SRC-DOCK-ROSTER-R2", "title": "Synthetic Dock Operations Roster Revision 2", "observed_at": "2026-10-14T20:18:00Z", "effective_at": "2026-10-14T20:30:00Z", "supersedes": "SRC-DOCK-ROSTER-R1"},
 ]
 RESTRICTED_LITERALS = [
     "SRC-RESTRICTED-DOCK-99",
@@ -86,12 +86,19 @@ class OracleFailure(ValueError):
     pass
 
 
+CHECK_COUNT = 0
+
+
 def require(condition: bool, message: str) -> None:
+    global CHECK_COUNT
+    CHECK_COUNT += 1
     if not condition:
         raise OracleFailure(message)
 
 
 def check(expected_path: Path, matrix_path: Path, pinned_plan: Path, require_eight: bool) -> dict[str, Any]:
+    global CHECK_COUNT
+    CHECK_COUNT = 0
     expected = json.loads(expected_path.read_text(encoding="utf-8"))
     matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
     plan = pinned_plan.read_text(encoding="utf-8")
@@ -100,6 +107,11 @@ def check(expected_path: Path, matrix_path: Path, pinned_plan: Path, require_eig
     require(expected.get("scope", {}).get("source_history") == "Append-only; revisions and assignments are never overwritten.", "append-only source-history requirement is missing")
     require(expected.get("scope", {}).get("coverage_status") == "explicit_edges_only", "coverage must say explicit_edges_only")
     require(expected.get("scope", {}).get("unlinked_artifact_status") == "unknown", "unlinked artifacts must remain unknown")
+    require(expected.get("research_provenance") == {
+        "reference": "/workspace/inbox/company-brain-prior-13-reference.json",
+        "sha256": "c771e8613e12c0853da7eb318d68a23b7da9ecc7fa0ccc6390fbec416b1a2a4c",
+        "status": "prior public ideation context; product choice remains the already-approved Hospital Brain",
+    }, "prior public research provenance/hash is missing or changed")
     require(expected.get("expected_paths") == EXPECTED_PATHS, "exact before/after role paths differ from the independent pin")
     require(expected.get("expected_review_candidates") == EXPECTED_CANDIDATES, "exact candidate queue differs from the independent pin")
     fixture = expected.get("fixture", {})
@@ -114,6 +126,7 @@ def check(expected_path: Path, matrix_path: Path, pinned_plan: Path, require_eig
     }
     for key, value in fixed.items():
         require(fixture.get(key) == value, f"fixture.{key} differs from the independent pin")
+    require(fixture.get("source_before_title") == "Synthetic Dock Operations Roster Revision 1", "R1 title differs from the independent pin")
     require(fixture.get("source_after_title") == "Synthetic Dock Operations Roster Revision 2", "R2 title differs from the independent pin")
     require(
         {key: fixture.get(key) for key in ("restricted_source_id", "restricted_source_title", "restricted_fact", "restricted_equipment_id", "restricted_department_id", "restricted_role_id")}
@@ -147,6 +160,8 @@ def check(expected_path: Path, matrix_path: Path, pinned_plan: Path, require_eig
         "INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK",
         "ROLE-DOCK-DUTY", "ROLE-DOCK-SWING", "SRC-DOCK-ROSTER-R2",
         "HND-DOCK-2020", "TKT-DOCK-88", "HND-DOCK-LEXICAL-ONLY",
+        "/workspace/inbox/company-brain-prior-13-reference.json",
+        "c771e8613e12c0853da7eb318d68a23b7da9ecc7fa0ccc6390fbec416b1a2a4c",
         *RESTRICTED_LITERALS, "SOP-OPS-9-V2", "SOP-OPS-9-V3",
     ]
     missing = [literal for literal in required_packet_literals if literal not in plan]
@@ -157,7 +172,7 @@ def check(expected_path: Path, matrix_path: Path, pinned_plan: Path, require_eig
         "matrix_case_count": len(cases),
         "nonzero_assertion_floor": sum(case["nonzero_assertion_count"] for case in cases),
         "pinned_plan": str(pinned_plan),
-        "independent_checks": 28,
+        "independent_checks": CHECK_COUNT,
     }
 
 

@@ -3,6 +3,11 @@
   "product": "WardAtlas",
   "purpose": "Candidate-independent outcomes for an append-only synthetic roster revision and explicitly linked operational review candidates.",
   "planner_packet": "/workspace/worktrees/planner-9b1a51761889446c8b5525bde02bc5d6/plans/planner-9b1a51761889446c8b5525bde02bc5d6.md",
+  "research_provenance": {
+    "reference": "/workspace/inbox/company-brain-prior-13-reference.json",
+    "sha256": "c771e8613e12c0853da7eb318d68a23b7da9ecc7fa0ccc6390fbec416b1a2a4c",
+    "status": "prior public ideation context; product choice remains the already-approved Hospital Brain"
+  },
   "scope": {
     "synthetic_only": true,
     "clinical_decisions": false,
@@ -20,6 +25,7 @@
     "role_before_id": "ROLE-DOCK-DUTY",
     "role_after_id": "ROLE-DOCK-SWING",
     "source_before_id": "SRC-DOCK-ROSTER-R1",
+    "source_before_title": "Synthetic Dock Operations Roster Revision 1",
     "source_after_id": "SRC-DOCK-ROSTER-R2",
     "source_after_title": "Synthetic Dock Operations Roster Revision 2",
     "observed_at": "2026-10-14T20:18:00Z",
@@ -53,7 +59,7 @@
     },
     {
       "id": "dock-role-path-after-effective-time",
-      "expected": {"as_of": "2026-10-14T20:30:00Z", "role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"], "source_versions": [{"source_id": "SRC-DOCK-ROSTER-R1", "observed_at": "2026-10-14T19:00:00Z"}, {"source_id": "SRC-DOCK-ROSTER-R2", "observed_at": "2026-10-14T20:18:00Z", "effective_at": "2026-10-14T20:30:00Z", "supersedes": "SRC-DOCK-ROSTER-R1"}]},
+      "expected": {"as_of": "2026-10-14T20:30:00Z", "role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"], "source_versions": [{"source_id": "SRC-DOCK-ROSTER-R1", "title": "Synthetic Dock Operations Roster Revision 1", "observed_at": "2026-10-14T19:00:00Z"}, {"source_id": "SRC-DOCK-ROSTER-R2", "title": "Synthetic Dock Operations Roster Revision 2", "observed_at": "2026-10-14T20:18:00Z", "effective_at": "2026-10-14T20:30:00Z", "supersedes": "SRC-DOCK-ROSTER-R1"}]},
       "oracle": "Only the final role changes at the pinned effective time; both source revisions and provenance timestamps remain inspectable."
     },
     {
