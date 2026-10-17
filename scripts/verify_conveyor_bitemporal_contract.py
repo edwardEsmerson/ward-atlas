@@ -72,6 +72,12 @@ PINNED_ADDITIVE_ORACLE_MATRIX_PAIRS = (
         "matrix": "tests/decision-provenance-adversarial-matrix.json",
         "matrix_sha256": "256048400ee304f59884ecf3393f9a59e30d76f29281c9c6ea5378740dd71ad3",
     },
+    {
+        "oracle": "tests/evidence-watch-expected-results.json",
+        "oracle_sha256": "1ee83f8ad7f9ad52b08b3759b20b590343c44eb09a7aeb2b18f1cd9d79027e1c",
+        "matrix": "tests/evidence-watch-adversarial-matrix.json",
+        "matrix_sha256": "e7bdee4b56611d13fd7ad00195b4ec5ffb50d265503f04083d48854e96c13279",
+    },
 )
 
 # Exact bytes of every tests/*expected-results.json and

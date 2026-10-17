@@ -47,8 +47,9 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
         self.assertEqual(assertions, 84)
         self.assertEqual(tuple(row["id"] for row in self.expected["cases"]), contract.REQUIRED_CASES)
         self.assertEqual(tuple(row["id"] for row in self.matrix["cases"]), contract.REQUIRED_CASES)
-        self.assertEqual(len(digests), 33)  # packet, 24 frozen files, and four pinned additive pairs
+        self.assertEqual(len(digests), 35)  # packet, 24 frozen files, and five pinned additive pairs
         self.assertEqual(len(contract.PINNED_EXISTING), 24)
+        self.assertEqual(len(contract.PINNED_ADDITIVE_ORACLE_MATRIX_PAIRS), 5)
         self.assertEqual(
             set(contract.verify_existing_oracles(ROOT, self.expected)),
             set(contract.PINNED_EXISTING) | set(contract._pinned_additive_files()),
@@ -209,7 +210,7 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
                     contract.validate_structure(self.expected, changed, True)
 
     def test_frozen_hash_manifest_rejects_byte_drift_missing_or_new_oracle(self):
-        self.assertEqual(len(contract.verify_existing_oracles(ROOT, self.expected)), 32)
+        self.assertEqual(len(contract.verify_existing_oracles(ROOT, self.expected)), 34)
         with tempfile.TemporaryDirectory() as directory:
             temp_root = Path(directory)
             pinned_files = {**contract.PINNED_EXISTING, **contract._pinned_additive_files()}
@@ -270,6 +271,48 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
         drifted_manifest["frozen_preexisting_oracle_hashes"][0]["sha256"] = "0" * 64
         with self.assertRaisesRegex(contract.ContractFailure, "manifest differs"):
             contract.verify_existing_oracles(ROOT, drifted_manifest)
+
+    def test_watch_pair_byte_drift_and_missing_members_and_rogue_pair_reject(self):
+        watch_paths = (
+            "tests/evidence-watch-expected-results.json",
+            "tests/evidence-watch-adversarial-matrix.json",
+        )
+        rogue_paths = (
+            "tests/rogue-expected-results.json",
+            "tests/rogue-adversarial-matrix.json",
+        )
+        pinned_files = {**contract.PINNED_EXISTING, **contract._pinned_additive_files()}
+        with tempfile.TemporaryDirectory() as directory:
+            temp_root = Path(directory)
+            for relative in pinned_files:
+                target = temp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+
+            for relative in watch_paths:
+                artifact = temp_root / relative
+                original_bytes = artifact.read_bytes()
+                with self.subTest(altered_watch_member=relative):
+                    artifact.write_bytes(original_bytes + b" ")
+                    with self.assertRaisesRegex(
+                        contract.ContractFailure, "additive oracle/matrix .* pinned byte hash"
+                    ):
+                        contract.verify_existing_oracles(temp_root, self.expected)
+                    artifact.write_bytes(original_bytes)
+
+                with self.subTest(missing_watch_member=relative):
+                    artifact.unlink()
+                    with self.assertRaisesRegex(contract.ContractFailure, "file set differs"):
+                        contract.verify_existing_oracles(temp_root, self.expected)
+                    shutil.copyfile(ROOT / relative, artifact)
+
+            for relative in rogue_paths:
+                rogue = temp_root / relative
+                with self.subTest(rogue_inventory_member=relative):
+                    rogue.write_text("{}\n", encoding="utf-8")
+                    with self.assertRaisesRegex(contract.ContractFailure, "file set differs"):
+                        contract.verify_existing_oracles(temp_root, self.expected)
+                    rogue.unlink()
 
     def test_recomputed_digest_cannot_rewrite_the_fixed_expected_artifacts(self):
         changed_expected = copy.deepcopy(self.expected)
