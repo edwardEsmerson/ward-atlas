@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('/tools/node/lib/node_modules/playwright-core');
 const shiftExpected = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests/shift-board-expected-results.json'), 'utf8'));
+const bitemporalExpected = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tests/dock-bitemporal-expected-results.json'), 'utf8'));
 
 const [url, reportPath] = process.argv.slice(2);
 if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hostname)) {
@@ -64,6 +65,47 @@ if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hos
     check('desktop review queue uses only the two explicit edges and excludes the lexical decoy', reviewText.includes(reviewExpected.review_candidates[0]) && reviewText.includes(reviewExpected.review_candidates[1]) && !reviewText.includes(reviewExpected.excluded_lexical_only_id) && reviewText.includes(reviewExpected.unchanged_handover_role_id) && reviewText.includes(reviewExpected.unchanged_handover_source_id), reviewText);
     check('desktop review coverage treats unlinked artifacts as unknown', (await page.locator('#dock-coverage').innerText()).includes('Unlinked artifact status: unknown'), await page.locator('#dock-coverage').innerText());
 
+    const temporal = Object.fromEntries(bitemporalExpected.cases.map(row => [row.id, row.expected]));
+    await page.locator('#dock-time').selectOption(temporal['dock-bitemporal-known-r2-pending-review'].effective_at);
+    await page.locator('#dock-known-time').selectOption(temporal['dock-bitemporal-early-known-r1-duty'].known_at);
+    await page.waitForFunction(() => document.querySelector('#dock-role-badge')?.textContent === 'ROLE-DOCK-DUTY' && document.querySelector('#dock-time-context')?.textContent.includes('knowledge limited to sources observed by 2026-10-14T20:17:59Z') && document.querySelector('#dock-sources')?.textContent.includes('SRC-DOCK-ROSTER-R1') && !document.querySelector('#dock-sources')?.textContent.includes('SRC-DOCK-ROSTER-R2'));
+    const earlyVisible = await page.locator('body').innerText();
+    const earlyResponse = await page.evaluate(async pair => {
+      const query = new URLSearchParams({ scope: 'operations', effective_at: pair.effective_at, known_at: pair.known_at });
+      const response = await fetch(`/api/shift-board?${query}`);
+      return { status: response.status, body: await response.json() };
+    }, temporal['dock-bitemporal-early-known-r1-duty']);
+    check('desktop two-axis query returns duty from R1 before later knowledge is available', earlyResponse.status === 200 && earlyResponse.body.dock.role_path.join('|') === temporal['dock-bitemporal-early-known-r1-duty'].role_path.join('|') && earlyResponse.body.dock.source_versions.length === 1 && earlyResponse.body.dock.source_versions[0].source_id === 'SRC-DOCK-ROSTER-R1' && earlyResponse.body.dock.review_candidates.length === 0, earlyResponse.body.dock);
+    check('early-knowledge desktop UI does not disclose the later revision or dependent candidates', !/SRC-DOCK-ROSTER-R2|Revision 2|ROLE-DOCK-SWING|HND-DOCK-2020|TKT-DOCK-88|20:18:00Z/.test(earlyVisible), earlyVisible);
+
+    await page.locator('#dock-known-time').selectOption(temporal['dock-bitemporal-known-r2-pending-review'].known_at);
+    await page.waitForFunction(() => document.querySelector('#dock-sources')?.textContent.includes('SRC-DOCK-ROSTER-R2') && document.querySelector('#dock-review')?.textContent.includes('HND-DOCK-2020'));
+    const knownVisible = await page.locator('#dock-sources').innerText();
+    const knownCandidates = await page.locator('#dock-review').innerText();
+    check('advancing only known-at reveals R2 provenance and the two explicitly linked pending review candidates', knownVisible.includes('SRC-DOCK-ROSTER-R1') && knownVisible.includes('SRC-DOCK-ROSTER-R2') && knownVisible.includes('2026-10-14T20:18:00Z') && knownVisible.includes('2026-10-14T20:30:00Z') && knownCandidates.includes('HND-DOCK-2020') && knownCandidates.includes('TKT-DOCK-88') && !knownCandidates.includes('HND-DOCK-LEXICAL-ONLY') && await page.locator('#dock-role-badge').innerText() === 'ROLE-DOCK-DUTY', { sources: knownVisible, candidates: knownCandidates });
+    check('knowledge boundary is rendered separately from the effective boundary', (await page.locator('#dock-time-context').innerText()).includes('Effective at 2026-10-14T20:29:00Z') && (await page.locator('#dock-time-context').innerText()).includes('knowledge limited to sources observed by 2026-10-14T20:19:00Z'), await page.locator('#dock-time-context').innerText());
+
+    await page.locator('#dock-time').selectOption(temporal['dock-bitemporal-crossed-axes-unknown'].effective_at);
+    await page.locator('#dock-known-time').selectOption(temporal['dock-bitemporal-crossed-axes-unknown'].known_at);
+    await page.waitForFunction(() => document.querySelector('#dock-role-badge')?.textContent === 'Role unknown');
+    const crossedResponse = await page.evaluate(async pair => {
+      const query = new URLSearchParams({ scope: 'operations', effective_at: pair.effective_at, known_at: pair.known_at });
+      const response = await fetch(`/api/shift-board?${query}`);
+      return { status: response.status, body: await response.json() };
+    }, temporal['dock-bitemporal-crossed-axes-unknown']);
+    const crossedSerialized = JSON.stringify(crossedResponse.body);
+    check('future-effective but not-yet-known ownership stays unknown without hindsight leakage', crossedResponse.status === 200 && crossedResponse.body.dock.role_path.length === 0 && crossedResponse.body.dock.role_id === null && crossedResponse.body.dock.role_status === 'unknown' && crossedResponse.body.dock.source_versions.length === 1 && crossedResponse.body.dock.review_candidates.length === 0 && !/SRC-DOCK-ROSTER-R2|Revision 2|ROLE-DOCK-SWING|20:18:00Z/.test(crossedSerialized), crossedResponse.body.dock);
+
+    await page.locator('#dock-known-time').selectOption(temporal['dock-bitemporal-known-r2-pending-review'].known_at);
+    await page.locator('#dock-time').selectOption(temporal['dock-bitemporal-known-future-effective-swing'].effective_at);
+    await page.waitForFunction(() => document.querySelector('#dock-role-badge')?.textContent === 'ROLE-DOCK-SWING');
+    const futureResponse = await page.evaluate(async pair => {
+      const query = new URLSearchParams({ scope: 'operations', effective_at: pair.effective_at, known_at: pair.known_at });
+      const response = await fetch(`/api/shift-board?${query}`);
+      return { status: response.status, body: await response.json() };
+    }, temporal['dock-bitemporal-known-future-effective-swing']);
+    check('known future-effective assignment applies at valid-time boundary with separate provenance wording', futureResponse.status === 200 && futureResponse.body.dock.role_path.join('|') === temporal['dock-bitemporal-known-future-effective-swing'].role_path.join('|') && futureResponse.body.dock.interpretation === temporal['dock-bitemporal-known-future-effective-swing'].interpretation, futureResponse.body.dock);
+
     const conveyorExpected = shiftExpected.cases.find(row => row.id === 'conveyor-observed-and-hypothetical-times').expected;
     const expectedPathText = conveyorExpected.observed_at_1830.paths.map(path => path.join('  →  '));
     let renderedConveyorPaths = await page.locator('#conveyor-paths .shift-path').allInnerTexts();
@@ -89,6 +131,7 @@ if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hos
 
     const beforeReset = await page.locator('#impact-count').innerText();
     await page.getByRole('button', { name: 'Reset synthetic scenario' }).click();
+    await page.waitForFunction(() => document.querySelector('#reset')?.disabled === false);
     await page.waitForFunction(() => document.querySelector('#impact-count')?.textContent === '2 impact paths');
     check('in-app reset reseeds the same pinned paths', beforeReset === '2 impact paths' && await page.locator('#impact-count').innerText() === '2 impact paths');
 
@@ -100,7 +143,7 @@ if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hos
     });
     check('unconfirmed browser draft is not persisted', preview.status === 200 && preview.body.count === 0 && preview.body.actions.length === 0, preview);
     const previewText = await page.locator('#preview').innerText();
-    check('draft links proposed follow-up to current fixture sources', previewText.includes('SRC-ASSET-C4') && previewText.includes('SRC-SOP-CURRENT-V2') && previewText.includes('SRC-SOP-CURRENT-V3'));
+    check('draft links proposed follow-up to current fixture sources', previewText.includes('SRC-ASSET-C4') && previewText.includes('SRC-SOP-CURRENT-V2') && previewText.includes('SRC-SOP-CURRENT-V3'), previewText);
     await page.getByRole('button', { name: 'Confirm & save locally' }).click();
     await page.getByText('1 saved', { exact: true }).waitFor();
     const afterConfirm = await page.evaluate(async () => {
@@ -111,10 +154,23 @@ if (!url || !reportPath || !['localhost', '127.0.0.1'].includes(new URL(url).hos
     check('confirmation response has no external effects', await page.locator('#notice').innerText().then(text => text.includes('No external action was taken')));
     check('confirmation endpoint reports exactly one local action and zero external writes', confirmationResponse?.status === 201 && confirmationResponse.body.persisted === true && confirmationResponse.body.storage === 'local-only' && confirmationResponse.body.external_effects.length === 0 && shiftExpected.cases.find(row => row.id === 'explicit-local-confirmation-no-external-writes').expected.external_writes.length === 0, confirmationResponse);
 
+    await page.locator('#dock-time').selectOption('2026-10-14T20:29:00Z');
+    await page.locator('#dock-known-time').selectOption('2026-10-14T20:19:00Z');
+    const desktopPair = await page.evaluate(async () => {
+      const query = new URLSearchParams({ scope: 'operations', effective_at: '2026-10-14T20:29:00Z', known_at: '2026-10-14T20:19:00Z' });
+      const response = await fetch(`/api/shift-board?${query}`);
+      return await response.json();
+    });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForTimeout(150);
     const mobile = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
     check('mobile viewport has no page-level horizontal overflow', mobile.document <= mobile.viewport + 2 && mobile.body <= mobile.viewport + 2, mobile);
+    const mobilePair = await page.evaluate(async () => {
+      const query = new URLSearchParams({ scope: 'operations', effective_at: '2026-10-14T20:29:00Z', known_at: '2026-10-14T20:19:00Z' });
+      const response = await fetch(`/api/shift-board?${query}`);
+      return await response.json();
+    });
+    check('same bitemporal API pair agrees at desktop and mobile widths', JSON.stringify(mobilePair) === JSON.stringify(desktopPair) && await page.locator('#dock-known-time').isVisible(), { desktopRole: desktopPair.dock.role_id, mobileRole: mobilePair.dock.role_id, controlVisible: await page.locator('#dock-known-time').isVisible() });
     check('browser requests remain on the explicitly selected local origin', [...hosts].length === 1 && [...hosts][0] === new URL(url).host, [...hosts]);
     check('browser has no console/page errors', errors.length === 0, errors);
 

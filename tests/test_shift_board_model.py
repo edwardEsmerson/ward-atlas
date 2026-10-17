@@ -11,8 +11,12 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from wardatlas_shift_board import (  # noqa: E402
     BRANCH_ID,
+    DOCK_SOURCE_QUERY,
     branch_reset_queries,
     dock_role_query,
+    dock_review_query,
+    dock_source_query,
+    dock_supersession_query,
     normalize_timestamp,
     seed_shift_board_queries,
 )
@@ -40,6 +44,17 @@ class ShiftBoardModelTests(unittest.TestCase):
         self.assertIn("event.branch_id IS NULL", CONVEYOR_EVENT_QUERY)
         self.assertIn("rsrc.access = 'operations'", CONVEYOR_PATH_QUERY)
         self.assertIn("owns.source_id = rsrc.id", CONVEYOR_PATH_QUERY)
+
+    def test_dock_knowledge_cutoff_filters_every_visible_evidence_join(self):
+        cutoff = "2026-10-14T20:17:59Z"
+        self.assertIn(f'src.observed_at <= "{cutoff}"', dock_role_query("2026-10-14T20:30:00Z", cutoff))
+        self.assertIn(f'src.observed_at <= "{cutoff}"', dock_source_query(cutoff))
+        self.assertIn(f'newer.observed_at <= "{cutoff}"', dock_supersession_query(cutoff))
+        self.assertIn(f'older.observed_at <= "{cutoff}"', dock_supersession_query(cutoff))
+        self.assertIn(f'newer.observed_at <= "{cutoff}"', dock_review_query(cutoff))
+        self.assertIn(f'older.observed_at <= "{cutoff}"', dock_review_query(cutoff))
+        self.assertEqual(dock_source_query(), DOCK_SOURCE_QUERY)
+        self.assertNotIn("observed_at <=", dock_role_query("2026-10-14T20:30:00Z"))
 
     def test_seed_and_branch_reset_are_idempotent_and_narrow(self):
         queries = seed_shift_board_queries()

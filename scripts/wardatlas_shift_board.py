@@ -123,8 +123,12 @@ def seed_shift_board_queries() -> list[str]:
     return queries
 
 
-def dock_role_query(as_of: str) -> str:
+def dock_role_query(as_of: str, known_at: str | None = None) -> str:
     at = _literal(normalize_timestamp(as_of))
+    knowledge_filter = (
+        f"\n  AND src.observed_at <= {_literal(normalize_timestamp(known_at))}"
+        if known_at is not None else ""
+    )
     return f"""
 MATCH (i:Incident {{id: 'INC-207'}})-[aff:AFFECTS]->(e:Equipment)
       -[sup:SUPPORTS]->(s:Service)-[serves:SERVES]->(d:Department)
@@ -133,7 +137,7 @@ WHERE i.access = 'operations' AND e.access = 'operations' AND s.access = 'operat
   AND d.access = 'operations' AND r.access = 'operations' AND src.access = 'operations'
   AND aff.access = 'operations' AND sup.access = 'operations' AND serves.access = 'operations'
   AND owns.access = 'operations' AND roster.access = 'operations'
-  AND owns.source_id = src.id AND owns.effective_from <= {at} AND owns.effective_to > {at}
+  AND owns.source_id = src.id AND owns.effective_from <= {at} AND owns.effective_to > {at}{knowledge_filter}
 RETURN i.id AS incident_id, e.id AS equipment_id, s.id AS service_id,
        d.id AS department_id, r.id AS role_id, r.name AS role_name,
        src.id AS source_id, src.title AS source_title, src.observed_at AS source_observed_at,
@@ -152,11 +156,34 @@ ORDER BY src.observed_at
 """.strip()
 
 
+def dock_source_query(known_at: str | None = None) -> str:
+    """Return operations-visible dock source rows, optionally as known then."""
+    if known_at is None:
+        return DOCK_SOURCE_QUERY
+    cutoff = _literal(normalize_timestamp(known_at))
+    return DOCK_SOURCE_QUERY.replace(
+        "AND src.access = 'operations'",
+        f"AND src.access = 'operations' AND src.observed_at <= {cutoff}",
+    )
+
+
 DOCK_SUPERSESSION_QUERY = """
 MATCH (newer:Evidence {id: 'SRC-DOCK-ROSTER-R2'})-[rel:SUPERSEDES]->(older:Evidence {id: 'SRC-DOCK-ROSTER-R1'})
 WHERE newer.access = 'operations' AND older.access = 'operations' AND rel.access = 'operations'
 RETURN newer.id AS source_id, older.id AS supersedes
 """.strip()
+
+
+def dock_supersession_query(known_at: str | None = None) -> str:
+    """Limit explicit supersession linkage to evidence observed by the cutoff."""
+    if known_at is None:
+        return DOCK_SUPERSESSION_QUERY
+    cutoff = _literal(normalize_timestamp(known_at))
+    return DOCK_SUPERSESSION_QUERY.replace(
+        "WHERE newer.access = 'operations' AND older.access = 'operations' AND rel.access = 'operations'",
+        "WHERE newer.access = 'operations' AND older.access = 'operations' AND rel.access = 'operations' "
+        f"AND newer.observed_at <= {cutoff} AND older.observed_at <= {cutoff}",
+    )
 
 
 DOCK_REVIEW_QUERY = """
@@ -170,6 +197,18 @@ RETURN artifact.id AS artifact_id, artifact.role_id AS recorded_role_id,
        newer.id AS superseding_source_id
 ORDER BY artifact.id
 """.strip()
+
+
+def dock_review_query(known_at: str | None = None) -> str:
+    """Return only explicit, operations-visible review edges known by the cutoff."""
+    if known_at is None:
+        return DOCK_REVIEW_QUERY
+    cutoff = _literal(normalize_timestamp(known_at))
+    return DOCK_REVIEW_QUERY.replace(
+        "AND cite.access = 'operations' AND sup.access = 'operations'",
+        "AND cite.access = 'operations' AND sup.access = 'operations' "
+        f"AND newer.observed_at <= {cutoff} AND older.observed_at <= {cutoff}",
+    )
 
 
 DOCK_HANDOVER_SNAPSHOT_QUERY = """
