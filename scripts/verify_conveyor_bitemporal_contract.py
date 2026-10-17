@@ -42,6 +42,25 @@ PACKET_OUTCOME_PREFIXES = (
     "12. **Repeat, reconnect, read-only, responsive UI, cleanup:**",
 )
 
+# Additive artifacts accepted after the original freeze are enumerated as
+# complete oracle/matrix pairs, independently of the immutable 24-file
+# pre-existing hash manifest below. Keeping this separate means that composing
+# a reviewed contract does not rewrite what was frozen by the original oracle.
+PINNED_ADDITIVE_ORACLE_MATRIX_PAIRS = (
+    {
+        "oracle": "tests/service-coverage-expected-results.json",
+        "oracle_sha256": "2f5da05f710c3fc5514ceb4d4a89415e40db1b340b91160b8062db0404b02bd4",
+        "matrix": "tests/service-coverage-adversarial-matrix.json",
+        "matrix_sha256": "4e5b5d58218a280876654a53434f11acc89c30c3ed25bc44862c244bdfb17c81",
+    },
+    {
+        "oracle": "tests/handover-known-time-expected-results.json",
+        "oracle_sha256": "fd72df03c8e865cfe347839074ee8251bf57216deac33fcc9d5a4d1152513f93",
+        "matrix": "tests/handover-known-time-adversarial-matrix.json",
+        "matrix_sha256": "7b8450947696e55af0dc48aaa6d27fd0231f458b0f527b3fc00f643ad1f64f67",
+    },
+)
+
 # Exact bytes of every tests/*expected-results.json and
 # tests/*adversarial-matrix.json present before this task added its two files.
 PINNED_EXISTING = {
@@ -168,6 +187,23 @@ def _expected_source_manifest() -> list[dict[str, Any]]:
 
 def _expected_frozen_manifest() -> list[dict[str, str]]:
     return [{"file": path, "sha256": digest} for path, digest in sorted(PINNED_EXISTING.items())]
+
+
+def _pinned_additive_files() -> dict[str, str]:
+    """Flatten the explicitly pinned additive pairs without changing the freeze."""
+    files: dict[str, str] = {}
+    for pair in PINNED_ADDITIVE_ORACLE_MATRIX_PAIRS:
+        require(
+            set(pair) == {"oracle", "oracle_sha256", "matrix", "matrix_sha256"},
+            "additive inventory entries must be complete oracle/matrix pairs",
+        )
+        oracle, matrix = pair["oracle"], pair["matrix"]
+        require(oracle.endswith("-expected-results.json") and matrix.endswith("-adversarial-matrix.json"), "additive inventory entry has invalid pair filenames")
+        for path, digest in ((oracle, pair["oracle_sha256"]), (matrix, pair["matrix_sha256"])):
+            require(path not in files and path not in PINNED_EXISTING, f"duplicate additive inventory path: {path}")
+            require(isinstance(digest, str) and len(digest) == 64, f"invalid pinned SHA-256 for additive artifact {path}")
+            files[path] = digest
+    return files
 
 
 def validate_structure(expected: dict[str, Any], matrix: dict[str, Any], require_twelve_groups: bool) -> int:
@@ -398,26 +434,35 @@ def verify_pinned_packet(path: Path) -> str:
 
 
 def verify_existing_oracles(root: Path, expected: dict[str, Any]) -> dict[str, str]:
-    """Check that the file set and bytes match the complete pre-task freeze."""
+    """Check the 24-file freeze plus exact, byte-pinned additive pairs.
+
+    The additive allowlist is deliberately separate from the oracle's frozen
+    pre-task manifest. No matching file outside either inventory is accepted.
+    """
     require(expected.get("frozen_preexisting_oracle_hashes") == _expected_frozen_manifest(), "frozen hash manifest differs from the independently pinned file list")
+    additive_files = _pinned_additive_files()
+    pinned_files = set(PINNED_EXISTING) | set(additive_files)
     discovered = {
         str(path.relative_to(root))
         for pattern in ("*expected-results.json", "*adversarial-matrix.json")
-        for path in (root / "tests").glob(pattern)
+        for path in (root / "tests").rglob(pattern)
         if str(path.relative_to(root)) not in {
             "tests/conveyor-bitemporal-expected-results.json",
             "tests/conveyor-bitemporal-adversarial-matrix.json",
         }
     }
-    require(discovered == set(PINNED_EXISTING), "pre-existing test oracle/matrix file set differs from the frozen inventory")
+    require(discovered == pinned_files, "test oracle/matrix file set differs from the frozen and explicitly additive inventories")
     digests: dict[str, str] = {}
-    for relative, pinned in PINNED_EXISTING.items():
+    for relative, pinned in {**PINNED_EXISTING, **additive_files}.items():
         try:
             raw = (root / relative).read_bytes()
         except OSError as exc:
-            raise ContractFailure(f"cannot read frozen oracle/matrix {relative}: {exc}") from exc
+            raise ContractFailure(f"cannot read pinned oracle/matrix {relative}: {exc}") from exc
         actual = hashlib.sha256(raw).hexdigest()
-        require(actual == pinned, f"pre-existing oracle/matrix {relative} differs from its frozen byte hash")
+        if relative in PINNED_EXISTING:
+            require(actual == pinned, f"pre-existing oracle/matrix {relative} differs from its frozen byte hash")
+        else:
+            require(actual == pinned, f"additive oracle/matrix {relative} differs from its pinned byte hash")
         digests[relative] = actual
     return digests
 
@@ -469,7 +514,8 @@ def main(argv: list[str] | None = None) -> int:
     print(
         "PASS: twelve fixed INC-204 event-valid/knowledge-known outcome groups; "
         f"{assertions} explicit nonzero assertions; packet, five accepted source outcomes, "
-        f"and all {len(source_digests) - 1} pre-existing oracle/matrix hashes verified. "
+        f"all 24 frozen pre-existing oracle/matrix hashes, and "
+        f"{len(PINNED_ADDITIVE_ORACLE_MATRIX_PAIRS)} explicitly pinned additive oracle/matrix pairs verified. "
         "No candidate behavior or output used."
     )
     return 0

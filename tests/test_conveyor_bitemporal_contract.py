@@ -47,7 +47,12 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
         self.assertEqual(assertions, 84)
         self.assertEqual(tuple(row["id"] for row in self.expected["cases"]), contract.REQUIRED_CASES)
         self.assertEqual(tuple(row["id"] for row in self.matrix["cases"]), contract.REQUIRED_CASES)
-        self.assertEqual(len(digests), 25)  # packet plus all 24 pre-existing oracle/matrix files
+        self.assertEqual(len(digests), 29)  # packet, 24 frozen files, and two pinned additive pairs
+        self.assertEqual(len(contract.PINNED_EXISTING), 24)
+        self.assertEqual(
+            set(contract.verify_existing_oracles(ROOT, self.expected)),
+            set(contract.PINNED_EXISTING) | set(contract._pinned_additive_files()),
+        )
         self.assertTrue(all(row["nonzero_assertion_count"] > 0 for row in self.matrix["cases"]))
         self.assertTrue(all(len(row["pinned_assertions"]) == row["nonzero_assertion_count"] for row in self.matrix["cases"]))
         self.assertEqual(
@@ -204,10 +209,11 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
                     contract.validate_structure(self.expected, changed, True)
 
     def test_frozen_hash_manifest_rejects_byte_drift_missing_or_new_oracle(self):
-        self.assertEqual(len(contract.verify_existing_oracles(ROOT, self.expected)), 24)
+        self.assertEqual(len(contract.verify_existing_oracles(ROOT, self.expected)), 28)
         with tempfile.TemporaryDirectory() as directory:
             temp_root = Path(directory)
-            for relative in contract.PINNED_EXISTING:
+            pinned_files = {**contract.PINNED_EXISTING, **contract._pinned_additive_files()}
+            for relative in pinned_files:
                 target = temp_root / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / relative, target)
@@ -216,11 +222,39 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
             with self.assertRaisesRegex(contract.ContractFailure, "differs from its frozen byte hash"):
                 contract.verify_existing_oracles(temp_root, self.expected)
 
-            shutil.copyfile(ROOT / "tests/expected-results.json", temp_root / "tests/expected-results.json")
+            altered.write_bytes((ROOT / "tests/shift-board-expected-results.json").read_bytes())
             extra = temp_root / "tests/rogue-expected-results.json"
             extra.write_text("{}\n", encoding="utf-8")
             with self.assertRaisesRegex(contract.ContractFailure, "file set differs"):
                 contract.verify_existing_oracles(temp_root, self.expected)
+
+            extra.unlink()
+            nested = temp_root / "tests/unlisted/rogue-adversarial-matrix.json"
+            nested.parent.mkdir()
+            nested.write_text("{}\n", encoding="utf-8")
+            with self.assertRaisesRegex(contract.ContractFailure, "file set differs"):
+                contract.verify_existing_oracles(temp_root, self.expected)
+
+            nested.unlink()
+            nested.parent.rmdir()
+            for relative in contract._pinned_additive_files():
+                artifact = temp_root / relative
+                original_bytes = (ROOT / relative).read_bytes()
+                artifact.write_bytes(original_bytes + b" ")
+                with self.subTest(changed_additive=relative), self.assertRaisesRegex(
+                    contract.ContractFailure, "additive oracle/matrix .* pinned byte hash"
+                ):
+                    contract.verify_existing_oracles(temp_root, self.expected)
+                artifact.write_bytes(original_bytes)
+
+            for relative in contract._pinned_additive_files():
+                artifact = temp_root / relative
+                artifact.unlink()
+                with self.subTest(missing_additive=relative), self.assertRaisesRegex(
+                    contract.ContractFailure, "file set differs"
+                ):
+                    contract.verify_existing_oracles(temp_root, self.expected)
+                shutil.copyfile(ROOT / relative, artifact)
 
         drifted_manifest = copy.deepcopy(self.expected)
         drifted_manifest["frozen_preexisting_oracle_hashes"][0]["sha256"] = "0" * 64
