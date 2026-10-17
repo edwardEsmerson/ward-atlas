@@ -523,7 +523,7 @@ def selected_port(value: int, label: str) -> None:
         span = int(os.environ["WORKSHOP_PORT_SPAN"])
     except (KeyError, ValueError) as exc:
         raise VerificationFailure("WORKSHOP_PORT_BASE and WORKSHOP_PORT_SPAN must be set") from exc
-    if not (25000 <= value <= 25999 and base <= value < base + span):
+    if base < 1024 or span < 1 or value < 1024 or not (base <= value < base + span):
         raise VerificationFailure(f"{label} must be selected inside this worker's allocated private port range")
 
 

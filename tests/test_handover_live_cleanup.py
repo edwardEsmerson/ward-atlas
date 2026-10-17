@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from verify_handover_brief_live import HandoverLiveVerifier  # noqa: E402
+from verify_handover_brief_live import HandoverLiveVerifier, VerificationFailure, selected_port  # noqa: E402
 
 
 class HandoverVerifierCleanupTests(unittest.TestCase):
@@ -50,6 +52,19 @@ class HandoverVerifierCleanupTests(unittest.TestCase):
 
             self.assertFalse(state_dir.exists())
             self.assertTrue(verifier.owned_state_removed)
+
+    def test_selected_port_accepts_any_explicit_high_port_inside_allocated_range(self):
+        with patch.dict(os.environ, {"WORKSHOP_PORT_BASE": "24000", "WORKSHOP_PORT_SPAN": "1000"}):
+            self.assertIsNone(selected_port(24187, "database port"))
+
+    def test_selected_port_rejects_ports_outside_range_and_privileged_values(self):
+        with patch.dict(os.environ, {"WORKSHOP_PORT_BASE": "24000", "WORKSHOP_PORT_SPAN": "1000"}):
+            with self.assertRaises(VerificationFailure):
+                selected_port(23999, "database port")
+            with self.assertRaises(VerificationFailure):
+                selected_port(25000, "database port")
+            with self.assertRaises(VerificationFailure):
+                selected_port(1000, "database port")
 
 
 if __name__ == "__main__":

@@ -63,6 +63,23 @@ python3 scripts/verify_handover_brief_live.py --db-port "$DB_PORT" --app-port "$
 
 The live verifier owns a unique lane-named graph, loopback app, project-local state directory and database process; it deletes only those resources. On a source-only checkout the pinned FalkorDB module is bootstrapped and digest-verified automatically.
 
+## Confirmed handover drift review
+
+The read-only `GET /api/handover/compare?scope=operations&action_id=...&observed_at=...&branch_at=...` endpoint compares a confirmed action's immutable `snapshot` with fresh results from the existing FalkorDB-backed SOP-impact and shift-board queries. The defaults are the pinned `2026-10-14T19:30:00Z` observed restoration and `2026-10-14T18:50:00Z` hypothetical drill. Added/removed path records carry their complete source IDs, titles and observation times; the unresolved SOP witness is a separate object. Missing current graph state or witness links remain unknown, never resolution or safety. The browser comparison appears on each saved action and labels the branch hypothetical beside the still-observed mainline. It does not create a draft, confirm an action, mutate the graph, or rewrite the saved action.
+
+Run the frozen nine-case oracle, focused drift tests, and the actual-FalkorDB/API/desktop-mobile workflow with all accepted regression suites from a clean source checkout:
+
+```sh
+: "${WORKSHOP_PORT_BASE:?set the allocated private port base}"
+: "${WORKSHOP_PORT_SPAN:?set the allocated private port span}"
+: "${WORKSHOP_LANE:?set the allocated workshop lane}"
+python3 scripts/verify_handover_drift_contract.py --expected tests/handover-drift-expected-results.json --matrix tests/handover-drift-adversarial-matrix.json --pinned-plan /workspace/worktrees/planner-828ef7b6a76e4128b9e1b2ecad33c4a7/plans/planner-828ef7b6a76e4128b9e1b2ecad33c4a7.md --require-nine-cases
+python3 -m unittest discover -s tests -p 'test_handover_drift*.py'
+python3 scripts/verify_handover_drift_workflow.py --require-live-falkordb --fail-on-zero --fresh-owned-graph --private-range-from-env --assert-api --assert-browser --assert-path-delta --assert-witness-provenance --assert-immutable-action --assert-acl --desktop-mobile --verify-all-accepted-suites --assert-owned-cleanup
+```
+
+The drift verifier selects distinct ports from the worker's allocated range, names its graph with the lane and a unique run ID, starts only loopback processes, bootstraps the pinned FalkorDB module when needed, and deletes only its graph/data/state and stops only its app/database processes. Its report and responsive screenshots are stored under `/workspace/evidence/handover-drift/$WORKSHOP_LANE/`. `--verify-all-accepted-suites` runs the pinned original, shift-board, SOP-impact, handover-witness, drift, cascade, role-scope, review-receipt, dock-bitemporal, escalation, and source-change contracts, all unit tests, the dock-bitemporal live API/browser workflow, and the integrated UI/API/browser regressions. A green result is synthetic behavior evidence, not real-hospital validation.
+
 Exercise all ten pinned groups against actual FalkorDB and the live API/browser from a clean source checkout (the verifier bootstraps the existing digest-pinned local module when needed):
 
 ```sh
