@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -35,6 +36,21 @@ class CascadeContractTests(unittest.TestCase):
             require_eight_cases=True,
         )
 
+    def prepare_oracle_source_trees(self, temp: Path) -> tuple[Path, Path]:
+        product_tests = temp / "product" / "tests"
+        worktrees_root = temp / "worktrees"
+        for source in contract.PINNED_ORACLE_SOURCES:
+            if source["worktree"] == "product":
+                source_root = ROOT / "tests"
+                destination = product_tests
+            else:
+                source_root = Path("/workspace/worktrees") / source["worktree"] / "tests"
+                destination = worktrees_root / source["worktree"] / "tests"
+            destination.mkdir(parents=True, exist_ok=True)
+            for filename in (source["expected_file"], source["matrix_file"]):
+                shutil.copyfile(source_root / filename, destination / filename)
+        return product_tests, worktrees_root
+
     def test_exact_eight_outcomes_and_nonzero_matrix_mappings(self):
         count = self.validate()
         self.assertGreater(count, 0)
@@ -48,6 +64,7 @@ class CascadeContractTests(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertEqual(result["outcome_groups"], 8)
         self.assertEqual(result["pinned_planner_packets_checked"], 5)
+        self.assertEqual(result["existing_product_oracle_sources_checked"], 5)
         self.assertFalse(result["candidate_output_used"])
         self.assertFalse(result["live_database_behavior_claimed"])
 
@@ -101,6 +118,30 @@ class CascadeContractTests(unittest.TestCase):
         changed["preserved_existing_outputs"][0]["paths"][0][-1] = "ROLE-DRIFT"
         with self.assertRaisesRegex(ValueError, "INC-204 paths differ"):
             contract.verify_existing_oracles(changed, ROOT / "tests")
+
+    def test_missing_each_temporal_prior_oracle_file_fails_closed(self):
+        external_sources = [source for source in contract.PINNED_ORACLE_SOURCES if source["worktree"] != "product"]
+        for source in external_sources:
+            for filename in (source["expected_file"], source["matrix_file"]):
+                with self.subTest(source=source["id"], missing=filename), tempfile.TemporaryDirectory() as directory:
+                    temp = Path(directory)
+                    product_tests, worktrees_root = self.prepare_oracle_source_trees(temp)
+                    missing = worktrees_root / source["worktree"] / "tests" / filename
+                    missing.unlink()
+                    with self.assertRaisesRegex(ValueError, f"cannot read required oracle source.*{filename}"):
+                        contract.verify_existing_oracles(self.expected, product_tests, worktrees_root=worktrees_root)
+
+    def test_mutating_each_temporal_prior_oracle_file_fails_closed(self):
+        external_sources = [source for source in contract.PINNED_ORACLE_SOURCES if source["worktree"] != "product"]
+        for source in external_sources:
+            for filename in (source["expected_file"], source["matrix_file"]):
+                with self.subTest(source=source["id"], mutated=filename), tempfile.TemporaryDirectory() as directory:
+                    temp = Path(directory)
+                    product_tests, worktrees_root = self.prepare_oracle_source_trees(temp)
+                    mutated = worktrees_root / source["worktree"] / "tests" / filename
+                    mutated.write_bytes(mutated.read_bytes() + b"\n")
+                    with self.assertRaisesRegex(ValueError, f"{filename} differs from its pinned SHA-256"):
+                        contract.verify_existing_oracles(self.expected, product_tests, worktrees_root=worktrees_root)
 
     def test_companion_planner_hash_fails_closed(self):
         with tempfile.TemporaryDirectory() as directory:

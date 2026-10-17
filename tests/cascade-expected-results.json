@@ -40,6 +40,48 @@
     "tests/source-change-expected-results.json",
     "tests/shift-board-expected-results.json"
   ],
+  "pinned_oracle_sources": [
+    {
+      "id": "original",
+      "worktree": "product",
+      "expected_file": "expected-results.json",
+      "matrix_file": "adversarial-matrix.json",
+      "expected_sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+      "matrix_sha256": "6d0edbc69620da85b494185879565c8260c9d2d3fe6afdd5bf56c5acd92205ba"
+    },
+    {
+      "id": "source-change",
+      "worktree": "product",
+      "expected_file": "source-change-expected-results.json",
+      "matrix_file": "source-change-adversarial-matrix.json",
+      "expected_sha256": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097",
+      "matrix_sha256": "2afff10adb99964a821291d491169487600f37aa41d7b2d153dc98b463a0da84"
+    },
+    {
+      "id": "temporal",
+      "worktree": "auto-e9e0c734104402034b0cf441",
+      "expected_file": "temporal-expected-results.json",
+      "matrix_file": "temporal-adversarial-matrix.json",
+      "expected_sha256": "53a9556f1c3ea4338d7a525dda5de2961fcded19e10558c94db6b3223b3afda5",
+      "matrix_sha256": "6253ff84642fe9682783378948cf4eef02a291584a1fb2a73d99aee09e7f97eb"
+    },
+    {
+      "id": "prior-planner-legacy",
+      "worktree": "auto-e9e0c734104402034b0cf441",
+      "expected_file": "prior-planner-expected-results.json",
+      "matrix_file": "prior-planner-adversarial-matrix.json",
+      "expected_sha256": "1e85f58c1a10c051d988e9ec5194ef3dea291ccf7c3f230de1f672295502a473",
+      "matrix_sha256": "a2aecdeb5169339d9f22182f29d1638b26da16ae8b8ffe7c7d96a0b89a4a4b58"
+    },
+    {
+      "id": "shift-board",
+      "worktree": "product",
+      "expected_file": "shift-board-expected-results.json",
+      "matrix_file": "shift-board-adversarial-matrix.json",
+      "expected_sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428",
+      "matrix_sha256": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7"
+    }
+  ],
   "scope": {
     "synthetic_only": true,
     "clinical_decisions": false,

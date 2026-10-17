@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 
-EXPECTED_ARTIFACT_SHA256 = "12221f236058569bf1f4a4b0cd3b75b901f56b60fa34ba4ee5f47cb8ac5353c2"
+EXPECTED_ARTIFACT_SHA256 = "52fd4abe069e850e4ee070b8e6d0f9ed26fff5ad1e5e0c47efb28ad78227581b"
 MATRIX_ARTIFACT_SHA256 = "c74431b0c2bebbdc25419bf58d39129d150779e1ef7418b64c80dee6979398db"
 
 # Fixed companion planning packets live beside the supplied cascade packet.
@@ -43,6 +43,38 @@ PINNED_PLANS = {
         "5dd4c50cd2044e016e3593c337a5ccae966cfba8ef74cbcb8d0ffd95eaed55de",
     ),
 }
+PINNED_ORACLE_SOURCES = [
+    {
+        "id": "original", "worktree": "product",
+        "expected_file": "expected-results.json", "matrix_file": "adversarial-matrix.json",
+        "expected_sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+        "matrix_sha256": "6d0edbc69620da85b494185879565c8260c9d2d3fe6afdd5bf56c5acd92205ba",
+    },
+    {
+        "id": "source-change", "worktree": "product",
+        "expected_file": "source-change-expected-results.json", "matrix_file": "source-change-adversarial-matrix.json",
+        "expected_sha256": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097",
+        "matrix_sha256": "2afff10adb99964a821291d491169487600f37aa41d7b2d153dc98b463a0da84",
+    },
+    {
+        "id": "temporal", "worktree": "auto-e9e0c734104402034b0cf441",
+        "expected_file": "temporal-expected-results.json", "matrix_file": "temporal-adversarial-matrix.json",
+        "expected_sha256": "53a9556f1c3ea4338d7a525dda5de2961fcded19e10558c94db6b3223b3afda5",
+        "matrix_sha256": "6253ff84642fe9682783378948cf4eef02a291584a1fb2a73d99aee09e7f97eb",
+    },
+    {
+        "id": "prior-planner-legacy", "worktree": "auto-e9e0c734104402034b0cf441",
+        "expected_file": "prior-planner-expected-results.json", "matrix_file": "prior-planner-adversarial-matrix.json",
+        "expected_sha256": "1e85f58c1a10c051d988e9ec5194ef3dea291ccf7c3f230de1f672295502a473",
+        "matrix_sha256": "a2aecdeb5169339d9f22182f29d1638b26da16ae8b8ffe7c7d96a0b89a4a4b58",
+    },
+    {
+        "id": "shift-board", "worktree": "product",
+        "expected_file": "shift-board-expected-results.json", "matrix_file": "shift-board-adversarial-matrix.json",
+        "expected_sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428",
+        "matrix_sha256": "9cf1a4b144df3ff7357e389acec7c5e6b0e6ddcdab18577fa193c09541c0bbd7",
+    },
+]
 PINNED_PLAN_LITERALS = {
     "cascade-packet": (
         "2026-10-15T06:00:00Z", "2026-10-15T06:15:00Z", "2026-10-15T06:30:00Z",
@@ -200,76 +232,89 @@ def _case_map(document: dict[str, Any], label: str) -> dict[str, dict[str, Any]]
     return {row["id"]: row for row in rows}
 
 
-def _read_json(path: Path) -> dict[str, Any]:
+def _read_pinned_json(path: Path, expected_digest: str) -> dict[str, Any]:
     try:
-        parsed = json.loads(path.read_text(encoding="utf-8"))
+        raw = path.read_bytes()
+        parsed = json.loads(raw.decode("utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise ContractFailure(f"cannot read oracle source {path}: {exc}") from exc
-    require(isinstance(parsed, dict), f"oracle source {path} must be a JSON object")
+        raise ContractFailure(f"cannot read required oracle source {path}: {exc}") from exc
+    require(isinstance(parsed, dict), f"required oracle source {path} must be a JSON object")
+    actual_digest = hashlib.sha256(raw).hexdigest()
+    require(actual_digest == expected_digest, f"required oracle source {path} differs from its pinned SHA-256")
     return parsed
 
 
-def verify_existing_oracles(expected: dict[str, Any], tests_dir: Path) -> int:
-    """Cross-check compatibility pins against untouched product oracle artifacts.
+def _validate_source_pair(
+    source: dict[str, Any], tests_dir: Path, worktrees_root: Path
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    if source["worktree"] == "product":
+        source_tests = tests_dir
+    else:
+        source_tests = worktrees_root / source["worktree"] / "tests"
+    expected_doc = _read_pinned_json(source_tests / source["expected_file"], source["expected_sha256"])
+    matrix_doc = _read_pinned_json(source_tests / source["matrix_file"], source["matrix_sha256"])
+    require(expected_doc.get("schema_version") == matrix_doc.get("schema_version") == 1, f"{source['id']} oracle pair must use schema 1")
+    require(expected_doc.get("product") == "WardAtlas", f"{source['id']} expected-results is not WardAtlas")
+    require(matrix_doc.get("oracle_file") == f"tests/{source['expected_file']}", f"{source['id']} matrix points to an unexpected oracle")
+    expected_cases = _case_map(expected_doc, f"{source['id']} expected-results")
+    matrix_cases = matrix_doc.get("cases")
+    matrix_ids = _ids(matrix_cases, f"{source['id']} matrix")
+    require(matrix_ids == list(expected_cases), f"{source['id']} matrix does not map every source-oracle case in order")
+    for expected_case, matrix_case in zip(
+        expected_doc.get("cases", expected_doc.get("scenarios", [])), matrix_cases
+    ):
+        require(matrix_case.get("scenario_id") == expected_case.get("id"), f"{source['id']} matrix has a mismatched scenario ID")
+        assertions = matrix_case.get("pinned_assertions")
+        count = matrix_case.get("nonzero_assertion_count")
+        require(isinstance(assertions, list) and assertions, f"{source['id']} {matrix_case.get('id')} lacks nonzero assertions")
+        require(type(count) is int and count > 0, f"{source['id']} {matrix_case.get('id')} has invalid assertion count")
+    return expected_doc, matrix_doc
 
-    Temporal and legacy planner artifacts belong to separately admitted work and
-    are not copied into this task's checkout. Their immutable planner packets are
-    verified separately; if their oracle JSON is present in a later integration,
-    this function also checks it instead of silently skipping a mismatch.
-    """
+
+def verify_existing_oracles(
+    expected: dict[str, Any],
+    tests_dir: Path,
+    worktrees_root: Path = Path("/workspace/worktrees"),
+) -> int:
+    """Require and cross-check all five existing expected-result/matrix pairs."""
+    require(expected.get("pinned_oracle_sources") == PINNED_ORACLE_SOURCES, "pinned original/source-change/temporal/prior/shift-board source list or digests changed")
     expected_records = expected.get("preserved_existing_outputs")
     require(isinstance(expected_records, list), "preserved existing outputs must be explicit")
     records = {item.get("oracle"): item for item in expected_records if isinstance(item, dict)}
     require(len(records) == len(expected_records), "existing-output oracle names must be unique")
 
-    original = _read_json(tests_dir / "expected-results.json")
-    original_matrix = _read_json(tests_dir / "adversarial-matrix.json")
+    sources = {}
+    for source in PINNED_ORACLE_SOURCES:
+        sources[source["id"]] = _validate_source_pair(source, tests_dir, worktrees_root)[0]
+
+    original = sources["original"]
     orig_case = _case_map(original, "original expected-results").get("multi-hop-outage-current-ownership")
     require(orig_case is not None, "original oracle lacks the pinned INC-204 multi-hop case")
     orig_paths = orig_case.get("expected", {}).get("impact_paths")
     require(orig_paths == records.get("original", {}).get("paths") == INC204_PATHS, "INC-204 paths differ from original oracle pin")
-    require("multi-hop-outage-current-ownership" in _ids(original_matrix.get("cases"), "original matrix"), "original matrix lost its INC-204 mapping")
 
-    source = _read_json(tests_dir / "source-change-expected-results.json")
-    source_matrix = _read_json(tests_dir / "source-change-adversarial-matrix.json")
+    source = sources["source-change"]
     source_case = _case_map(source, "source-change expected-results").get("dock-role-path-after-effective-time")
     require(source_case is not None, "source-change oracle lacks the pinned INC-207 ownership case")
     source_path = source_case.get("expected", {}).get("role_path")
     require(source_path == records.get("source-change", {}).get("paths", [None])[0] == INC207_PATH, "INC-207 source-change path differs from its pinned oracle")
-    require("dock-role-path-after-effective-time" in _ids(source_matrix.get("cases"), "source-change matrix"), "source-change matrix lost its INC-207 mapping")
 
-    shift = _read_json(tests_dir / "shift-board-expected-results.json")
-    shift_matrix = _read_json(tests_dir / "shift-board-adversarial-matrix.json")
+    temporal = sources["temporal"]
+    temporal_case = _case_map(temporal, "temporal expected-results").get("temporal-outage-active")
+    require(temporal_case is not None, "temporal oracle lacks the pinned INC-204 outage case")
+    require(temporal_case.get("expected", {}).get("active_paths") == records.get("temporal", {}).get("paths") == INC204_PATHS, "INC-204 temporal paths differ from the pinned temporal oracle")
+
+    prior = sources["prior-planner-legacy"]
+    prior_case = _case_map(prior, "prior-planner expected-results").get("legacy-multi-hop-outage-ownership")
+    require(prior_case is not None, "prior-planner oracle lacks the separate legacy path case")
+    require(prior_case.get("expected", {}).get("paths") == records.get("prior-planner-legacy", {}).get("paths") == LEGACY_PATHS, "legacy paths differ from the pinned prior-planner oracle")
+
+    shift = sources["shift-board"]
     shift_cases = _case_map(shift, "shift-board expected-results")
     conveyor = shift_cases.get("conveyor-observed-and-hypothetical-times", {}).get("expected", {}).get("observed_at_1830", {}).get("paths")
     dock = shift_cases.get("dock-role-time-and-source-evidence", {}).get("expected", {}).get("at_effective_time", {}).get("role_path")
     require(conveyor == records.get("shift-board-conveyor", {}).get("paths") == INC204_PATHS, "INC-204 shift-board paths differ from their pin")
     require(dock == records.get("shift-board-dock", {}).get("paths", [None])[0] == INC207_PATH, "INC-207 shift-board path differs from its pin")
-    shift_ids = _ids(shift_matrix.get("cases"), "shift-board matrix")
-    require("conveyor-observed-and-hypothetical-times" in shift_ids and "dock-role-time-and-source-evidence" in shift_ids, "shift-board matrix lost an isolation source case")
-
-    # A temporal or legacy oracle may be merged by another lane. If present, it
-    # must agree with this exact compatibility snapshot; absence is not a reason
-    # to touch or reconstruct that in-flight task's files.
-    optional = (
-        ("temporal", "temporal-expected-results.json", "temporal-outage-active", "active_paths", INC204_PATHS),
-        ("prior-planner-legacy", "prior-planner-expected-results.json", "legacy-multi-hop-outage-ownership", "paths", LEGACY_PATHS),
-    )
-    for record_id, filename, scenario_id, field, paths in optional:
-        candidate = tests_dir / filename
-        matrix_candidate = tests_dir / filename.replace("expected-results", "adversarial-matrix")
-        if candidate.exists() != matrix_candidate.exists():
-            raise ContractFailure(f"incomplete optional oracle pair: {filename}")
-        if candidate.exists():
-            doc = _read_json(candidate)
-            case = _case_map(doc, filename).get(scenario_id)
-            require(case is not None, f"{filename} lost {scenario_id}")
-            actual = case.get("expected", {}).get(field)
-            if record_id == "temporal":
-                actual = case.get("expected", {}).get("active_paths")
-            require(actual == records.get(record_id, {}).get("paths") == paths, f"{filename} conflicts with the preserved cascade compatibility pin")
-            _case_map(_read_json(matrix_candidate), matrix_candidate.name)
-
     require(
         expected.get("existing_product_oracles") == [
             "tests/expected-results.json",
@@ -278,7 +323,7 @@ def verify_existing_oracles(expected: dict[str, Any], tests_dir: Path) -> int:
         ],
         "existing product oracle source list changed",
     )
-    return 3 + sum(1 for path in (tests_dir / "temporal-expected-results.json", tests_dir / "prior-planner-expected-results.json") if path.exists())
+    return len(PINNED_ORACLE_SOURCES)
 
 
 def validate_artifacts(
