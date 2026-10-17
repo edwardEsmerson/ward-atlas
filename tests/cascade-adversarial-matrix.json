@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/cascade-expected-results.json",
+  "oracle_policy": "Each adversarial case maps to one independently pinned cascade outcome. These checks require real FalkorDB in the later behavior task; this matrix is not live product evidence.",
+  "cases": [
+    {
+      "id": "cold-empty-graph",
+      "scenario_id": "cold-empty-graph",
+      "attack_or_edge_case": "Query a uniquely owned graph before adding the cascade fixture.",
+      "setup": "Create one fresh task-owned graph; do not seed any scenario records.",
+      "pinned_assertions": ["no scenario event exists", "no impact paths are returned", "the state is empty/unknown", "no available state is invented", "no service, role, or safe outcome is invented"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Warm/shared state or fabricated safe/default facts turn missing evidence into a known outcome.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:41"]
+    },
+    {
+      "id": "baseline-mainline",
+      "scenario_id": "baseline-mainline",
+      "attack_or_edge_case": "Read the source-backed available FPU baseline without applying any scenario branch.",
+      "setup": "Use the synthetic SRC-TABLETOP-FPU-7 availability observation at 06:00Z and query mainline at 06:30Z.",
+      "pinned_assertions": ["EQ-FPU-7 is available at 2026-10-15T06:00:00Z", "mainline at 06:30Z has exactly zero outage paths", "no outage scenario branch was applied"],
+      "nonzero_assertion_count": 3,
+      "failure_detected": "Hypothetical event leaks into observed/mainline state or the baseline is guessed from a branch.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:42"]
+    },
+    {
+      "id": "shared-dependency-cascade",
+      "scenario_id": "shared-dependency-cascade",
+      "attack_or_edge_case": "Traverse an outage at the shared upstream facilities unit through both downstream logistics chains.",
+      "setup": "Add only EVT-FPU-OUTAGE-HYP-01 to BR-FPU-OUTAGE-DRILL with its pinned source/time; query at 06:30Z.",
+      "pinned_assertions": ["exact branch, event, source, and event timestamp", "exact ordered dock-charger to receiving-dock role path", "exact ordered linen-conveyor to linen-logistics role path", "both paths are labeled hypothetical/simulated rather than observed", "mainline/base topology remains unchanged"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Static path list, missing multi-hop dependency semantics, wrong role endpoint, extra/missing route, or hypothetical claim mislabeled as observed.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:43"]
+    },
+    {
+      "id": "branch-only-edge-counterfactual",
+      "scenario_id": "branch-only-edge-counterfactual",
+      "attack_or_edge_case": "Remove only the owned FPU-to-dock-charger dependency in a second branch and compare exact path delta.",
+      "setup": "Fork BR-FPU-ISOLATE-DOCK-FEED from the same outage event/base topology; remove the dependency only in that branch.",
+      "pinned_assertions": ["the only branch-local mutation is EQ-FPU-7 to EQ-DOCK-CHARGER-2", "counterfactual returns exactly the linen-conveyor path", "outage branch still returns both pinned paths", "mainline remains zero impact paths", "reset/evaluation does not mutate the other branch or mainline"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Branch mutation leaks into mainline/other branch or the returned delta is not caused by the removed graph edge.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:44"]
+    },
+    {
+      "id": "no-cross-case-contamination",
+      "scenario_id": "no-cross-case-contamination",
+      "attack_or_edge_case": "Load and mutate the new scenario in a graph that also carries existing INC-204/INC-207 cases.",
+      "setup": "Compare existing original, source-change, temporal, and shift-board oracle paths before and after cascade load, branch evaluation, and branch reset; retain legacy planner fixture as separate.",
+      "pinned_assertions": ["no path joins INC-204 or INC-207 to EQ-FPU-7", "existing INC-204 original and temporal paths are unchanged", "existing INC-204 shift-board paths are unchanged", "existing INC-207 source-change and shift-board paths are unchanged", "INC-LIFT-01 remains a distinct legacy oracle, not a cascade alias"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "New graph mutation contaminates earlier incidents, their paths/provenance, or maps a legacy/current scenario by superficial similarity.",
+      "planner_refs": [
+        "planner-8b15037dc21642129e4f0cbd47508f2f.md:45",
+        "planner-ed8ab68cd001411d97ee43310862ae22.md:29",
+        "planner-9b1a51761889446c8b5525bde02bc5d6.md:41",
+        "planner-13609527bde94e87ae5bcacaa2c86a70.md:44",
+        "planner-5f75fb17810c463fb9d84bd5821b254f.md:32",
+        "planner-5f75fb17810c463fb9d84bd5821b254f.md:34"
+      ]
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "scenario_id": "denied-source-nondisclosure",
+      "attack_or_edge_case": "Inject a restricted FPU source/event with distinctive secret markers and compare operations-scope API and graph output.",
+      "setup": "Capture the visible output, add only SRC-RESTRICTED-FPU-77-linked restricted facts, and query at the same operations scope.",
+      "pinned_assertions": ["API and visual-graph output remain equivalent before/after", "restricted IDs/title/fact are not disclosed", "hidden counts or existence are not disclosed", "no restricted-derived path, role, or paraphrase leaks"],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Direct or inferential restricted-source disclosure, including count/existence and graph-path leakage.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:46"]
+    },
+    {
+      "id": "time-repeat-and-reconnect",
+      "scenario_id": "time-repeat-and-reconnect",
+      "attack_or_edge_case": "Challenge time normalization and invalid input, repeat the same seed, then query through a fresh client connection.",
+      "setup": "Compare offset 07:30+01:00 to 06:30Z; reject minute 61 before mutation; seed twice and reconnect to the same uniquely owned graph.",
+      "pinned_assertions": ["offset equals 2026-10-15T06:30:00Z and returns same pinned paths", "malformed 06:61Z is rejected before branch/graph mutation", "second identical seed creates no duplicate IDs/nodes/edges", "a genuinely new client connection is used", "mainline, outage branch, and isolation branch each return their pinned results after reconnect"],
+      "nonzero_assertion_count": 5,
+      "failure_detected": "Timestamp confusion, partial invalid-input mutation, duplicate seed, warm-client cache, or branch drift after reconnect.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:47"]
+    },
+    {
+      "id": "local-only-scope-boundary",
+      "scenario_id": "local-only-scope-boundary",
+      "attack_or_edge_case": "Inspect all graph and application effects of creating, evaluating, resetting, and cleaning up the simulation.",
+      "setup": "Use fictional facilities/logistics fixtures in an isolated graph and observe external-effect counters and cleanup ownership.",
+      "pinned_assertions": ["writes target only the unique task-owned synthetic graph", "no message, call, ticket, service write, or external action occurs", "no action/draft is automatically confirmed", "paths remain non-clinical and no diagnosis/treatment/patient-impact/triage is inferred", "no hospital-safety claim is made", "cleanup deletes only the owned graph and stops only owned processes"],
+      "nonzero_assertion_count": 6,
+      "failure_detected": "External or clinical action escapes the simulator boundary, or cleanup affects unowned resources.",
+      "planner_refs": ["planner-8b15037dc21642129e4f0cbd47508f2f.md:48"]
+    }
+  ]
+}
