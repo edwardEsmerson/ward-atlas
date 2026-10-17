@@ -29,6 +29,11 @@ from verify_falkordb_live import (
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
 from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
+from wardatlas_knowledge_timeline import (
+    build_queries as build_knowledge_timeline_queries,
+    considered_query as knowledge_timeline_considered_query,
+    project_timeline as project_knowledge_timeline,
+)
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -229,6 +234,22 @@ APP_HTML = r'''<!doctype html>
     .decision-claim { border-top:1px solid #355052; padding:8px 0; color:#f0d9a9; font-size:11px; line-height:1.6; }
     .decision-claim small { display:block; color:#afc0bb; overflow-wrap:anywhere; }
     .decision-unknown { color:#f1c278; font-size:12px; padding:7px 0; }
+    .knowledge-timeline { margin:0 0 18px; border-color:#49616d; background:linear-gradient(145deg,#1b2d3b,#152630 72%); }
+    .knowledge-controls { display:grid; grid-template-columns:minmax(220px,1fr) auto; gap:9px 12px; align-items:end; margin:14px 0; }
+    .knowledge-controls label { display:block; color:#b6c7ca; font-size:10px; margin-bottom:6px; }
+    .knowledge-controls input { width:100%; min-width:0; color:var(--ink); background:#10232d; border:1px solid #49616d; border-radius:7px; padding:9px 10px; font:inherit; font-size:11px; }
+    .knowledge-presets { display:flex; flex-wrap:wrap; gap:7px; grid-column:1/-1; }
+    .knowledge-presets .button { padding:7px 9px; font-size:10px; }
+    .knowledge-state { color:#b7d6d0; font-size:10px; line-height:1.6; margin:8px 0; }
+    .knowledge-claims { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .knowledge-claim { min-width:0; border:1px solid #354f5b; border-radius:9px; padding:10px; background:#10212b; overflow-wrap:anywhere; }
+    .knowledge-claim strong { display:block; color:#f0d9a9; font-size:11px; line-height:1.5; }
+    .knowledge-claim small,.knowledge-record small { display:block; color:#a9bec0; font-size:9px; line-height:1.6; margin-top:5px; }
+    .knowledge-path { font:9px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; color:#bdd5d2; overflow-wrap:anywhere; margin-top:6px; }
+    .knowledge-conflict { border-left:2px dashed var(--amber); padding:7px 9px; margin-top:10px; color:#f2cf91; font-size:10px; line-height:1.6; overflow-wrap:anywhere; }
+    .knowledge-record { border:1px solid #426363; border-radius:9px; padding:10px; margin-top:10px; color:#cfe0db; font-size:10px; line-height:1.6; overflow-wrap:anywhere; }
+    .knowledge-unknown { color:var(--amber); font-size:10px; line-height:1.6; margin-top:9px; }
+    @media (max-width:680px) { .knowledge-controls { grid-template-columns:1fr; } .knowledge-presets { grid-column:auto; } .knowledge-claims { grid-template-columns:1fr; } }
     @media (max-width:760px) { .sop-impact-grid { grid-template-columns:1fr; } }
     #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
@@ -290,9 +311,30 @@ APP_HTML = r'''<!doctype html>
       <section id="decision-docket" class="card decision-docket" aria-labelledby="decision-docket-title">
         <div class="card-head"><div><div class="eyebrow">Register-rooted provenance · read only</div><h2 id="decision-docket-title">Decision provenance docket</h2></div><span id="decision-docket-badge" class="tag blue">Loading register evidence…</span></div>
         <p class="decision-docket-intro">This docket starts at the synthetic operations register and follows explicit TRACKS, CONSIDERS, CLAIMS_ROLE and EVIDENCED_BY relationships. Recorded state is not a selected procedure: neither disputed version is made authoritative, and claim roles are not current owners or contacts.</p>
-        <div id="decision-docket-empty" class="decision-unknown" hidden>Unknown / no evidence. The register record or its own source link is unavailable; no decision absence, resolution, procedure, or owner is inferred.</div>
+        <div id="decision-docket-empty" class="decision-unknown" hidden>Unknown / no evidence. No absence, resolution, procedure, or owner is inferred from missing source links.</div>
         <div id="decision-docket-content" aria-live="polite"></div>
         <div id="decision-docket-notice" class="notice" aria-live="polite"></div>
+      </section>
+      <section id="decision-knowledge-timeline" class="card knowledge-timeline" aria-labelledby="knowledge-timeline-title">
+        <div class="card-head"><div><div class="eyebrow">Source observation · read only</div><h2 id="knowledge-timeline-title">Replay what was knowable</h2></div><span id="knowledge-timeline-badge" class="tag blue">Loading source-time view…</span></div>
+        <p class="decision-docket-intro">Choose a UTC observation cutoff. The replay filters each graph fact through its own source observation time; a missing or later source does not prove a fact is absent. This is knowledge time, not an effective date, current owner, or procedure.</p>
+        <div class="knowledge-controls">
+          <div><label for="knowledge-time">Known-at cutoff · ISO-8601 with explicit offset</label><input id="knowledge-time" type="text" value="2026-10-14T16:05:00Z" autocomplete="off" spellcheck="false" aria-describedby="knowledge-time-help"></div>
+          <button id="knowledge-replay" class="button primary" type="button">Replay cutoff</button>
+          <div id="knowledge-time-help" class="subtle">Invalid or timezone-naive values are rejected; no local-clock fallback is used.</div>
+          <div class="knowledge-presets" aria-label="Pinned observation cutoffs">
+            <button class="button" type="button" data-known-at="2026-10-14T15:59:59Z">15:59:59Z</button>
+            <button class="button" type="button" data-known-at="2026-10-14T16:00:00Z">16:00Z</button>
+            <button class="button" type="button" data-known-at="2026-10-14T16:04:00Z">16:04Z</button>
+            <button class="button" type="button" data-known-at="2026-10-14T16:05:00Z">16:05Z</button>
+          </div>
+        </div>
+        <div id="knowledge-timeline-context" class="knowledge-state" aria-live="polite"></div>
+        <div id="knowledge-timeline-claims" class="knowledge-claims"></div>
+        <div id="knowledge-timeline-conflict" class="knowledge-conflict" hidden></div>
+        <div id="knowledge-timeline-record" class="knowledge-record" hidden></div>
+        <div id="knowledge-timeline-unknown" class="knowledge-unknown" hidden></div>
+        <div id="knowledge-timeline-notice" class="notice" aria-live="polite"></div>
       </section>
       <div id="legacy-grid" class="grid" hidden>
         <div class="stack">
@@ -342,6 +384,7 @@ APP_HTML = r'''<!doctype html>
     let conveyorAt = '2026-10-14T18:30:00Z';
     const branchAt = '2026-10-14T18:50:00Z';
     let shiftRequestSequence = 0;
+    let knowledgeRequestSequence = 0;
     function element(tag, cls, text) { const node=document.createElement(tag); if(cls) node.className=cls; if(text!==undefined) node.textContent=text; return node; }
     async function api(path, options={}) { const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}}); const data=await response.json(); if(!response.ok) throw new Error(data.error||`HTTP ${response.status}`); return data; }
     function sourceName(id,title,observed) { const box=element('div','evidence-item'); box.append(element('strong','',title)); box.append(element('span','evidence-id',id)); box.append(element('span','',`Observed ${observed}`)); return box; }
@@ -475,17 +518,80 @@ APP_HTML = r'''<!doctype html>
         content.append(card);
       }
     }
-    async function loadDecisionDocket() {
+    async function loadDecisionDocket(sequence=knowledgeRequestSequence) {
       try {
         const data=await api('/api/decision-docket?scope=operations');
+        if(sequence!==knowledgeRequestSequence) return null;
         renderDecisionDocket(data);
         $('decision-docket-notice').textContent='';
         return data;
       } catch(e) {
+        if(sequence!==knowledgeRequestSequence) return null;
         $('decision-docket-badge').textContent='Docket unavailable';
         $('decision-docket-empty').hidden=true;
         $('decision-docket-content').replaceChildren();
         $('decision-docket-notice').textContent=`Decision provenance unavailable: ${e.message}. The existing incident briefing and shift board remain available.`;
+        return null;
+      }
+    }
+    function renderKnowledgeTimeline(data) {
+      const badge=$('knowledge-timeline-badge');
+      badge.textContent=data.generic_unknown?'Unknown · no evidence':data.decision_record?'Register source known · '+data.claim_context_state:data.claim_context_state;
+      const context=$('knowledge-timeline-context'); context.textContent=`Known-at ${data.known_at||'not selected'} · claim context ${data.claim_context_state}. Retrieved claim facts and graph-derived relationships are shown separately; missing evidence stays unknown.`;
+      const claims=$('knowledge-timeline-claims'); claims.replaceChildren();
+      for(const claim of data.claims) {
+        const card=element('article','knowledge-claim');
+        card.append(element('strong','',`${claim.version_id} · ${claim.claim_label} → ${claim.role_id}`));
+        card.append(element('small','',`Source fact · ${claim.source.id} · ${claim.source.title} · observed ${claim.source.observed_at}`));
+        card.append(element('div','knowledge-path',`${claim.applicability_edge.from} -[${claim.applicability_edge.relationship}]-> ${claim.applicability_edge.to} · ${claim.claim_edge.from} -[${claim.claim_edge.relationship}]-> ${claim.claim_edge.to} · ${claim.source.evidence_link.from} -[${claim.source.evidence_link.relationship}]-> ${claim.source.evidence_link.to}`));
+        claims.append(card);
+      }
+      const conflict=$('knowledge-timeline-conflict'); conflict.hidden=!data.conflict;
+      conflict.textContent=data.conflict?`Graph-derived relationship · ${data.conflict.edge.from} -[${data.conflict.edge.relationship} · ${data.conflict.edge.status}]-> ${data.conflict.edge.to}. Not a source quotation or authoritative procedure.`:'';
+      const record=$('knowledge-timeline-record'); record.hidden=!data.decision_record;
+      if(data.decision_record) {
+        const item=data.decision_record; record.replaceChildren();
+        record.append(element('strong','',`Separately evidenced recorded state · ${item.id} · ${item.title} · ${item.recorded_state}`));
+        record.append(element('small','',`${item.register_id} -[TRACKS]-> ${item.id} -[EVIDENCED_BY]-> ${item.source.id} · ${item.source.title} · observed ${item.source.observed_at}`));
+        record.append(element('small','',item.recorded_statement));
+        const edges=item.provenance_path.map(edge=>`${edge.from} -[${edge.relationship}]-> ${edge.to}`).join(' · ');
+        record.append(element('div','knowledge-path',edges));
+        for(const edge of data.decision_considers_edges) record.append(element('div','knowledge-path',`${edge.from} -[${edge.relationship}]-> ${edge.to} · independently source-known claim`));
+      }
+      const unknown=$('knowledge-timeline-unknown');
+      unknown.hidden=Boolean(data.claims.length||data.decision_record);
+      unknown.textContent=unknown.hidden?'':'No source-backed fact is available at this cutoff. This is not a conclusion that a fact does not exist.';
+    }
+    async function loadKnowledgeTimeline() {
+      const sequence=++knowledgeRequestSequence;
+      try {
+        const knownAt=$('knowledge-time').value;
+        const params=new URLSearchParams({scope:'operations'});
+        if(knownAt) params.set('known_at',knownAt);
+        const data=await api(`/api/decision-timeline?${params.toString()}`);
+        if(sequence!==knowledgeRequestSequence) return data;
+        renderKnowledgeTimeline(data); $('knowledge-timeline-notice').textContent='';
+        if(data.decision_record && data.claim_context_state==='evidence-backed') await loadDecisionDocket(sequence);
+        else {
+          $('decision-docket-badge').textContent='Unknown · no evidence';
+          $('decision-docket-empty').hidden=false;
+          $('decision-docket-content').replaceChildren();
+          $('decision-docket-notice').textContent='';
+        }
+        return data;
+      } catch(e) {
+        if(sequence!==knowledgeRequestSequence) return null;
+        $('knowledge-timeline-badge').textContent='Replay unavailable';
+        $('knowledge-timeline-context').textContent='No projection was retrieved for this cutoff; the previous result has been cleared.';
+        $('knowledge-timeline-claims').replaceChildren();
+        $('knowledge-timeline-conflict').hidden=true; $('knowledge-timeline-conflict').textContent='';
+        $('knowledge-timeline-record').hidden=true; $('knowledge-timeline-record').replaceChildren();
+        $('knowledge-timeline-unknown').hidden=false;
+        $('knowledge-timeline-unknown').textContent='No source-time view is available for this request.';
+        $('decision-docket-badge').textContent='Unknown · no evidence';
+        $('decision-docket-empty').hidden=false; $('decision-docket-content').replaceChildren();
+        $('decision-docket-notice').textContent='';
+        $('knowledge-timeline-notice').textContent=`Source-time replay unavailable: ${e.message}. No current-time substitution was attempted.`;
         return null;
       }
     }
@@ -551,7 +657,7 @@ APP_HTML = r'''<!doctype html>
       }
     }
      async function loadAll() {
-      const [health, data, graph, actions, shiftBoard, docket]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadDecisionDocket()]);
+      const [health, data, graph, actions, shiftBoard, timeline]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadKnowledgeTimeline()]);
       $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
       renderBriefing(data,graph); renderActions(actions.actions);
     }
@@ -654,6 +760,8 @@ APP_HTML = r'''<!doctype html>
       }
     }
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
+    $('knowledge-replay').addEventListener('click',()=>loadKnowledgeTimeline());
+    for(const button of document.querySelectorAll('[data-known-at]')) button.addEventListener('click',()=>{ $('knowledge-time').value=button.dataset.knownAt; loadKnowledgeTimeline(); });
     for(const input of [$('dock-time'),$('dock-known-time')]) input.addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
     for(const button of document.querySelectorAll('[data-conveyor-at]')) button.addEventListener('click',()=>{ conveyorAt=button.dataset.conveyorAt; loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`); });
     $('branch-reset').addEventListener('click',async()=>{ const button=$('branch-reset'); button.disabled=true; try { await api('/api/shift-board/branch/reset',{method:'POST',body:'{}'}); $('shift-board-notice').textContent='Only the named hypothetical overlay was reset; observed events were preserved.'; await loadShiftBoard(); } catch(e) { $('shift-board-notice').textContent=`Branch reset failed: ${e.message}`; } finally { button.disabled=false; } });
@@ -862,6 +970,30 @@ class WardAtlasService:
                 return project_docket(records, lambda query: self._rows(connection, query))
             finally:
                 connection.close()
+
+    def decision_timeline(self, known_at: str | None = None) -> dict:
+        """Replay source-visible claims and separately sourced record state.
+
+        The cutoff is normalized before the graph connection is opened. Claim
+        discovery never traverses the record or its CONSIDERS edges; those are
+        queried only after the register-rooted record's own source is visible.
+        """
+        claim_query, record_query, conflict_query, normalized = build_knowledge_timeline_queries(known_at)
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                claims = self._rows(connection, claim_query)
+                records = self._rows(connection, record_query)
+                considered = []
+                if records:
+                    considered = self._rows(
+                        connection,
+                        knowledge_timeline_considered_query(records[0]["decision_id"], normalized or "0001-01-01T00:00:00Z"),
+                    )
+                conflict = self._rows(connection, conflict_query) if len({row["version_id"] for row in claims}) >= 2 else []
+            finally:
+                connection.close()
+        return project_knowledge_timeline(normalized, claims, records, considered, conflict)
 
     @staticmethod
     def _event_order(row: dict) -> datetime:
@@ -1290,7 +1422,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/handover/compare"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -1321,6 +1453,12 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, data)
             elif parsed.path == "/api/decision-docket":
                 self._send(200, service.decision_docket())
+            elif parsed.path == "/api/decision-timeline":
+                values = parse_qs(parsed.query, keep_blank_values=True)
+                if "known_at" in values and len(values["known_at"]) != 1:
+                    raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
+                data = service.decision_timeline(values.get("known_at", [None])[0])
+                self._send(200, data)
             elif parsed.path == "/api/handover/compare":
                 values = parse_qs(parsed.query, keep_blank_values=True)
                 for key in ("action_id", "observed_at", "branch_at"):
@@ -1346,7 +1484,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._error(503, "Local graph or action state is unavailable.")
         except ValueError as exc:
-            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/handover/compare"}:
+            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare"}:
                 message = str(exc)
                 if parsed.path != "/api/handover/compare" and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
                     message = "Invalid timestamp; use an explicit ISO-8601 offset."
