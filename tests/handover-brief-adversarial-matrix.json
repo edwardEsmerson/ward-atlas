@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "purpose": "Trace each of the nine fixed handover-witness outcomes to nonzero independently pinned assertions; later behavior tests must execute each assertion against actual FalkorDB/API behavior.",
+  "oracle_policy": "Assertion values are fixed by handover-brief-expected-results.json and its immutable pinned source oracles, never by candidate output.",
+  "required_case_count": 9,
+  "groups": [
+    {
+      "case_id": "cold-empty-unknown",
+      "assertions": [
+        {"id": "cold-empty.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "cold-empty.no-impact-paths", "pointer": "/expected/impact_paths", "equals": []},
+        {"id": "cold-empty.no-sop-witness", "pointer": "/expected/sop_witness", "equals": null},
+        {"id": "cold-empty.no-source-rows", "pointer": "/expected/source_rows", "equals": 0},
+        {"id": "cold-empty.no-draft-or-action", "pointer": "/expected/draft", "equals": null},
+        {"id": "cold-empty.no-saved-actions", "pointer": "/expected/saved_actions", "equals": []},
+        {"id": "cold-empty.unknown-not-no-risk", "pointer": "/expected/risk_or_conflict_absence_concluded", "equals": false},
+        {"id": "cold-empty.state-is-unknown", "pointer": "/expected/board_state", "equals": "empty/unknown"}
+      ]
+    },
+    {
+      "case_id": "inc204-observed-paths-and-provenance",
+      "assertions": [
+        {"id": "inc204.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "inc204.exact-two-paths", "pointer": "/expected/impact_paths", "equals": [["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"], ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]]},
+        {"id": "inc204.incident-and-row-count", "pointer": "/expected/row_count", "equals": 2},
+        {"id": "inc204.full-path-provenance", "pointer": "/expected/path_evidence", "equals_case_value": true},
+        {"id": "inc204.current-ownership-provenance", "pointer": "/expected/current_ownership_source_ids", "equals": ["SRC-OPS-ROSTER", "SRC-OPS-ROSTER"]},
+        {"id": "inc204.exact-as-of", "pointer": "/expected/as_of", "equals": "2026-10-14T18:30:00Z"}
+      ]
+    },
+    {
+      "case_id": "typed-current-sop-witness-and-stale-exclusion",
+      "assertions": [
+        {"id": "sop.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "sop.shared-equipment-and-complete-linkage", "pointer": "/expected/sop_witness/shared_equipment_id", "equals": "CONVEYOR-C4"},
+        {"id": "sop.complete-linkage-status", "pointer": "/expected/sop_witness/linkage_status", "equals": "complete"},
+        {"id": "sop.explicit-applicability-edges", "pointer": "/expected/sop_witness/applicability_edges", "equals_case_value": true},
+        {"id": "sop.conflict-edge-and-unresolved", "pointer": "/expected/sop_witness/conflict_edge", "equals_case_value": true},
+        {"id": "sop.unresolved-status", "pointer": "/expected/sop_witness/conflict_status", "equals": "unresolved"},
+        {"id": "sop.exact-claims-labels-and-sources", "pointer": "/expected/sop_witness/claim_evidence", "equals_case_value": true},
+        {"id": "sop.exactly-two-claims", "pointer": "/expected/sop_witness/returned_claim_count", "equals": 2},
+        {"id": "sop.claims-are-unverified", "pointer": "/expected/sop_witness/claims_are_unverified", "equals": true},
+        {"id": "sop.claims-not-current-owners", "pointer": "/expected/sop_witness/claims_are_current_owner_facts", "equals": false},
+        {"id": "sop.no-winner", "pointer": "/expected/sop_witness/winner_selected", "equals": false},
+        {"id": "sop.no-winner-or-contact", "pointer": "/expected/sop_witness/contact_supplied", "equals": false},
+        {"id": "sop.stale-v1-excluded-from-c4", "pointer": "/expected/sop_witness/stale_version_excluded_from_c4_witness", "equals_case_value": true},
+        {"id": "sop.no-procedure-or-clinical-conclusion", "pointer": "/expected/sop_witness/procedure_or_clinical_conclusion_supplied", "equals": false},
+        {"id": "sop.no-direct-incident-causal-edge", "pointer": "/expected/sop_witness/direct_incident_to_sop_causal_edge_asserted", "equals": false}
+      ]
+    },
+    {
+      "case_id": "owned-edge-removal-is-unknown-only",
+      "assertions": [
+        {"id": "edge-counterfactual.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "edge-counterfactual.baseline-paths", "pointer": "/expected/baseline_impact_paths", "equals_case_value": true},
+        {"id": "edge-counterfactual.only-owned-applies-edge-removed", "pointer": "/expected/edge_removals/0/removed_edge", "equals_case_value": true},
+        {"id": "edge-counterfactual.only-owned-conflict-edge-removed", "pointer": "/expected/edge_removals/1/removed_edge", "equals_case_value": true},
+        {"id": "edge-counterfactual.applies-edge-breaks-witness", "pointer": "/expected/edge_removals/0/complete_conflict_witness_returned", "equals": false},
+        {"id": "edge-counterfactual.applies-edge-missing-is-unknown", "pointer": "/expected/edge_removals/0/linkage_status", "equals": "incomplete/unknown"},
+        {"id": "edge-counterfactual.applies-edge-never-resolved-or-absent", "pointer": "/expected/edge_removals/0/no_resolved_or_absent_conclusion", "equals": true},
+        {"id": "edge-counterfactual.conflict-edge-missing-is-unknown", "pointer": "/expected/edge_removals/1/linkage_status", "equals": "unknown"},
+        {"id": "edge-counterfactual.suppress-proposal-without-witness", "pointer": "/expected/edge_removals/0/incident_linked_sop_review_proposal_returned", "equals": false},
+        {"id": "edge-counterfactual.applies-edge-keeps-exact-paths", "pointer": "/expected/edge_removals/0/impact_paths_after_removal", "equals_case_value": true},
+        {"id": "edge-counterfactual.applies-edge-keeps-path-provenance", "pointer": "/expected/edge_removals/0/path_evidence_after_removal", "equals_case_value": true},
+        {"id": "edge-counterfactual.outage-paths-unchanged", "pointer": "/expected/edge_removals/0/impact_paths_unchanged", "equals": true},
+        {"id": "edge-counterfactual.provenance-unchanged", "pointer": "/expected/edge_removals/0/path_evidence_unchanged", "equals": true},
+        {"id": "edge-counterfactual.no-other-snapshot-change", "pointer": "/expected/edge_removals/1/all_non_witness_snapshot_fields_unchanged", "equals": true},
+        {"id": "edge-counterfactual.conflict-edge-breaks-witness", "pointer": "/expected/edge_removals/1/complete_conflict_witness_returned", "equals": false},
+        {"id": "edge-counterfactual.conflict-edge-suppresses-proposal", "pointer": "/expected/edge_removals/1/incident_linked_sop_review_proposal_returned", "equals": false},
+        {"id": "edge-counterfactual.conflict-edge-preserves-source-claims", "pointer": "/expected/edge_removals/1/source_claims_preserved", "equals": true},
+        {"id": "edge-counterfactual.conflict-edge-keeps-exact-paths", "pointer": "/expected/edge_removals/1/impact_paths_after_removal", "equals_case_value": true},
+        {"id": "edge-counterfactual.conflict-edge-keeps-path-provenance", "pointer": "/expected/edge_removals/1/path_evidence_after_removal", "equals_case_value": true},
+        {"id": "edge-counterfactual.conflict-edge-paths-unchanged", "pointer": "/expected/edge_removals/1/impact_paths_unchanged", "equals": true},
+        {"id": "edge-counterfactual.conflict-edge-provenance-unchanged", "pointer": "/expected/edge_removals/1/path_evidence_unchanged", "equals": true},
+        {"id": "edge-counterfactual.missing-is-unknown-not-resolved", "pointer": "/expected/edge_removals/1/no_no_conflict_or_resolved_conclusion", "equals": true},
+        {"id": "edge-counterfactual.reseed-restores-witness", "pointer": "/expected/edge_removals/1/reseed_restores_exact_conflict_witness", "equals": true},
+        {"id": "edge-counterfactual.reseeded-witness-is-canonical", "pointer": "/expected/reseeded_witness", "equals": "#/canonical_snapshot/sop_witness"}
+      ]
+    },
+    {
+      "case_id": "restoration-keeps-sop-claims-unresolved",
+      "assertions": [
+        {"id": "restoration.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "restoration.exact-time", "pointer": "/expected/as_of", "equals": "2026-10-14T19:30:00Z"},
+        {"id": "restoration.no-active-paths", "pointer": "/expected/active_impact_paths", "equals": []},
+        {"id": "restoration.sop-conflict-stays-unresolved", "pointer": "/expected/sop_conflict_status", "equals": "unresolved"},
+        {"id": "restoration.exact-source-backed-claims", "pointer": "/expected/sop_claims", "equals_case_value": true},
+        {"id": "restoration.claims-remain-source-backed", "pointer": "/expected/source_backed_witness_matches_canonical", "equals": true},
+        {"id": "restoration.no-safe-conclusion", "pointer": "/expected/sop_safe_conclusion_asserted", "equals": false},
+        {"id": "restoration.no-no-risk-conclusion", "pointer": "/expected/no_operational_risk_conclusion_asserted", "equals": false}
+      ]
+    },
+    {
+      "case_id": "denied-source-response-invariance",
+      "assertions": [
+        {"id": "acl.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "acl.operations-viewer", "pointer": "/expected/viewer_scope", "equals": "operations"},
+        {"id": "acl.full-response-invariant", "pointer": "/expected/operations_response_semantically_identical_before_after", "equals": true},
+        {"id": "acl-entire-visible-snapshot-invariant", "pointer": "/expected/canonical_snapshot_unchanged", "equals": true},
+        {"id": "acl.no-restricted-literals", "pointer": "/expected/restricted_literals_disclosed", "equals": []},
+        {"id": "acl.no-hidden-existence-or-dependent-leak", "pointer": "/expected/hidden_count_or_existence_disclosed", "equals": false},
+        {"id": "acl.no-hidden-relationship-or-paraphrase", "pointer": "/expected/hidden_relation_or_dependent_paraphrase_disclosed", "equals": false},
+        {"id": "acl.no-hidden-derived-path", "pointer": "/expected/hidden_path_disclosed", "equals": false},
+        {"id": "acl.restricted-fixture-scope", "pointer": "/expected/restricted_probe/acl", "equals": "restricted"},
+        {"id": "acl.distinct-restricted-source-tripwire", "pointer": "/expected/restricted_probe/source_id", "equals": "SRC-RESTRICTED-SOP-PROBE-91"},
+        {"id": "acl.restricted-path-tripwire-is-not-visible", "pointer": "/expected/restricted_probe/path", "equals_case_value": true},
+        {"id": "acl.restricted-fixture-version", "pointer": "/expected/restricted_probe/version_id", "equals": "SOP-RESTRICTED-PROBE-91"},
+        {"id": "acl.restricted-fixture-claimed-role", "pointer": "/expected/restricted_probe/claimed_role_id", "equals": "ROLE-RESTRICTED-PROBE-91"},
+        {"id": "acl.restricted-fixture-title", "pointer": "/expected/restricted_probe/source_title", "equals": "Restricted synthetic SOP-impact probe 91"},
+        {"id": "acl.restricted-fixture-body", "pointer": "/expected/restricted_probe/source_text", "equals": "Restricted synthetic SOP claim: role probe 91."},
+        {"id": "acl.restricted-fixture-department", "pointer": "/expected/restricted_probe/department_id", "equals": "DEPT-RESTRICTED-PROBE-91"},
+        {"id": "acl.restricted-fixture-relation", "pointer": "/expected/restricted_probe/relationship_id", "equals": "REL-RESTRICTED-SOP-PROBE-91"}
+      ]
+    },
+    {
+      "case_id": "read-only-preview-and-explicit-local-confirmation",
+      "assertions": [
+        {"id": "handover.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "handover.entire-timestamped-snapshot-is-pinned", "pointer": "/canonical_snapshot", "equals": {
+          "as_of": "2026-10-14T18:30:00Z",
+          "impact": {
+            "status": "observed-impact",
+            "paths": [
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+              ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+            ],
+            "path_evidence": [
+              {"path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"], "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"]},
+              {"path": ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"], "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], "observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]}
+            ]
+          },
+          "sop_witness": {
+            "shared_equipment_id": "CONVEYOR-C4",
+            "linkage_status": "complete",
+            "conflict_status": "unresolved",
+            "applicability_edges": [{"from": "SOP-OPS-9-V2", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4"}, {"from": "SOP-OPS-9-V3", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4"}],
+            "conflict_edge": {"from": "SOP-OPS-9-V2", "relationship": "SOP_CONFLICT", "to": "SOP-OPS-9-V3", "status": "unresolved"},
+            "claim_evidence": [
+              {"sop_version_id": "SOP-OPS-9-V2", "claim_relationship": "CLAIMS_ROLE", "role_id": "ROLE-FACILITIES-DUTY", "claim_label": "unverified SOP claim", "source_evidence_linked": true, "source_id": "SRC-SOP-CURRENT-V2", "source_title": "Synthetic SOP-OPS-9 Current Text v2", "observed_at": "2026-10-14T16:00:00Z"},
+              {"sop_version_id": "SOP-OPS-9-V3", "claim_relationship": "CLAIMS_ROLE", "role_id": "ROLE-MATERIALS-LEAD", "claim_label": "unverified SOP claim", "source_evidence_linked": true, "source_id": "SRC-SOP-CURRENT-V3", "source_title": "Synthetic SOP-OPS-9 Current Text v3", "observed_at": "2026-10-14T16:04:00Z"}
+            ],
+            "stale_version_excluded_from_c4_witness": {"version_id": "SOP-OPS-9-V1", "source_id": "SRC-SOP-ARCHIVE-9", "source_title": "Synthetic SOP-OPS-9 Archived Text v1", "observed_at": "2026-01-10T12:00:00Z", "referenced_equipment_id": "CONVEYOR-C3", "is_applicable_to_c4": false, "is_joined_to_inc204_conflict_witness": false},
+            "claims_are_current_owner_facts": false,
+            "winner_selected": false,
+            "contact_supplied": false,
+            "direct_incident_to_sop_causal_edge_asserted": false,
+            "procedure_or_clinical_conclusion_supplied": false
+          }
+        }},
+        {"id": "handover.preview-has-zero-writes", "pointer": "/expected/preview_graph_writes", "equals": 0},
+        {"id": "handover.preview-has-zero-local-action-writes", "pointer": "/expected/preview_local_action_writes", "equals": 0},
+        {"id": "handover.no-draft-persisted-before-confirmation", "pointer": "/expected/draft_persisted_before_confirmation", "equals": false},
+        {"id": "handover.explicit-confirmation-required", "pointer": "/expected/explicit_confirmation_required", "equals": true},
+        {"id": "handover.confirmation-writes-exactly-one-local-action", "pointer": "/expected/local_synthetic_actions_after_one_confirmation", "equals": 1},
+        {"id": "handover.explicit-server-confirmation", "pointer": "/expected/server_side_confirmation_required", "equals": true},
+        {"id": "handover.preview-carries-fixed-structured-snapshot", "pointer": "/expected/preview_snapshot", "equals": "#/canonical_snapshot"},
+        {"id": "handover.saved-action-carries-same-fixed-snapshot", "pointer": "/expected/saved_action_snapshot", "equals": "#/canonical_snapshot"},
+        {"id": "handover.saved-snapshot-equals-preview", "pointer": "/expected/saved_snapshot_equals_preview", "equals": true},
+        {"id": "handover.snapshot-unchanged-after-later-graph-change", "pointer": "/expected/later_graph_change_rewrites_saved_snapshot", "equals": false},
+        {"id": "handover.source-truth-not-resolved", "pointer": "/expected/source_truth_resolved", "equals": false},
+        {"id": "handover.does-not-claim-action-performed", "pointer": "/expected/work_claimed_performed", "equals": false},
+        {"id": "handover.no-clinical-action", "pointer": "/expected/clinical_action_proposed", "equals": false},
+        {"id": "handover.no-message-call-or-ticket", "pointer": "/expected/messages_sent", "equals": false},
+        {"id": "handover.no-calls", "pointer": "/expected/calls_made", "equals": false},
+        {"id": "handover.no-external-ticket", "pointer": "/expected/external_tickets_created", "equals": false},
+        {"id": "handover.no-external-writes", "pointer": "/expected/external_writes", "equals": []}
+      ]
+    },
+    {
+      "case_id": "timestamp-normalization-and-pre-mutation-rejection",
+      "assertions": [
+        {"id": "time.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "time.exact-offset-input", "pointer": "/expected/offset_input", "equals": "2026-10-14T20:30:00+02:00"},
+        {"id": "time.offset-normalizes-to-utc", "pointer": "/expected/normalized_as_of", "equals": "2026-10-14T18:30:00Z"},
+        {"id": "time.result-equals-fixed-snapshot", "pointer": "/expected/normalized_result_matches", "equals": "#/canonical_snapshot"},
+        {"id": "time.exact-malformed-probe-rejected", "pointer": "/expected/malformed_timestamp", "equals": "not-a-timestamp"},
+        {"id": "time.malformed-value-rejected", "pointer": "/expected/malformed_rejected", "equals": true},
+        {"id": "time.rejects-before-graph-mutation", "pointer": "/expected/rejection_precedes_graph_mutation", "equals": true},
+        {"id": "time.rejects-before-action-mutation", "pointer": "/expected/rejection_precedes_action_mutation", "equals": true},
+        {"id": "time.desktop-mobile-api-browser-agree", "pointer": "/expected/desktop_mobile_api_and_browser_semantics_agree", "equals": true},
+        {"id": "time.no-clinical-inference-or-procedure", "pointer": "/expected/clinical_inference", "equals": false},
+        {"id": "time.no-person-assigned", "pointer": "/expected/person_assigned", "equals": false},
+        {"id": "time.no-automatic-confirmation", "pointer": "/expected/automatically_confirmed", "equals": false},
+        {"id": "time-no-external-writes", "pointer": "/expected/external_writes", "equals": []}
+      ]
+    },
+    {
+      "case_id": "idempotent-reseed-and-fresh-client-equality",
+      "assertions": [
+        {"id": "repeat.full-expected-object", "pointer": "/expected", "equals_case_value": true},
+        {"id": "repeat.pinned-packet-sha256", "pointer": "/pinned_sources/0/sha256", "equals": "82ee7daadb65238676478e1bea7e1229f3a7dee003d7d25620b7ebbf4c70d36b"},
+        {"id": "repeat.pinned-original-sha256", "pointer": "/pinned_sources/1/sha256", "equals": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"},
+        {"id": "repeat.pinned-shift-board-sha256", "pointer": "/pinned_sources/2/sha256", "equals": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"},
+        {"id": "repeat.pinned-sop-impact-sha256", "pointer": "/pinned_sources/3/sha256", "equals": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"},
+        {"id": "repeat.cascade-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/0/sha256", "equals": "52fd4abe069e850e4ee070b8e6d0f9ed26fff5ad1e5e0c47efb28ad78227581b"},
+        {"id": "repeat.original-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/1/sha256", "equals": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"},
+        {"id": "repeat.review-receipt-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/2/sha256", "equals": "382383b65ae8a9984550227c8ad9000d893bcd9e0171298ec3bf6adb7e170972"},
+        {"id": "repeat.role-scope-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/3/sha256", "equals": "fc83b36dd9cfea900a1885816c6b84ffe7a1ab3d5c62d45be87f97a7368a9867"},
+        {"id": "repeat.shift-board-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/4/sha256", "equals": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"},
+        {"id": "repeat.sop-impact-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/5/sha256", "equals": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"},
+        {"id": "repeat.source-change-oracle-unchanged", "pointer": "/frozen_preexisting_oracle_files/6/sha256", "equals": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097"},
+        {"id": "repeat-exactly-two-seed-runs", "pointer": "/expected/seed_runs", "equals": 2},
+        {"id": "repeat.no-duplicate-nodes-or-edges", "pointer": "/expected/node_delta_after_second_seed", "equals": 0},
+        {"id": "repeat.no-relationship-duplicates", "pointer": "/expected/relationship_delta_after_second_seed", "equals": 0},
+        {"id": "repeat.no-duplicate-fixture-ids", "pointer": "/expected/duplicate_fixture_ids", "equals": []},
+        {"id": "repeat.fresh-client-required", "pointer": "/expected/fresh_falkordb_client_required", "equals": true},
+        {"id": "repeat.reconnected-result-is-fixed-snapshot", "pointer": "/expected/reconnected_snapshot", "equals": "#/canonical_snapshot"},
+        {"id": "repeat.full-snapshot-preserved", "pointer": "/expected/ordered_paths_claims_and_provenance_preserved", "equals": true},
+        {"id": "repeat.reseed-restores-owned-witness", "pointer": "/expected/owned_edge_removal_reseed_restores_exact_witness", "equals": true},
+        {"id": "repeat.unique-owned-graph", "pointer": "/expected/unique_task_owned_graph_required", "equals": true},
+        {"id": "repeat.cleanup-owned-resources-only", "pointer": "/expected/cleanup_only_owned_graph_and_process", "equals": true}
+      ]
+    }
+  ]
+}
