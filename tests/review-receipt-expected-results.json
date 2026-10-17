@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent outcomes for the synthetic handover review receipt, fixed before receipt query or UI behavior changes.",
+  "oracle_policy": "Every value is pinned to the committed review-receipt planning packet and cross-checked against unchanged shift-board, source-change, and original expected-results oracles. Candidate responses never supply or amend expectations.",
+  "pinned_sources": [
+    {
+      "id": "review-receipt-packet",
+      "file": "planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md",
+      "sha256": "4db10d9c0df59f2b400d9bd89307e0874e3b51395b38307e23bfc2f0dd7c0d60",
+      "outcome_lines": [30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+    },
+    {
+      "id": "shift-board-expected-results",
+      "file": "tests/shift-board-expected-results.json",
+      "sha256": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428"
+    },
+    {
+      "id": "source-change-expected-results",
+      "file": "tests/source-change-expected-results.json",
+      "sha256": "d26438dac655a9842d7bc60a2435ae1e3cab3a38a0f932d63005f044b0ba6097"
+    },
+    {
+      "id": "original-expected-results",
+      "file": "tests/expected-results.json",
+      "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "database_requirement": "The later integrated behavior check must use actual FalkorDB; an in-memory or Redis-only substitute is not a passing result.",
+    "receipt_storage": "Only the explicitly owned synthetic FalkorDB graph, and only after explicit local review acknowledgment.",
+    "external_writes": false
+  },
+  "cases": [
+    {
+      "id": "cold-empty-and-unacknowledged-draft",
+      "expected": {
+        "cold_graph_review_receipt_count": 0,
+        "cold_browser_state": "empty/unknown",
+        "draft_open_or_preview_graph_node_delta": 0,
+        "draft_open_or_preview_graph_relationship_delta": 0,
+        "draft_open_or_preview_receipt_node_delta": 0,
+        "draft_open_or_preview_receipt_relationship_delta": 0,
+        "draft_open_or_preview_handover_action_count_delta": 0,
+        "draft_open_or_preview_local_action_file_written": false,
+        "cold_graph_invents_receipt": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-1"],
+      "evidence_semantics": "A cold graph has no review receipt. Opening or previewing a draft is read-only and missing data is empty/unknown, not an invented receipt."
+    },
+    {
+      "id": "fixed-review-context",
+      "expected": {
+        "context_as_of": "2026-10-14T20:30:00Z",
+        "current_role_path": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"],
+        "current_source": {
+          "source_id": "SRC-DOCK-ROSTER-R2",
+          "title": "Synthetic Dock Operations Roster Revision 2",
+          "observed_at": "2026-10-14T20:18:00Z",
+          "effective_at": "2026-10-14T20:30:00Z",
+          "supersedes": "SRC-DOCK-ROSTER-R1"
+        },
+        "handover_id": "HND-DOCK-2020",
+        "unchanged_handover_role_id": "ROLE-DOCK-DUTY",
+        "unchanged_handover_source_id": "SRC-DOCK-ROSTER-R1",
+        "handover_reviewable_only_through_explicit_dependency": true,
+        "excluded_lexical_only_handover_id": "HND-DOCK-LEXICAL-ONLY",
+        "unlinked_artifact_coverage": "unknown"
+      },
+      "planner_refs": ["review-receipt-packet#outcome-2"],
+      "evidence_semantics": "R2's observation and effective times remain distinct. The handover's older role/source are unchanged; only its explicit dependency makes it reviewable."
+    },
+    {
+      "id": "explicit-review-only-acknowledgment",
+      "expected": {
+        "receipt_node_label": "ReviewReceipt",
+        "receipt_id": "RCP-HND-DOCK-2020-01",
+        "receipt_node_delta_after_one_acknowledgment": 1,
+        "kind": "local_handover_review_acknowledgement",
+        "disposition": "KEEP_HANDOVER_OPEN_FOR_REVIEW",
+        "context_as_of": "2026-10-14T20:30:00Z",
+        "recorded_at": "2026-10-14T20:35:00Z",
+        "source_truth_resolved": false,
+        "handover_content_changed": false,
+        "external_action": false,
+        "synthetic_test_record": true,
+        "confirmed_actions_json_entries_added": 0,
+        "existing_handover_action_count_delta": 0
+      },
+      "planner_refs": ["review-receipt-packet#outcome-3"],
+      "evidence_semantics": "One explicit, distinct local-review acknowledgment appends one fictional receipt; it does not confirm an existing handover action or state that a real operator acted."
+    },
+    {
+      "id": "graph-reconstructed-evidence-and-incomplete-edge",
+      "expected": {
+        "related_incident_id": "INC-207",
+        "related_handover_id": "HND-DOCK-2020",
+        "related_source_ids": ["SRC-DOCK-ROSTER-R1", "SRC-DOCK-ROSTER-R2"],
+        "ordered_role_snapshot": [
+          {"role_id": "ROLE-DOCK-DUTY", "source_id": "SRC-DOCK-ROSTER-R1", "context": "unchanged_handover"},
+          {"role_id": "ROLE-DOCK-SWING", "source_id": "SRC-DOCK-ROSTER-R2", "context": "current_at_context_as_of"}
+        ],
+        "retrieval_uses_explicit_graph_relationships": true,
+        "required_owned_evidence_edge_removed_context_status": "incomplete",
+        "lexical_or_current_live_path_reconstruction_allowed": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-4"],
+      "evidence_semantics": "The receipt context is reconstructed by traversing explicit graph relationships and an ordered historical snapshot; removing a required owned edge makes it incomplete."
+    },
+    {
+      "id": "idempotent-confirmation",
+      "expected": {
+        "same_receipt_key_retry_receipt_node_delta": 0,
+        "same_receipt_key_retry_duplicate_relationship_delta": 0,
+        "same_receipt_key_retry_returns_same_receipt_id": "RCP-HND-DOCK-2020-01",
+        "different_review_silently_merged": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-5"],
+      "evidence_semantics": "Retrying the same acknowledged review is idempotent; a different review is not folded into this receipt."
+    },
+    {
+      "id": "reconnect-and-historical-snapshot-stability",
+      "expected": {
+        "fresh_client_reconnect_required": true,
+        "receipt_id": "RCP-HND-DOCK-2020-01",
+        "recorded_at": "2026-10-14T20:35:00Z",
+        "context_as_of": "2026-10-14T20:30:00Z",
+        "related_source_ids": ["SRC-DOCK-ROSTER-R1", "SRC-DOCK-ROSTER-R2"],
+        "unchanged_handover_id": "HND-DOCK-2020",
+        "ordered_path_snapshot": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK", "ROLE-DOCK-SWING"],
+        "unchanged_handover_context": {
+          "handover_id": "HND-DOCK-2020",
+          "role_id": "ROLE-DOCK-DUTY",
+          "source_id": "SRC-DOCK-ROSTER-R1"
+        },
+        "snapshot_claims_role_current_at_later_read_time": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-6"],
+      "evidence_semantics": "A fresh client reconstructs the same receipt and historical context; the old snapshot does not assert that its role remains current later."
+    },
+    {
+      "id": "unchanged-source-handover-and-original-oracles",
+      "expected": {
+        "handover_content_changed": false,
+        "source_r1_record_changed": false,
+        "source_r2_record_changed": false,
+        "effective_role_assignments_changed": false,
+        "unresolved_sop_claims_changed": false,
+        "incident_state_changed": false,
+        "original_source_temporal_shift_board_and_cascade_oracles_changed": false,
+        "receipt_implies_handover_delivered": false,
+        "receipt_implies_procedure_approved": false,
+        "receipt_implies_work_performed": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-7"],
+      "evidence_semantics": "Receipt creation and reading do not mutate existing source or operational facts and make no claim of delivery, approval, or completed work."
+    },
+    {
+      "id": "server-side-branch-and-pre-effective-denial",
+      "expected": {
+        "candidate_handover_id": "HND-DOCK-2020",
+        "candidate_incident_id": "INC-207",
+        "unrelated_hypothetical_branch_id": "BR-C4-RESTORE-DRILL",
+        "hypothetical_branch_incident_id": "INC-204",
+        "branch_attachment_server_side_rejected": true,
+        "pre_effective_as_of": "2026-10-14T20:29:00Z",
+        "pre_effective_acknowledgment_server_side_rejected": true,
+        "rejected_before_receipt_action_or_graph_mutation": true,
+        "rejected_branch_receipt_node_delta": 0,
+        "rejected_branch_handover_action_count_delta": 0,
+        "rejected_branch_graph_mutation_count": 0,
+        "rejected_pre_effective_receipt_node_delta": 0,
+        "rejected_pre_effective_handover_action_count_delta": 0,
+        "rejected_pre_effective_graph_mutation_count": 0,
+        "branch_creates_causal_relation_to_candidate_incident": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-8"],
+      "evidence_semantics": "The unrelated INC-204 simulation branch and a 20:29Z pre-effective view are refused by the server before any persistent mutation; browser hiding is not enforcement."
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "expected": {
+        "viewer_scope": "operations",
+        "restricted_source_literals": [
+          "SRC-RESTRICTED-DOCK-99",
+          "Restricted Dock Continuity Annex 99",
+          "Restricted-only note: logistics bay status unresolved.",
+          "EQ-RESTRICTED-DOCK-99",
+          "DEPT-RESTRICTED-DOCK-99",
+          "ROLE-RESTRICTED-DOCK-OWNER"
+        ],
+        "visible_receipt_and_path_output_unchanged_after_restricted_fixture": true,
+        "inaccessible_id_title_body_count_existence_relationship_path_or_paraphrase_disclosed": false,
+        "write_error_leaks_restricted_evidence": false,
+        "read_response_leaks_restricted_evidence": false,
+        "visual_graph_leaks_restricted_evidence": false
+      },
+      "planner_refs": ["review-receipt-packet#outcome-9"],
+      "evidence_semantics": "The listed hidden literals are test tripwires only. Operations-visible output is invariant under restricted fixture injection and reveals neither direct nor derived information."
+    },
+    {
+      "id": "local-only-no-external-write",
+      "expected": {
+        "message_sent": false,
+        "call_made": false,
+        "external_ticket_created": false,
+        "hospital_system_write": false,
+        "automatic_assignment": false,
+        "clinical_advice": false,
+        "external_network_write": false,
+        "receipt_storage_scope": "explicitly_owned_synthetic_falkordb_graph_after_acknowledgment_only",
+        "existing_handover_action_file_written": false,
+        "cleanup_deletes_only_task_owned_graph": true,
+        "cleanup_stops_only_task_owned_processes": true
+      },
+      "planner_refs": ["review-receipt-packet#outcome-10"],
+      "evidence_semantics": "No external or clinical operation occurs. The review receipt is local graph evidence, separate from all existing handover-action files."
+    }
+  ]
+}

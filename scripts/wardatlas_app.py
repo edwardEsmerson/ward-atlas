@@ -28,6 +28,25 @@ from verify_falkordb_live import (
     text,
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
+from wardatlas_shift_board import (
+    BRANCH_AT,
+    BRANCH_EVENT_QUERY,
+    BRANCH_ID,
+    branch_reset_queries,
+    CONVEYOR_EVENT_QUERY,
+    CONVEYOR_OUTAGE_AT,
+    CONVEYOR_PATH_QUERY,
+    CONVEYOR_RESTORED_AT,
+    DOCK_BEFORE,
+    DOCK_EFFECTIVE,
+    DOCK_HANDOVER_SNAPSHOT_QUERY,
+    DOCK_REVIEW_QUERY,
+    DOCK_SOURCE_QUERY,
+    DOCK_SUPERSESSION_QUERY,
+    dock_role_query,
+    normalize_timestamp,
+    seed_shift_board_queries,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,9 +146,36 @@ APP_HTML = r'''<!doctype html>
     .safety strong { color:#d3e2dc; }
     .notice { min-height:20px; margin-top:10px; color:#f1c278; font-size:12px; }
     .empty { color:#9fb3b7; padding:14px 0; font-size:13px; }
+    .shift-board { margin:0 0 18px; border-color:#41605d; background:linear-gradient(145deg,#18332f,#142631 66%); }
+    .shift-intro { max-width:760px; color:#b6c9c5; font-size:12px; line-height:1.55; margin:9px 0 17px; }
+    .shift-cases { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:13px; }
+    .shift-case { min-width:0; border:1px solid #33514f; background:#10231f88; border-radius:12px; padding:15px; }
+    .shift-case header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .shift-case h3 { font-size:14px; margin:1px 0 4px; }
+    .shift-kicker { color:var(--mint); font-size:9px; letter-spacing:.13em; text-transform:uppercase; font-weight:800; }
+    .shift-controls { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:11px 0; }
+    .shift-controls label { color:#afc2bf; font-size:10px; }
+    .shift-controls select { color:var(--ink); background:#1a3038; border:1px solid #426067; border-radius:7px; padding:7px 8px; font:inherit; font-size:10px; }
+    .shift-controls .button { padding:7px 9px; font-size:10px; }
+    .shift-result { min-height:35px; color:#d6e3df; font-size:11px; line-height:1.55; }
+    .shift-path { overflow-wrap:anywhere; border-left:2px solid var(--mint); padding:7px 9px; margin:7px 0; background:#102d26; color:#d8e9e2; font-size:10px; line-height:1.6; }
+    .shift-path strong { color:#a9e9cd; }
+    .shift-evidence { margin-top:10px; border-top:1px solid #304b49; padding-top:9px; }
+    .shift-evidence h4 { margin:0 0 6px; color:#9fc0b5; font-size:9px; letter-spacing:.12em; text-transform:uppercase; }
+    .shift-source { display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px 10px; color:#c8d8d2; font-size:10px; padding:4px 0; }
+    .shift-source span { color:#9eb7b4; }
+    .review-item { display:flex; align-items:center; gap:8px; margin:6px 0; color:#dbe8e2; font-size:10px; }
+    .review-item::before { content:"↻"; color:var(--amber); font-size:14px; }
+    .branch-box { border:1px dashed #9e8055; border-radius:9px; padding:10px; margin-top:10px; background:#2b261d88; }
+    .branch-box strong { color:#ffd08a; font-size:10px; }
+    .branch-box p { margin:5px 0 0; color:#c4c8bd; font-size:10px; line-height:1.5; }
+    .shift-unknown { color:#f1c278; }
+    .shift-case[hidden] { display:none; }
+    #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
     @media (max-width:900px) { .grid { grid-template-columns:1fr; } .hero { grid-template-columns:1fr; align-items:start; } .incident-card { max-width:420px; } }
-    @media (max-width:560px) { .shell { padding:13px 13px 35px; } .topbar { align-items:flex-start; } .top-actions { flex-direction:column-reverse; align-items:flex-end; gap:8px; } .pill { font-size:10px; padding:7px 9px; } .button { padding:9px 10px; font-size:12px; } .hero { padding:25px 0 17px; gap:17px; } h1 { font-size:35px; } .hero p { font-size:13px; } .card { padding:15px; border-radius:12px; } .card-head { flex-direction:column; } .path-row { grid-template-columns:1fr; } .role-label { text-align:left; max-width:none; } .footer { flex-direction:column; } }
+    @media (max-width:760px) { .shift-cases { grid-template-columns:1fr; } }
+    @media (max-width:560px) { .shell { padding:13px 13px 35px; } .topbar { align-items:flex-start; } .top-actions { flex-direction:column-reverse; align-items:flex-end; gap:8px; } .pill { font-size:10px; padding:7px 9px; } .button { padding:9px 10px; font-size:12px; } .hero { padding:25px 0 17px; gap:17px; } h1 { font-size:35px; } .hero p { font-size:13px; } .card { padding:15px; border-radius:12px; } .card-head { flex-direction:column; } .path-row { grid-template-columns:1fr; } .role-label { text-align:left; max-width:none; } .footer { flex-direction:column; } .shift-case { padding:12px; } .shift-controls { align-items:stretch; } .shift-controls select { max-width:100%; } }
   </style>
 </head>
 <body>
@@ -140,10 +186,34 @@ APP_HTML = r'''<!doctype html>
     </header>
     <main>
       <section class="hero" aria-labelledby="main-title">
-        <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">One outage. Two accountable paths.</h1><p>Trace the conveyor outage through service dependencies to the operating roles that are explicitly current. Inspect the evidence behind each hop before preparing a local handover.</p></div>
-        <aside class="incident-card"><div class="status">Open operations incident</div><strong id="incident-title">INC-204 · Loading briefing</strong><p id="incident-summary">Synthetic material-transfer conveyor outage. No patient or clinical information.</p></aside>
+        <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
+        <aside class="incident-card"><div id="incident-status" class="status">No graph-backed incident</div><strong id="incident-title">No incident in graph</strong><p id="incident-summary">Empty/unknown is not evidence of safety or no operational risk.</p></aside>
       </section>
-      <div class="grid">
+      <section class="card shift-board" aria-labelledby="shift-board-title">
+        <div class="card-head"><div><div class="eyebrow">Integrated board · two separate synthetic cases</div><h2 id="shift-board-title">Shift changes, with provenance</h2></div><span id="shift-board-badge" class="tag blue">Loading live graph…</span></div>
+        <p class="shift-intro">The dock roster is selected by its effective time, not when the revision was observed. Conveyor status is replayed from observed state events; the drill branch is labeled hypothetical and never rewrites the mainline.</p>
+        <div id="shift-board-empty" class="empty" hidden>Board empty / unknown. No incident, source, role, or review item is inferred from a blank graph. Reset the synthetic scenario to load the two pinned cases.</div>
+        <div class="shift-cases">
+          <article id="dock-case" class="shift-case" hidden aria-labelledby="dock-case-title">
+            <header><div><div class="shift-kicker">Ownership revision · source change</div><h3 id="dock-case-title">INC-207 · Receiving dock</h3></div><span id="dock-role-badge" class="tag">Role unknown</span></header>
+            <div class="shift-controls"><label for="dock-time">Evaluate ownership at</label><select id="dock-time"><option value="2026-10-14T20:29:00Z">20:29Z · before effective boundary</option><option value="2026-10-14T20:30:00Z" selected>20:30Z · R2 effective</option></select></div>
+            <div id="dock-path" class="shift-result" aria-live="polite"></div>
+            <div class="shift-evidence"><h4>Observed roster sources</h4><div id="dock-sources"></div></div>
+            <div class="shift-evidence"><h4>Explicit-edge review queue</h4><div id="dock-review"></div><p id="dock-coverage" class="subtle"></p></div>
+          </article>
+          <article id="conveyor-case" class="shift-case" hidden aria-labelledby="conveyor-case-title">
+            <header><div><div class="shift-kicker">Event replay · observed mainline</div><h3 id="conveyor-case-title">INC-204 · Conveyor C4</h3></div><span id="conveyor-status-badge" class="tag amber">State unknown</span></header>
+            <div class="shift-controls" aria-label="Observed timeline controls"><button class="button" type="button" data-conveyor-at="2026-10-14T18:30:00Z">Observed · 18:30Z</button><button class="button" type="button" data-conveyor-at="2026-10-14T19:30:00Z">Restored · 19:30Z</button><button id="branch-reset" class="button" type="button">Reset branch overlay</button></div>
+            <div id="conveyor-event" class="shift-result" aria-live="polite"></div>
+            <div id="conveyor-paths" class="shift-result"></div>
+            <div class="branch-box"><strong>HYPOTHETICAL · BR-C4-RESTORE-DRILL · 18:50Z</strong><p id="branch-result" aria-live="polite">Loading isolated branch…</p></div>
+            <div class="shift-evidence"><h4>Path provenance · source facts</h4><div id="conveyor-sources"></div></div>
+            <div class="shift-evidence"><h4>Evidence boundary</h4><p id="conveyor-evidence-label" class="subtle"></p></div>
+          </article>
+        </div>
+        <div id="shift-board-notice" class="notice" aria-live="polite"></div>
+      </section>
+      <div id="legacy-grid" class="grid" hidden>
         <div class="stack">
           <section class="card" aria-labelledby="graph-title">
             <div class="card-head"><div><div class="eyebrow">Live FalkorDB relationship path</div><h2 id="graph-title">Impact map</h2></div><span id="impact-count" class="tag">Waiting for graph</span></div>
@@ -187,9 +257,54 @@ APP_HTML = r'''<!doctype html>
   <script>
     const $ = id => document.getElementById(id);
     let briefing = null;
+    let conveyorAt = '2026-10-14T18:30:00Z';
+    const branchAt = '2026-10-14T18:50:00Z';
     function element(tag, cls, text) { const node=document.createElement(tag); if(cls) node.className=cls; if(text!==undefined) node.textContent=text; return node; }
     async function api(path, options={}) { const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}}); const data=await response.json(); if(!response.ok) throw new Error(data.error||`HTTP ${response.status}`); return data; }
     function sourceName(id,title,observed) { const box=element('div','evidence-item'); box.append(element('strong','',title)); box.append(element('span','evidence-id',id)); box.append(element('span','',`Observed ${observed}`)); return box; }
+    function renderShiftBoard(data) {
+      const empty=data.board_state==='empty/unknown';
+      $('shift-board-badge').textContent=empty?'Empty · unknown':'Live · two graph cases';
+      $('shift-board-empty').hidden=!empty;
+      $('dock-case').hidden=!data.dock; $('conveyor-case').hidden=!data.conveyor;
+      if(!data.dock && !data.conveyor) return;
+      if(data.dock) {
+        const dock=data.dock; $('dock-role-badge').textContent=dock.role_id||'Role unknown';
+        const rolePath=$('dock-path'); rolePath.replaceChildren();
+        if(dock.role_path.length) { rolePath.append(element('div','shift-path',dock.role_path.join('  →  '))); }
+        else rolePath.append(element('div','shift-unknown','Ownership path is missing / unknown at this time.'));
+        const sources=$('dock-sources'); sources.replaceChildren();
+        for(const source of dock.source_versions) { const row=element('div','shift-source'); row.append(element('strong','',`${source.source_id} · ${source.title}`)); row.append(element('span','',`Observed ${source.observed_at}${source.effective_at?` · effective ${source.effective_at}`:''}`)); sources.append(row); }
+        const queue=$('dock-review'); queue.replaceChildren();
+        if(!dock.review_candidates.length) queue.append(element('div','subtle','No explicitly linked review candidate is available.'));
+        for(const item of dock.review_candidates) { const row=element('div','review-item',`${item.artifact_id} · cites ${item.cited_source_id}`); queue.append(row); }
+        if(dock.unchanged_handover) queue.append(element('p','subtle',`Historical handover unchanged: ${dock.unchanged_handover.role_id} · ${dock.unchanged_handover.source_id}.`));
+        $('dock-coverage').textContent=`Coverage: ${dock.coverage_status}. Unlinked artifact status: ${dock.unlinked_artifact_status}; no link is not evidence of currentness.`;
+      }
+      if(data.conveyor) {
+        const conveyor=data.conveyor; $('conveyor-status-badge').textContent=conveyor.status;
+        const event=$('conveyor-event'); event.replaceChildren();
+        if(conveyor.event) {
+          const observed=conveyor.event.evidence_label==='observed source fact';
+          event.append(element('div',observed?'shift-result':'shift-unknown',`${observed?'Observed source fact':'Hypothetical event'} · ${conveyor.event.event_id} · ${conveyor.event.value} at ${conveyor.event.event_at}${conveyor.event.source_id?` · ${conveyor.event.source_id}`:''}`));
+        } else event.append(element('div','shift-unknown','No effective state event; status is unknown, not safe or restored.'));
+        const paths=$('conveyor-paths'); paths.replaceChildren();
+        if(!conveyor.paths.length) paths.append(element('div',conveyor.status==='unknown'?'shift-unknown':'subtle',conveyor.status==='unknown'?'No active path is established from available evidence.':'No active impact paths at this observed time.'));
+        for(const item of conveyor.paths) paths.append(element('div','shift-path',item.path.join('  →  ')));
+        const sources=$('conveyor-sources'); sources.replaceChildren();
+        for(const item of conveyor.paths) for(const source of item.evidence) {
+          const row=element('div','shift-source'); row.append(element('strong','',`${source.source_id} · ${source.title}`)); row.append(element('span','',`Observed ${source.observed_at}`)); sources.append(row);
+        }
+        const branch=conveyor.branch; const branchBox=$('branch-result');
+        if(!branch || !branch.overlay_present) branchBox.textContent='No branch overlay is seeded. Observed mainline is unchanged.';
+        else branchBox.textContent=`${branch.branch_id} · ${branch.status} · ${branch.event?`${branch.event.event_id} at ${branch.event.event_at} · ${branch.event.evidence_label}`:'no branch event'} · ${branch.paths.length} branch impact paths. Mainline remains ${branch.mainline_status} with ${branch.mainline_paths.length} paths; observed state mutated: ${branch.observed_state_mutated}.`;
+        $('conveyor-evidence-label').textContent='Observed event/source facts are separate from graph-derived impact paths. Branch assumptions are hypothetical only; an unknown or unlinked fact remains unknown.';
+      }
+    }
+    async function loadShiftBoard() {
+      const params=new URLSearchParams({scope:'operations',dock_at:$('dock-time').value,conveyor_at:conveyorAt,branch_at:branchAt});
+      const board=await api(`/api/shift-board?${params.toString()}`); renderShiftBoard(board); return board;
+    }
     function renderPaths(data) {
       const svg=$('graph'); svg.replaceChildren();
       const positions={
@@ -229,6 +344,10 @@ APP_HTML = r'''<!doctype html>
     }
     function renderBriefing(data, graph) {
       briefing=data;
+      $('legacy-grid').hidden=!data.incident;
+      $('main-title').textContent=data.incident?'One outage. Two accountable paths.':'A board with no defaults.';
+      $('hero-description').textContent=data.incident?'Trace the conveyor outage through service dependencies to the operating roles that are explicitly current. Inspect the evidence behind each hop before preparing a local handover.':'The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.';
+      $('incident-status').textContent=data.incident?'Open operations incident':'No graph-backed incident';
       $('incident-title').textContent=data.incident ? `${data.incident.id} · ${data.incident.status.toUpperCase()}` : 'No open incident in graph';
       $('incident-summary').textContent=data.incident ? `${data.incident.equipment_name} is unavailable. Synthetic operations evidence only; no patient or clinical information.` : 'The graph is empty. Reset the synthetic scenario to load the fictional outage.';
       $('impact-count').textContent=`${data.impact_paths.length} impact paths`;
@@ -248,7 +367,7 @@ APP_HTML = r'''<!doctype html>
       }
     }
     async function loadAll() {
-      const [health, data, graph, actions]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions')]);
+      const [health, data, graph, actions, shiftBoard]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard()]);
       $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
       renderBriefing(data,graph); renderActions(actions.actions);
     }
@@ -259,6 +378,9 @@ APP_HTML = r'''<!doctype html>
       for(const item of actions.slice().reverse()) { const card=element('div','saved-item'); card.append(element('strong','',`${item.id} · ${item.incident_id}`)); card.append(element('p','',`Confirmed ${item.confirmed_at}. Stored only in local app state.`)); root.append(card); }
     }
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
+    $('dock-time').addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
+    for(const button of document.querySelectorAll('[data-conveyor-at]')) button.addEventListener('click',()=>{ conveyorAt=button.dataset.conveyorAt; loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`); });
+    $('branch-reset').addEventListener('click',async()=>{ const button=$('branch-reset'); button.disabled=true; try { await api('/api/shift-board/branch/reset',{method:'POST',body:'{}'}); $('shift-board-notice').textContent='Only the named hypothetical overlay was reset; observed events were preserved.'; await loadShiftBoard(); } catch(e) { $('shift-board-notice').textContent=`Branch reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('prepare').addEventListener('click',async()=>{ const button=$('prepare'); button.disabled=true; $('notice').textContent='Preparing a source-linked draft…'; try {
       const draft=await api('/api/handover/draft',{method:'POST',body:JSON.stringify({incident_id:'INC-204'})}); const box=$('preview'); box.replaceChildren(); box.append(element('h3','',`Preview · ${draft.incident_id}`)); box.append(element('p','',draft.summary));
       const list=element('ul','task-list'); for(const task of draft.proposed_actions) list.append(element('li','',`${task.text} [${task.source_ids.join(', ')}]`)); box.append(list);
@@ -430,6 +552,195 @@ class WardAtlasService:
             }
         return {"scope": "operations", "nodes": list(nodes.values()), "edges": list(edges.values()), "impact_path_count": len(data["impact_paths"]), "sop_conflict_status": sop["conflict_status"] if sop else None}
 
+    @staticmethod
+    def _event_order(row: dict) -> datetime:
+        return datetime.fromisoformat(row["event_at"].replace("Z", "+00:00"))
+
+    @staticmethod
+    def _event_view(row: dict, hypothetical: bool = False) -> dict:
+        event = {
+            "event_id": row["event_id"],
+            "value": row["value"],
+            "event_at": row["event_at"],
+            "evidence_label": "hypothetical branch" if hypothetical else "observed source fact",
+        }
+        if hypothetical:
+            event["branch_id"] = row["branch_id"]
+        else:
+            event.update({
+                "source_id": row["source_id"],
+                "source_title": row["source_title"],
+                "source_observed_at": row["source_observed_at"],
+            })
+        return event
+
+    @staticmethod
+    def _conveyor_paths(rows: list[dict], active: bool) -> list[dict]:
+        if not active:
+            return []
+        paths = []
+        for row in rows:
+            path = [row["incident_id"], row["equipment_id"], row["service_id"], row["department_id"], row["role_id"]]
+            evidence = [
+                {"source_id": row["incident_source_id"], "title": row["incident_source_title"], "observed_at": row["incident_observed_at"]},
+                {"source_id": row["equipment_source_id"], "title": row["equipment_source_title"], "observed_at": row["equipment_observed_at"]},
+                {"source_id": row["service_source_id"], "title": row["service_source_title"], "observed_at": row["service_observed_at"]},
+                {"source_id": row["ownership_source_id"], "title": row["ownership_source_title"], "observed_at": row["ownership_observed_at"]},
+            ]
+            paths.append({"path": path, "evidence": evidence})
+        return paths
+
+    def shift_board(
+        self,
+        dock_at: str = DOCK_EFFECTIVE,
+        conveyor_at: str = CONVEYOR_OUTAGE_AT,
+        branch_at: str = BRANCH_AT,
+    ) -> dict:
+        """Query both separately-pinned cases and their graph-derived evidence."""
+        dock_at = normalize_timestamp(dock_at)
+        conveyor_at = normalize_timestamp(conveyor_at)
+        branch_at = normalize_timestamp(branch_at)
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                dock_paths = self._rows(connection, dock_role_query(dock_at))
+                dock_sources = self._rows(connection, DOCK_SOURCE_QUERY)
+                supersession_rows = self._rows(connection, DOCK_SUPERSESSION_QUERY)
+                review_rows = self._rows(connection, DOCK_REVIEW_QUERY)
+                handover_rows = self._rows(connection, DOCK_HANDOVER_SNAPSHOT_QUERY)
+                observed_events = self._rows(connection, CONVEYOR_EVENT_QUERY)
+                branch_events = self._rows(connection, BRANCH_EVENT_QUERY)
+                conveyor_rows = self._rows(connection, CONVEYOR_PATH_QUERY)
+            finally:
+                connection.close()
+
+        supersedes = {row["source_id"]: row["supersedes"] for row in supersession_rows}
+        dock_case_present = bool(dock_paths or dock_sources or review_rows)
+        dock_case = None
+        if dock_case_present:
+            source_versions = []
+            for row in dock_sources:
+                source = {
+                    "source_id": row["source_id"],
+                    "title": row["title"],
+                    "observed_at": row["observed_at"],
+                }
+                if row.get("effective_at"):
+                    source["effective_at"] = row["effective_at"]
+                if row["source_id"] in supersedes:
+                    source["supersedes"] = supersedes[row["source_id"]]
+                source_versions.append(source)
+            handover = handover_rows[0] if handover_rows else None
+            role_path = []
+            role_id = None
+            if dock_paths:
+                row = dock_paths[0]
+                role_path = [row["incident_id"], row["equipment_id"], row["service_id"], row["department_id"], row["role_id"]]
+                role_id = row["role_id"]
+            dock_case = {
+                "incident_id": "INC-207",
+                "as_of": dock_at,
+                "role_path": role_path,
+                "role_id": role_id,
+                "source_versions": source_versions,
+                "review_candidates": review_rows,
+                "coverage_status": "explicit_edges_only",
+                "unlinked_artifact_status": "unknown",
+                "unchanged_handover": ({"artifact_id": handover["artifact_id"], "role_id": handover["role_id"], "source_id": handover["source_id"]} if handover else None),
+                "role_evidence": ([{"source_id": row["source_id"], "title": row["source_title"], "observed_at": row["source_observed_at"], **({"effective_at": row["source_effective_at"]} if row.get("source_effective_at") else {})} for row in dock_paths]),
+            }
+
+        observed_before_main = [row for row in observed_events if row["event_at"] <= conveyor_at]
+        main_event_row = max(observed_before_main, key=self._event_order) if observed_before_main else None
+        main_status = (
+            "unknown" if main_event_row is None
+            else "observed-impact" if main_event_row["value"] == "unavailable"
+            else "restored"
+        )
+        main_event = self._event_view(main_event_row) if main_event_row else None
+        main_paths = self._conveyor_paths(conveyor_rows, main_status == "observed-impact")
+
+        observed_before_branch = [row for row in observed_events if row["event_at"] <= branch_at]
+        branch_rows = [
+            {**row, "_hypothetical": False}
+            for row in observed_before_branch
+        ] + [
+            {**row, "_hypothetical": True}
+            for row in branch_events
+            if row["event_at"] <= branch_at
+        ]
+        overlay_present = bool(branch_events)
+        branch_event_row = max(branch_rows, key=self._event_order) if branch_rows and overlay_present else None
+        branch_status = (
+            "unknown" if branch_event_row is None
+            else "hypothetical-restored" if branch_event_row.get("_hypothetical") and branch_event_row["value"] == "available"
+            else "hypothetical-impact" if branch_event_row.get("_hypothetical")
+            else "observed-impact" if branch_event_row["value"] == "unavailable"
+            else "restored"
+        )
+        branch_event = self._event_view(branch_event_row, hypothetical=bool(branch_event_row and branch_event_row.get("_hypothetical"))) if branch_event_row else None
+        branch_paths = self._conveyor_paths(conveyor_rows, branch_event_row is not None and branch_event_row["value"] == "unavailable")
+        branch_main_event = max(observed_before_branch, key=self._event_order) if observed_before_branch else None
+        branch_main_status = (
+            "unknown" if branch_main_event is None
+            else "observed-impact" if branch_main_event["value"] == "unavailable"
+            else "restored"
+        )
+        branch_main_paths = self._conveyor_paths(conveyor_rows, branch_main_status == "observed-impact")
+        branch_case = {
+            "branch_id": BRANCH_ID,
+            "as_of": branch_at,
+            "overlay_present": overlay_present,
+            "status": branch_status,
+            "event": branch_event,
+            "paths": branch_paths,
+            "mainline_status": branch_main_status,
+            "mainline_paths": branch_main_paths,
+            "observed_state_mutated": False,
+        }
+        conveyor_present = bool(observed_events or conveyor_rows)
+        conveyor_case = None
+        if conveyor_present:
+            conveyor_case = {
+                "incident_id": "INC-204",
+                "equipment_id": "CONVEYOR-C4",
+                "as_of": conveyor_at,
+                "status": main_status,
+                "event": main_event,
+                "paths": main_paths,
+                "branch": branch_case,
+                "evidence_semantics": {
+                    "observed_event": "source fact",
+                    "paths": "graph-derived path",
+                    "branch_event": "hypothetical branch",
+                    "missing_or_unlinked": "missing or unknown evidence",
+                },
+            }
+
+        cases = [case_id for case_id, present in (("INC-207", dock_case_present), ("INC-204", conveyor_present)) if present]
+        return {
+            "scope": "operations",
+            "board_state": "ready" if cases else "empty/unknown",
+            "seeded_board_row_count": len(cases),
+            "case_ids": cases,
+            "cases": ([dock_case] if dock_case else []) + ([conveyor_case] if conveyor_case else []),
+            "dock": dock_case,
+            "conveyor": conveyor_case,
+        }
+
+    def reset_shift_board_branch(self) -> dict:
+        if not self.scenario_seeded_by_this_process:
+            raise RuntimeError("Refusing to reset a branch in a graph not seeded by this WardAtlas process.")
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                existing = self._rows(connection, f"MATCH (branch:ScenarioBranch {{id: '{BRANCH_ID}'}}) RETURN branch.id AS id")
+                for query in branch_reset_queries():
+                    query_result(connection.command("GRAPH.QUERY", self.graph_name, query))
+            finally:
+                connection.close()
+        return {"status": "reset", "branch_id": BRANCH_ID, "overlay_removed": bool(existing), "external_effects": []}
+
     def reset_scenario(self) -> dict:
         with self.graph_lock:
             connection = self._connection()
@@ -442,14 +753,14 @@ class WardAtlasService:
                     existing = self._rows(connection, "MATCH (n) RETURN n.id AS id LIMIT 1")
                     if existing:
                         raise RuntimeError("Refusing to reset a nonempty graph not seeded by this WardAtlas process.")
-                for query in seed_queries():
+                for query in [*seed_queries(), *seed_shift_board_queries()]:
                     query_result(connection.command("GRAPH.QUERY", self.graph_name, query))
                 self.scenario_seeded_by_this_process = True
             finally:
                 connection.close()
         with self.action_lock:
             self.pending.clear()
-        return {"status": "reset", "scenario": "INC-204 synthetic outage", "scope": "operations"}
+        return {"status": "reset", "scenario": "INC-204 synthetic outage", "scope": "operations", "included_shift_board_cases": ["INC-207", "INC-204"]}
 
     def saved_actions(self) -> list[dict]:
         with self.action_lock:
@@ -578,7 +889,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -586,17 +897,44 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, service.briefing())
             elif parsed.path == "/api/graph":
                 self._send(200, service.graph_view())
+            elif parsed.path == "/api/shift-board":
+                values = parse_qs(parsed.query, keep_blank_values=True)
+                for key in ("dock_at", "conveyor_at", "branch_at"):
+                    if key in values and len(values[key]) != 1:
+                        raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
+                data = service.shift_board(
+                    values.get("dock_at", [DOCK_EFFECTIVE])[0],
+                    values.get("conveyor_at", [CONVEYOR_OUTAGE_AT])[0],
+                    values.get("branch_at", [BRANCH_AT])[0],
+                )
+                self._send(200, data)
             elif parsed.path == "/api/actions":
                 items = service.saved_actions()
                 self._send(200, {"actions": items, "count": len(items), "storage": "local-only"})
             else:
                 self._error(404, "Not found.")
+        except ValueError:
+            if parsed.path == "/api/shift-board":
+                self._error(400, "Invalid timestamp; use an explicit ISO-8601 offset.")
+            else:
+                self._error(503, "Local graph or action state is unavailable.")
         except Exception:
             self._error(503, "Local graph or action state is unavailable.")
 
     def do_POST(self):
         parsed = urlsplit(self.path)
         service = self.server.service
+        if parsed.path == "/api/shift-board/branch/reset":
+            try:
+                self._json_body()
+                self._send(200, service.reset_shift_board_branch())
+            except ValueError as exc:
+                self._error(400, str(exc))
+            except RuntimeError as exc:
+                self._error(409, str(exc))
+            except Exception:
+                self._error(503, "The hypothetical shift-board branch could not be reset.")
+            return
         if parsed.path == "/api/scenario/reset":
             try:
                 # Consume the submitted JSON body before reusing this HTTP/1.1

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "oracle_file": "tests/review-receipt-expected-results.json",
+  "oracle_policy": "Each adversarial case maps one-to-one to a fixed outcome in the review-receipt packet and committed expected-results. Candidate outputs are never used to derive or change assertions.",
+  "cases": [
+    {
+      "id": "cold-empty-and-unacknowledged-draft",
+      "scenario_id": "cold-empty-and-unacknowledged-draft",
+      "attack_or_edge_case": "Open the review board on a cold owned graph, then open or preview the dock review candidate without acknowledging it.",
+      "setup": "Start with a unique empty graph. Record receipt/action counts, open or preview INC-207/HND-DOCK-2020, and record counts and browser empty/unknown state again.",
+      "pinned_assertions": [
+        "cold graph has exactly zero ReviewReceipt nodes",
+        "cold browser state is empty/unknown",
+        "opening or previewing the draft adds zero graph nodes overall",
+        "opening or previewing the draft adds zero graph relationships overall",
+        "opening or previewing the draft adds zero receipt nodes",
+        "opening or previewing the draft adds zero receipt relationships",
+        "opening or previewing the draft adds zero existing handover actions",
+        "opening or previewing the draft does not write the local action file",
+        "cold absence does not invent a receipt"
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "Warm shared data, a phantom receipt, or preview-time persistence makes an unacknowledged draft look committed.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:30"]
+    },
+    {
+      "id": "fixed-review-context",
+      "scenario_id": "fixed-review-context",
+      "attack_or_edge_case": "Construct the review at the exact R2 effective boundary while preserving the old handover evidence and excluding lexical-only coverage.",
+      "setup": "Use only pinned INC-207, HND-DOCK-2020, R1/R2 and explicit dependency edges; query context at 2026-10-14T20:30:00Z.",
+      "pinned_assertions": [
+        "context time is exactly 2026-10-14T20:30:00Z",
+        "current path is exactly INC-207 → EQ-DOCK-CART-2 → SVC-INBOUND-TRANSFER → DEPT-RECEIVING-DOCK → ROLE-DOCK-SWING",
+        "R2 is SRC-DOCK-ROSTER-R2 observed at 20:18:00Z",
+        "R2 is effective at 20:30:00Z and explicitly supersedes SRC-DOCK-ROSTER-R1",
+        "HND-DOCK-2020 remains unchanged at ROLE-DOCK-DUTY with SRC-DOCK-ROSTER-R1",
+        "HND-DOCK-2020 is reviewable only through its explicit dependency",
+        "HND-DOCK-LEXICAL-ONLY is excluded",
+        "unlinked artifact coverage remains unknown"
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "A wrong effective-time path, overwritten handover, missing explicit dependency, or lexical match alters the fixed context.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:31"]
+    },
+    {
+      "id": "explicit-review-only-acknowledgment",
+      "scenario_id": "explicit-review-only-acknowledgment",
+      "attack_or_edge_case": "Acknowledge the review once and distinguish the new review receipt from the existing handover-action confirmation flow.",
+      "setup": "Use the distinct local-review acknowledgment on HND-DOCK-2020, then inspect the receipt and existing action persistence/counts.",
+      "pinned_assertions": [
+        "exactly one ReviewReceipt is appended with ID RCP-HND-DOCK-2020-01",
+        "kind is local_handover_review_acknowledgement",
+        "disposition is KEEP_HANDOVER_OPEN_FOR_REVIEW",
+        "context_as_of is 2026-10-14T20:30:00Z",
+        "synthetic recorded_at is 2026-10-14T20:35:00Z",
+        "source_truth_resolved, handover_content_changed, and external_action are all false",
+        "confirmed-actions.json receives zero entries",
+        "existing handover-action count changes by zero",
+        "receipt is explicitly a synthetic test record, not a real operator statement"
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "The operation is mislabeled as approval/action, writes the existing action store, invents receipt fields, or records a real-person claim.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:32"]
+    },
+    {
+      "id": "graph-reconstructed-evidence-and-incomplete-edge",
+      "scenario_id": "graph-reconstructed-evidence-and-incomplete-edge",
+      "attack_or_edge_case": "Reconstruct receipt context through typed graph relationships, then remove a required task-owned evidence edge.",
+      "setup": "Read the acknowledged receipt through relationship traversal; remove one required owned evidence edge and read again without using lexical search or the live current path as fallback.",
+      "pinned_assertions": [
+        "receipt is explicitly related to INC-207",
+        "receipt is explicitly related to HND-DOCK-2020",
+        "receipt is explicitly related to SRC-DOCK-ROSTER-R1 and SRC-DOCK-ROSTER-R2",
+        "retrieval traverses graph relationships rather than only a JSON blob",
+        "ordered snapshot preserves old ROLE-DOCK-DUTY/R1 and current ROLE-DOCK-SWING/R2 context",
+        "removing a required owned evidence edge changes context_status to incomplete",
+        "lexical similarity or a live role path cannot reconstruct the removed historical edge"
+      ],
+      "nonzero_assertion_count": 7,
+      "failure_detected": "A decorative graph, JSON-only receipt, or fallback reconstruction keeps falsely complete evidence after an edge is removed.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:33"]
+    },
+    {
+      "id": "idempotent-confirmation",
+      "scenario_id": "idempotent-confirmation",
+      "attack_or_edge_case": "Retry the exact same confirmed receipt key and attempt to silently fold a different review into it.",
+      "setup": "Submit the acknowledged request twice with the same receipt key, then distinguish a request for another review.",
+      "pinned_assertions": [
+        "same-key retry adds zero receipt nodes",
+        "same-key retry adds zero duplicate relationships",
+        "same-key retry returns the same fixed receipt ID",
+        "a different review is not silently merged into this receipt"
+      ],
+      "nonzero_assertion_count": 4,
+      "failure_detected": "Repeated submission duplicates a decision or silently conflates distinct reviews.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:34"]
+    },
+    {
+      "id": "reconnect-and-historical-snapshot-stability",
+      "scenario_id": "reconnect-and-historical-snapshot-stability",
+      "attack_or_edge_case": "Disconnect and read the acknowledged receipt with a fresh client after the live context could have changed.",
+      "setup": "Close the original client, create a fresh connection to the same owned graph, and reconstruct receipt context without treating it as a present-time role assertion.",
+      "pinned_assertions": [
+        "a fresh client connection is used",
+        "receipt ID remains RCP-HND-DOCK-2020-01",
+        "recorded_at remains 2026-10-14T20:35:00Z",
+        "context_as_of remains 2026-10-14T20:30:00Z",
+        "R1 and R2 source IDs remain in the reconstructed receipt",
+        "HND-DOCK-2020 remains the unchanged linked handover",
+        "ordered snapshot retains the old HND-DOCK-2020 ROLE-DOCK-DUTY/SRC-DOCK-ROSTER-R1 context and the exact five-node current path",
+        "historical snapshot does not assert the role is current at later read time"
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "A warm-client cache hides drift, reconnect loses provenance, or a historical role snapshot is presented as current.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:35"]
+    },
+    {
+      "id": "unchanged-source-handover-and-original-oracles",
+      "scenario_id": "unchanged-source-handover-and-original-oracles",
+      "attack_or_edge_case": "Compare all preexisting operational facts and oracle files before and after receipt creation/read.",
+      "setup": "Capture HND-DOCK-2020, R1/R2, role assignments, SOP conflict and incident state; execute receipt write/read; compare against the original and source/handover oracle pins.",
+      "pinned_assertions": [
+        "HND-DOCK-2020 content is unchanged",
+        "R1 and R2 source records are unchanged",
+        "effective role assignments are unchanged",
+        "unresolved SOP claims are unchanged",
+        "incident state is unchanged",
+        "source, handover, original, temporal, shift-board, and cascade oracle outcomes remain unchanged",
+        "receipt does not imply handover delivery",
+        "receipt does not imply procedure approval",
+        "receipt does not imply work was performed"
+      ],
+      "nonzero_assertion_count": 9,
+      "failure_detected": "The receipt mutates prior operational facts, changes an established oracle, or implies approval/delivery/completion.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:36"]
+    },
+    {
+      "id": "server-side-branch-and-pre-effective-denial",
+      "scenario_id": "server-side-branch-and-pre-effective-denial",
+      "attack_or_edge_case": "Bypass browser visibility by posting the unrelated hypothetical branch or a pre-effective timestamp directly to the server.",
+      "setup": "Submit HND-DOCK-2020 attached to BR-C4-RESTORE-DRILL (the separate INC-204 simulation), then submit it at 2026-10-14T20:29:00Z; inspect all owned graph/action counts after each rejection.",
+      "pinned_assertions": [
+        "server rejects attaching HND-DOCK-2020 for INC-207 to BR-C4-RESTORE-DRILL for INC-204",
+        "server rejects acknowledgment at pre-effective 2026-10-14T20:29:00Z",
+        "rejections happen before receipt, action, or graph mutation",
+        "branch rejection adds zero receipt nodes",
+        "branch rejection changes zero existing handover actions",
+        "branch rejection causes zero graph mutations",
+        "pre-effective rejection adds zero receipt nodes or handover actions",
+        "BR-C4-RESTORE-DRILL creates no causal relationship to INC-207"
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "Client-only hiding, accepting a stale snapshot, or cross-incident branch contamination allows a forbidden acknowledgment.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:37"]
+    },
+    {
+      "id": "denied-source-nondisclosure",
+      "scenario_id": "denied-source-nondisclosure",
+      "attack_or_edge_case": "Inject the fixed restricted dock source after recording operations-visible receipt/path output and compare all outputs and errors.",
+      "setup": "Use the exact restricted literals from the unchanged shift-board/source-change oracle; compare operations-visible write errors, read payloads and visual graph before/after fixture injection.",
+      "pinned_assertions": [
+        "operations-visible receipt and path outputs are invariant before/after injection",
+        "no inaccessible source ID or title is disclosed",
+        "no inaccessible body or dependent paraphrase is disclosed",
+        "no hidden count or existence signal is disclosed",
+        "no restricted relationship or graph path is disclosed",
+        "write errors reveal no denied evidence",
+        "read responses reveal no denied evidence",
+        "visual graph reveals no denied evidence"
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "Direct, count/existence, write-error, relationship, visual-path, or inferred paraphrase disclosure changes the operations-visible result.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:38"]
+    },
+    {
+      "id": "local-only-no-external-write",
+      "scenario_id": "local-only-no-external-write",
+      "attack_or_edge_case": "Trace all side effects of acknowledgment and test cleanup; distinguish the graph receipt from existing handover-action persistence.",
+      "setup": "Acknowledge only inside the app, inspect owned graph and all existing action files/counters, observe network/external action surfaces, then clean up only resources created by this test.",
+      "pinned_assertions": [
+        "no message is sent and no call is made",
+        "no external ticket or hospital-system write occurs",
+        "no automatic assignment or clinical advice occurs",
+        "no external network write occurs",
+        "receipt is stored only in the explicitly owned synthetic FalkorDB graph after acknowledgment",
+        "no existing handover action or confirmed-actions.json file is written",
+        "cleanup deletes only this task's unique graph",
+        "cleanup stops only processes started by this task"
+      ],
+      "nonzero_assertion_count": 8,
+      "failure_detected": "A review receipt escapes local synthetic storage, writes the existing action store, produces clinical/external effects, or cleans up unowned resources.",
+      "planner_refs": ["planner-bdb7b5ac66b041fe8e0a44e126dcf00c.md:39"]
+    }
+  ]
+}

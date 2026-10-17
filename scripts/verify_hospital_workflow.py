@@ -10,11 +10,13 @@ candidate-independent oracle for the synthetic paths and SOP conflict.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
 import sys
 import time
+from urllib.parse import urlencode
 import urllib.error
 import urllib.request
 import uuid
@@ -23,14 +25,32 @@ from typing import Any
 
 from verify_falkordb_live import (
     LiveVerifier,
+    RespConnection,
     VerificationFailure,
     explicit_bind_preflight,
     host_facts,
     query_result,
     result_rows,
 )
+import verify_shift_board_contract as shift_board_contract
 from wardatlas_app import WardAtlasService
-from wardatlas_fixtures import restricted_fixture_queries
+from wardatlas_fixtures import restricted_fixture_queries, seed_queries
+from wardatlas_shift_board import (
+    BRANCH_AT,
+    BRANCH_EVENT_QUERY,
+    CONVEYOR_EVENT_QUERY,
+    CONVEYOR_OUTAGE_AT,
+    CONVEYOR_PATH_QUERY,
+    CONVEYOR_RESTORED_AT,
+    DOCK_BEFORE,
+    DOCK_EFFECTIVE,
+    DOCK_REVIEW_QUERY,
+    DOCK_SOURCE_QUERY,
+    branch_reset_queries,
+    dock_role_query,
+    restricted_shift_board_queries,
+    seed_shift_board_queries,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -102,6 +122,11 @@ def validate_docs() -> list[str]:
         "/workspace/evidence/wardatlas/ui/wardatlas-workflow.json",
         "/workspace/evidence/wardatlas/ui/desktop.png",
         "/workspace/evidence/wardatlas/ui/mobile.png",
+        "tests/shift-board-expected-results.json",
+        "tests/shift-board-adversarial-matrix.json",
+        "INC-207",
+        "BR-C4-RESTORE-DRILL",
+        "/workspace/evidence/integrate-graph-backed-shift-board/e449917f25da42488622367ede4583eb/ui-review-fix/wardatlas-workflow.json",
         "Redis 8.0.5",
         "FalkorDB 6.0.2",
         "27 assertions",
@@ -112,7 +137,7 @@ def validate_docs() -> list[str]:
         "not a validated hospital system",
     ]
     missing = [entry for entry in required_status if entry.casefold() not in status.casefold()]
-    required_matrix = ["Implemented", "Verified", "Planned", "not configured", "local-only"]
+    required_matrix = ["Implemented", "Verified", "Planned", "not configured", "local-only", "INC-207", "INC-204", "BR-C4-RESTORE-DRILL", "HND-DOCK-2020"]
     missing.extend(f"FEATURE-MATRIX.md missing {entry}" for entry in required_matrix if entry.casefold() not in matrix.casefold())
     if missing:
         raise VerificationFailure(f"status or feature matrix omits required honest delivery details: {missing}")
@@ -120,10 +145,14 @@ def validate_docs() -> list[str]:
 
 
 class HospitalWorkflowVerifier:
-    def __init__(self, args: argparse.Namespace, expected: dict, matrix: dict):
+    def __init__(self, args: argparse.Namespace, expected: dict, matrix: dict, shift_expected: dict, shift_matrix: dict):
         self.args = args
         self.expected = expected
         self.matrix = matrix
+        self.shift_expected = shift_expected
+        self.shift_matrix = shift_matrix
+        self.shift_expected_by_id = {row["id"]: row["expected"] for row in shift_expected["cases"]}
+        self.shift_board_assertions: dict[str, list[str]] = {row["id"]: [] for row in shift_matrix["cases"]}
         self.run_id = uuid.uuid4().hex
         self.db: LiveVerifier | None = None
         self.app: subprocess.Popen | None = None
@@ -144,13 +173,27 @@ class HospitalWorkflowVerifier:
     def assertion_count(self) -> int:
         return len(self.assertions)
 
-    def check(self, name: str, condition: bool, detail: Any = None) -> None:
+    def check(self, name: str, condition: bool, detail: Any = None, shift_case: str | None = None) -> None:
         row = {"assertion": name, "passed": bool(condition)}
         if detail is not None:
             row["detail"] = detail
         self.assertions.append(row)
+        if shift_case is not None:
+            if shift_case not in self.shift_board_assertions:
+                raise VerificationFailure(f"unknown shift-board adversarial case: {shift_case}")
+            self.shift_board_assertions[shift_case].append(name)
         if not condition:
             raise VerificationFailure(f"{name}; observed={detail!r}")
+
+    def shift_check(self, case_id: str, name: str, condition: bool, detail: Any = None) -> None:
+        self.check(name, condition, detail, shift_case=case_id)
+
+    def shift_board_request(self, dock_at: str = DOCK_EFFECTIVE, conveyor_at: str = CONVEYOR_OUTAGE_AT, branch_at: str = BRANCH_AT) -> tuple[int, dict | str]:
+        query = urlencode({"scope": "operations", "dock_at": dock_at, "conveyor_at": conveyor_at, "branch_at": branch_at})
+        status, body = self.get("/api/shift-board?" + query)
+        if status != 200 or not isinstance(body, dict):
+            raise VerificationFailure(f"shift-board API request failed: status={status}, body={body!r}")
+        return status, body
 
     def get(self, path: str) -> tuple[int, dict | str]:
         return api_request(self.app_url, path)
@@ -221,6 +264,20 @@ class HospitalWorkflowVerifier:
 
         status, empty = self.get("/api/briefing?scope=operations")
         self.check("empty graph returns no impact path or SOP finding through API", status == 200 and empty.get("impact_paths") == [] and empty.get("sop_finding") is None, empty)
+        empty_board_status, empty_board = self.get("/api/shift-board?scope=operations")
+        cold_expected = self.shift_expected_by_id["cold-empty-board"]
+        self.shift_check(
+            "cold-empty-board",
+            "cold graph reports zero shift-board rows and an empty/unknown state without invented cases",
+            empty_board_status == 200
+            and empty_board.get("seeded_board_row_count") == cold_expected["seeded_board_row_count"] == 0
+            and empty_board.get("cases") == cold_expected["incident_rows"] == []
+            and empty_board.get("case_ids") == []
+            and empty_board.get("board_state") == cold_expected["board_state"]
+            and empty_board.get("dock") is None
+            and empty_board.get("conveyor") is None,
+            empty_board,
+        )
 
         status, reset = self.post("/api/scenario/reset")
         self.check("in-app reset reseeds deterministic scenario", status == 200 and reset.get("status") == "reset" and reset.get("scenario") == "INC-204 synthetic outage", reset)
@@ -288,6 +345,481 @@ class HospitalWorkflowVerifier:
         rejected_list_status, rejected_list = self.get("/api/actions")
         self.check("false confirmation cannot persist an action", rejected_status == 400 and rejected.get("error") == "Explicit in-app confirmation is required; nothing was saved." and rejected_list_status == 200 and rejected_list.get("count") == 0 and not self.state_dir.exists(), {"status": rejected_status, "error": rejected, "actions": rejected_list})
 
+        self.shift_board_suite()
+
+    @staticmethod
+    def _canonical_conveyor_evidence(paths: list[dict]) -> list[dict]:
+        return [{
+            "path": item["path"],
+            "source_ids": [source["source_id"] for source in item["evidence"]],
+            "source_titles": [source["title"] for source in item["evidence"]],
+            "observed_at": [source["observed_at"] for source in item["evidence"]],
+        } for item in paths]
+
+    def _owned_graph_counts(self) -> tuple[int, int]:
+        node_rows = self.db.graph_rows("ui-shift-node-count", "MATCH (n) RETURN count(n) AS node_count")
+        rel_rows = self.db.graph_rows("ui-shift-rel-count", "MATCH ()-[r]->() RETURN count(r) AS rel_count")
+        return int(node_rows[0]["node_count"]), int(rel_rows[0]["rel_count"])
+
+    def shift_board_suite(self) -> None:
+        """Exercise all eight independently-pinned shift-board outcome groups."""
+        dock_exp = self.shift_expected_by_id["dock-role-time-and-source-evidence"]
+        review_exp = self.shift_expected_by_id["explicit-edge-review-queue"]
+        conveyor_exp = self.shift_expected_by_id["conveyor-observed-and-hypothetical-times"]
+        separation_exp = self.shift_expected_by_id["no-cross-case-path-or-causal-contamination"]
+        denied_exp = self.shift_expected_by_id["denied-source-nondisclosure"]
+        repeat_exp = self.shift_expected_by_id["empty-reseed-reconnect-and-owned-cleanup"]
+
+        _, dock_before_board = self.shift_board_request(dock_at=dock_exp["before"]["as_of"])
+        _, dock_after_board = self.shift_board_request(dock_at=dock_exp["at_effective_time"]["as_of"])
+        dock_before = dock_before_board["dock"]
+        dock_after = dock_after_board["dock"]
+        self.shift_check(
+            "dock-role-time-and-source-evidence",
+            "INC-207 has the exact graph-derived dock role path before and at R2's effective boundary",
+            dock_before["role_path"] == dock_exp["before"]["role_path"]
+            and dock_after["role_path"] == dock_exp["at_effective_time"]["role_path"],
+            {"before": dock_before["role_path"], "at_effective_time": dock_after["role_path"]},
+        )
+        self.shift_check(
+            "dock-role-time-and-source-evidence",
+            "only the final ownership node changes and both roster source versions retain observed/effective provenance",
+            dock_before["role_path"][:-1] == dock_after["role_path"][:-1]
+            and dock_before["role_path"][-1] == dock_exp["only_changed_path_node"]["from"]
+            and dock_after["role_path"][-1] == dock_exp["only_changed_path_node"]["to"]
+            and dock_after["source_versions"] == dock_exp["source_versions"]
+            and dock_before["source_versions"] == dock_exp["source_versions"]
+            and dock_before["as_of"] == dock_exp["before"]["as_of"]
+            and dock_after["as_of"] == dock_exp["at_effective_time"]["as_of"],
+            {"before_sources": dock_before["source_versions"], "after_sources": dock_after["source_versions"]},
+        )
+        _, normalized_offset = self.shift_board_request(dock_at="2026-10-14T22:30:00+02:00")
+        invalid_before_counts = self._owned_graph_counts()
+        invalid_status, invalid_body = self.get("/api/shift-board?" + urlencode({"scope": "operations", "dock_at": "2026-10-14T18:61:00Z"}))
+        invalid_after_counts = self._owned_graph_counts()
+        _, after_invalid_request = self.shift_board_request()
+        self.shift_check(
+            "dock-role-time-and-source-evidence",
+            "offset timestamps normalize to the exact pinned UTC boundary and malformed times fail without mutation",
+            normalized_offset["dock"]["as_of"] == dock_exp["at_effective_time"]["as_of"]
+            and normalized_offset["dock"]["role_path"] == dock_exp["at_effective_time"]["role_path"]
+            and invalid_status == 400
+            and invalid_body == {"error": "Invalid timestamp; use an explicit ISO-8601 offset."}
+            and invalid_before_counts == invalid_after_counts
+            and after_invalid_request["dock"] == dock_after
+            and after_invalid_request["conveyor"] == dock_after_board["conveyor"],
+            {"offset_time": normalized_offset["dock"]["as_of"], "invalid_status": invalid_status, "invalid_body": invalid_body},
+        )
+        # Prove the effective role is not a static response list: remove only
+        # this owned edge, query the real graph again, then restore the fixture.
+        self.db.graph_query(
+            "ui-remove-dock-r2-owner",
+            "MATCH (:Department {id: 'DEPT-RECEIVING-DOCK'})-[r:OWNED_BY {id: 'REL-DOCK-OWNER-R2'}]->(:Role {id: 'ROLE-DOCK-SWING'}) DELETE r",
+        )
+        _, without_r2 = self.shift_board_request(dock_at=dock_exp["at_effective_time"]["as_of"])
+        self.shift_check(
+            "dock-role-time-and-source-evidence",
+            "removing the R2 ownership edge removes the time-selected role result",
+            without_r2["dock"]["role_path"] == [],
+            without_r2["dock"],
+        )
+        for query in seed_shift_board_queries():
+            self.db.graph_query("ui-restore-dock-r2-owner", query)
+
+        _, review_board = self.shift_board_request(dock_at=dock_exp["at_effective_time"]["as_of"])
+        review = review_board["dock"]
+        review_ids = [row["artifact_id"] for row in review["review_candidates"]]
+        self.shift_check(
+            "explicit-edge-review-queue",
+            "review queue contains exactly the two artifacts linked to superseded R1",
+            review_ids == review_exp["review_candidates"]
+            and review_exp["excluded_lexical_only_id"] not in review_ids,
+            review["review_candidates"],
+        )
+        self.shift_check(
+            "explicit-edge-review-queue",
+            "old handover role/source are unchanged and unlinked coverage remains unknown",
+            review["unchanged_handover"] == {
+                "artifact_id": "HND-DOCK-2020",
+                "role_id": review_exp["unchanged_handover_role_id"],
+                "source_id": review_exp["unchanged_handover_source_id"],
+            }
+            and review["coverage_status"] == review_exp["coverage_status"]
+            and review["unlinked_artifact_status"] == review_exp["unlinked_artifact_status"]
+            and review_exp["missing_link_does_not_mean_current"] is True,
+            review,
+        )
+        before_citation_removal = review_board
+        self.db.graph_query(
+            "ui-remove-owned-handover-citation",
+            "MATCH (:Handover {id: 'HND-DOCK-2020'})-[r:CITES_SOURCE {id: 'REL-HND-DOCK-2020-R1'}]->(:Evidence {id: 'SRC-DOCK-ROSTER-R1'}) DELETE r",
+        )
+        _, after_citation_removal = self.shift_board_request(dock_at=dock_exp["at_effective_time"]["as_of"])
+        after_citation_ids = [row["artifact_id"] for row in after_citation_removal["dock"]["review_candidates"]]
+        self.shift_check(
+            "explicit-edge-review-queue",
+            "removing the owned citation removes only HND-DOCK-2020 and lexical text cannot restore it",
+            after_citation_ids == ["TKT-DOCK-88"]
+            and review_exp["excluded_lexical_only_id"] not in after_citation_ids
+            and after_citation_removal["dock"]["role_path"] == review["role_path"]
+            and after_citation_removal["conveyor"] == before_citation_removal["conveyor"],
+            after_citation_removal["dock"],
+        )
+        for query in seed_shift_board_queries():
+            self.db.graph_query("ui-restore-owned-handover-citation", query)
+
+        _, observed = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_at_1830"]["at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        conveyor_1830 = observed["conveyor"]
+        observed_paths = conveyor_1830["paths"]
+        observed_evidence = self._canonical_conveyor_evidence(observed_paths)
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "18:30 observed outage selects both exact graph paths with four pinned source records each",
+            conveyor_1830["status"] == conveyor_exp["observed_at_1830"]["status"]
+            and [item["path"] for item in observed_paths] == conveyor_exp["observed_at_1830"]["paths"]
+            and observed_evidence == conveyor_exp["observed_at_1830"]["canonical_path_evidence"],
+            observed_evidence,
+        )
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "observed outage event keeps the exact event/source/time provenance",
+            conveyor_1830["event"]["event_id"] == conveyor_exp["observed_at_1830"]["event_id"]
+            and conveyor_1830["event"]["source_id"] == conveyor_exp["observed_at_1830"]["source_id"]
+            and conveyor_1830["event"]["event_at"] == conveyor_exp["observed_at_1830"]["event_at"]
+            and conveyor_1830["event"]["evidence_label"] == "observed source fact",
+            conveyor_1830["event"],
+        )
+        _, restored = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_restoration_1930"]["at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        conveyor_1930 = restored["conveyor"]
+        _, replay = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_restoration_1930"]["historical_at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "19:30 observed restoration has no active paths while historical replay preserves the 18:30 evidence",
+            conveyor_1930["status"] == conveyor_exp["observed_restoration_1930"]["status"]
+            and conveyor_1930["event"]["event_id"] == conveyor_exp["observed_restoration_1930"]["restoration_event_id"]
+            and conveyor_1930["event"]["source_id"] == conveyor_exp["observed_restoration_1930"]["restoration_source_id"]
+            and conveyor_1930["event"]["event_at"] == conveyor_exp["observed_restoration_1930"]["restoration_event_at"]
+            and conveyor_1930["paths"] == []
+            and replay["conveyor"]["paths"] == observed_paths
+            and self._canonical_conveyor_evidence(replay["conveyor"]["paths"]) == observed_evidence,
+            {"restored_event": conveyor_1930["event"], "restored_paths": conveyor_1930["paths"], "replay_paths": replay["conveyor"]["paths"]},
+        )
+        branch = conveyor_1830["branch"]
+        branch_expected = conveyor_exp["hypothetical_branch_1850"]
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "18:50 branch is hypothetical-only and mainline keeps both observed paths unchanged",
+            branch["branch_id"] == branch_expected["branch_id"]
+            and branch["status"] == branch_expected["branch_status"]
+            and branch["event"]["event_id"] == branch_expected["hypothetical_event_id"]
+            and branch["event"]["event_at"] == branch_expected["hypothetical_event_at"]
+            and branch["event"]["evidence_label"] == "hypothetical branch"
+            and "source_id" not in branch["event"]
+            and branch["paths"] == branch_expected["branch_paths"]
+            and branch["mainline_status"] == branch_expected["mainline_status"]
+            and [row["path"] for row in branch["mainline_paths"]] == branch_expected["mainline_paths"]
+            and self._canonical_conveyor_evidence(branch["mainline_paths"]) == observed_evidence
+            and branch["observed_state_mutated"] == branch_expected["observed_state_mutated"],
+            branch,
+        )
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "API labels source events, graph paths, hypothetical assumptions, and missing evidence separately",
+            conveyor_1830["evidence_semantics"] == {
+                "observed_event": "source fact",
+                "paths": "graph-derived path",
+                "branch_event": "hypothetical branch",
+                "missing_or_unlinked": "missing or unknown evidence",
+            },
+            conveyor_1830["evidence_semantics"],
+        )
+        # Deliberately mislink the pinned hypothetical event onto the observed
+        # event relation with a visible source. Event-kind/branch filters must
+        # still keep it out of mainline history. Remove only these two owned
+        # adversarial relationships immediately afterward.
+        self.db.graph_query(
+            "ui-mislink-hypothetical-event-to-mainline",
+            "MATCH (i:Incident {id: 'INC-204'}), (event:StateEvent {id: 'EVT-BR-RESTORE-01'}) MERGE (i)-[r:HAS_STATE_EVENT {access: 'operations'}]->(event)",
+        )
+        self.db.graph_query(
+            "ui-mislink-hypothetical-event-source",
+            "MATCH (event:StateEvent {id: 'EVT-BR-RESTORE-01'}), (src:Evidence {id: 'SRC-ASSET-C4-OUTAGE'}) MERGE (event)-[r:EVIDENCED_BY {access: 'operations'}]->(src)",
+        )
+        linked_hypothetical_rows = self.db.graph_rows("ui-filter-hypothetical-mainline", CONVEYOR_EVENT_QUERY)
+        _, board_with_mislinked_hypothetical = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_at_1830"]["at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        self.shift_check(
+            "conveyor-observed-and-hypothetical-times",
+            "a hypothetical event mislinked to the mainline with visible source evidence is still excluded",
+            {row["event_id"] for row in linked_hypothetical_rows} == {"EVT-C4-UNAVAILABLE-01", "EVT-C4-RESTORED-01"}
+            and len(linked_hypothetical_rows) == 2
+            and board_with_mislinked_hypothetical["conveyor"] == observed["conveyor"],
+            {"mainline_event_ids": [row["event_id"] for row in linked_hypothetical_rows], "board_unchanged": board_with_mislinked_hypothetical["conveyor"] == observed["conveyor"]},
+        )
+        self.db.graph_query(
+            "ui-unlink-hypothetical-event-mainline",
+            "MATCH (i:Incident {id: 'INC-204'})-[r:HAS_STATE_EVENT]->(event:StateEvent {id: 'EVT-BR-RESTORE-01'}) DELETE r",
+        )
+        self.db.graph_query(
+            "ui-unlink-hypothetical-source",
+            "MATCH (event:StateEvent {id: 'EVT-BR-RESTORE-01'})-[r:EVIDENCED_BY]->(:Evidence {id: 'SRC-ASSET-C4-OUTAGE'}) DELETE r",
+        )
+
+        # The two cases share the graph, but actual variable-length graph
+        # traversals must not connect the dock revision to the conveyor event.
+        cross_path_rows = self.db.graph_rows(
+            "ui-cross-case-path",
+            "MATCH p=(i:Incident {id: 'INC-207'})-[*1..8]-(e:Equipment {id: 'CONVEYOR-C4'}) RETURN count(p) AS path_count",
+        )
+        causal_path_rows = self.db.graph_rows(
+            "ui-dock-roster-causal-path",
+            "MATCH p=(src:Evidence {id: 'SRC-DOCK-ROSTER-R2'})-[*1..8]-(evt:StateEvent {id: 'EVT-C4-UNAVAILABLE-01'}) RETURN count(p) AS path_count",
+        )
+        path_ids_by_case = {
+            "INC-207": set(review["role_path"] + [source["source_id"] for source in review["source_versions"]]),
+            "INC-204": {source["source_id"] for row in observed_paths for source in row["evidence"]} | {conveyor_1830["event"]["source_id"]},
+        }
+        self.shift_check(
+            "no-cross-case-path-or-causal-contamination",
+            "the shared graph contains no dock-to-conveyor path or dock-roster-to-outage causal path",
+            cross_path_rows == [{"path_count": 0}]
+            and causal_path_rows == [{"path_count": 0}]
+            and path_ids_by_case["INC-207"].isdisjoint(path_ids_by_case["INC-204"])
+            and separation_exp["dock_roster_revision_caused_INC-204_outage"] is False
+            and separation_exp["dock_and_conveyor_provenance_are_separate"] is True,
+            {"dock_to_conveyor": cross_path_rows, "roster_to_outage": causal_path_rows, "case_sources": {key: sorted(value) for key, value in path_ids_by_case.items()}},
+        )
+
+        # Removing an owned dependency edge must change only its downstream
+        # graph path, and restoring the edge must reproduce the pinned output.
+        self.db.graph_query(
+            "ui-remove-central-sterile-dependency",
+            "MATCH (:Service {id: 'SVC-MATERIAL-TRANSFER'})-[r:SERVES {id: 'REL-SVC-CSS'}]->(:Department {id: 'DEPT-CENTRAL-STERILE'}) DELETE r",
+        )
+        _, dependency_removed = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_at_1830"]["at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        remaining_expected = conveyor_exp["observed_at_1830"]["paths"][1:]
+        self.shift_check(
+            "no-cross-case-path-or-causal-contamination",
+            "removing one owned service dependency changes only its recorded conveyor path",
+            [row["path"] for row in dependency_removed["conveyor"]["paths"]] == remaining_expected
+            and dependency_removed["dock"] == observed["dock"]
+            and dependency_removed["conveyor"]["event"] == conveyor_1830["event"]
+            and dependency_removed["conveyor"]["branch"]["mainline_paths"] == dependency_removed["conveyor"]["paths"],
+            {"paths_after_removal": dependency_removed["conveyor"]["paths"], "dock_unchanged": dependency_removed["dock"] == observed["dock"]},
+        )
+        for query in seed_queries():
+            self.db.graph_query("ui-restore-central-sterile-dependency", query)
+        _, restored_dependency = self.shift_board_request(
+            conveyor_at=conveyor_exp["observed_at_1830"]["at"],
+            branch_at=conveyor_exp["hypothetical_branch_1850"]["at"],
+        )
+        self.shift_check(
+            "no-cross-case-path-or-causal-contamination",
+            "restoring the explicit dependency restores the exact pinned path set without cross-case effects",
+            [row["path"] for row in restored_dependency["conveyor"]["paths"]] == conveyor_exp["observed_at_1830"]["paths"]
+            and restored_dependency["dock"] == observed["dock"],
+            restored_dependency,
+        )
+        baseline_seeded_counts = self._owned_graph_counts()
+        self.shift_check(
+            "no-cross-case-path-or-causal-contamination",
+            "removing an owned citation changes only that review candidate and lexical wording cannot replace the missing edge",
+            after_citation_ids == ["TKT-DOCK-88"]
+            and after_citation_removal["conveyor"] == before_citation_removal["conveyor"]
+            and separation_exp["removing_owned_citation_changes_only_its_review_candidate"] is True
+            and separation_exp["text_similarity_cannot_recreate_removed_edge_results"] is True,
+            after_citation_removal["dock"]["review_candidates"],
+        )
+
+        denied_before = self.shift_board_request()[1]
+        for index, query in enumerate(restricted_shift_board_queries(), 1):
+            self.db.graph_query(f"ui-shift-denied-source-{index}", query)
+        denied_after = self.shift_board_request()[1]
+        denied_serialized = json.dumps(denied_after, sort_keys=True)
+        hidden = [
+            *denied_exp["dock_restricted_literals"],
+            denied_exp["conveyor_restricted_fixture"]["event_id"],
+            denied_exp["conveyor_restricted_fixture"]["source_id"],
+            denied_exp["conveyor_restricted_fixture"]["source_title"],
+            denied_exp["conveyor_restricted_fixture"]["fact_text"],
+            denied_exp["conveyor_restricted_fixture"]["event_effective_at"],
+        ]
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "operations board output is invariant after both pinned restricted source fixtures are injected",
+            denied_after == denied_before,
+            {"before": denied_before, "after": denied_after},
+        )
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "restricted identifiers, title/body, event time, hidden count/existence, and dependent paths do not leak",
+            all(literal not in denied_serialized for literal in hidden)
+            and not any("hidden_count" in key.lower() or "restricted_count" in key.lower() for key in denied_after)
+            and denied_exp["denied_identifier_title_fact_count_existence_path_or_paraphrase_disclosed"] is False
+            and denied_exp["hidden_counts_or_existence_disclosed"] is False,
+            {"forbidden_literals_found": [literal for literal in hidden if literal in denied_serialized], "top_level_fields": sorted(denied_after)},
+        )
+        self.db.graph_query(
+            "ui-point-ops-owner-edge-at-denied-source",
+            "MATCH (:Department {id: 'DEPT-CENTRAL-STERILE'})-[owns:OWNED_BY {id: 'REL-CSS-CURRENT'}]->(:Role {id: 'ROLE-STERILE-OPS-COORD'}) SET owns.source_id = 'SRC-RESTRICTED-92', owns.source_title = 'Restricted Continuity Annex 92', owns.observed_at = '2026-10-14T18:20:00Z'",
+        )
+        self.db.graph_query(
+            "ui-add-denied-role-evidence-link",
+            "MATCH (role:Role {id: 'ROLE-STERILE-OPS-COORD'}), (src:Evidence {id: 'SRC-RESTRICTED-92'}) MERGE (role)-[r:EVIDENCED_BY {access: 'operations'}]->(src)",
+        )
+        _, denied_owner_edge = self.shift_board_request()
+        denied_owner_serialized = json.dumps(denied_owner_edge, sort_keys=True)
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "an operations-labeled ownership edge cannot expose a restricted provenance node or its dependent path",
+            [row["path"] for row in denied_owner_edge["conveyor"]["paths"]] == conveyor_exp["observed_at_1830"]["paths"][1:]
+            and all(literal not in denied_owner_serialized for literal in hidden)
+            and "Restricted Continuity Annex 92" not in denied_owner_serialized,
+            denied_owner_edge["conveyor"]["paths"],
+        )
+        self.db.graph_query(
+            "ui-remove-denied-role-evidence-link",
+            "MATCH (:Role {id: 'ROLE-STERILE-OPS-COORD'})-[r:EVIDENCED_BY]->(:Evidence {id: 'SRC-RESTRICTED-92'}) DELETE r",
+        )
+        self.db.graph_query(
+            "ui-restore-ops-owner-provenance",
+            "MATCH (:Department {id: 'DEPT-CENTRAL-STERILE'})-[owns:OWNED_BY {id: 'REL-CSS-CURRENT'}]->(:Role {id: 'ROLE-STERILE-OPS-COORD'}) SET owns.source_id = 'SRC-OPS-ROSTER', owns.source_title = 'Synthetic Operations Role Roster', owns.observed_at = '2026-10-14T18:04:00Z'",
+        )
+        _, restored_owner_source = self.shift_board_request()
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "restoring the owned operations provenance restores the exact visible evidence output",
+            restored_owner_source == denied_after,
+            {"restored_equals_original_visible": restored_owner_source == denied_after},
+        )
+        denied_scope_status, denied_scope_body = self.get("/api/shift-board?scope=restricted")
+        self.shift_check(
+            "denied-source-nondisclosure",
+            "unsupported shift-board role scope receives the generic denial without graph details",
+            denied_scope_status == 403
+            and denied_scope_body == {"error": "This view is not available."}
+            and all(marker not in json.dumps(denied_scope_body) for marker in hidden),
+            {"status": denied_scope_status, "body": denied_scope_body},
+        )
+
+        # The browser suite later verifies the explicit confirmation click; at
+        # this API boundary preview alone must still leave persistent state empty.
+        draft_status, action_draft = self.post("/api/handover/draft", {"incident_id": "INC-204"})
+        actions_status, actions = self.get("/api/actions")
+        self.shift_check(
+            "explicit-local-confirmation-no-external-writes",
+            "a graph-backed briefing or draft preview has no persisted local action before explicit confirmation",
+            draft_status == 201
+            and bool(action_draft.get("confirmation_token"))
+            and not any(term in json.dumps(action_draft).casefold() for term in ("diagnosis", "treatment", "medication", "triage"))
+            and actions_status == 200
+            and actions.get("count") == 0
+            and actions.get("actions") == []
+            and self.shift_expected_by_id["explicit-local-confirmation-no-external-writes"]["draft_persisted_before_confirmation"] is False
+            and self.shift_expected_by_id["explicit-local-confirmation-no-external-writes"]["explicit_confirmation_required"] is True,
+            {"draft": action_draft, "actions": actions},
+        )
+
+        # Idempotence means re-running the MERGE fixture in place produces no
+        # duplicate graph nodes/edges, not merely that a reset can reseed.
+        counts_before_repeat = self._owned_graph_counts()
+        board_before_repeat = self.shift_board_request()[1]
+        for query in [*seed_shift_board_queries()]:
+            self.db.graph_query("ui-repeat-shift-board-seed", query)
+        counts_after_repeat = self._owned_graph_counts()
+        board_after_repeat = self.shift_board_request()[1]
+        self.shift_check(
+            "empty-reseed-reconnect-and-owned-cleanup",
+            "repeat ingestion adds zero shift-board nodes or relationships and pinned outputs remain unchanged",
+            counts_after_repeat == counts_before_repeat
+            and board_after_repeat == board_before_repeat
+            and repeat_exp["repeated_seed_node_delta"] == 0
+            and repeat_exp["repeated_seed_relationship_delta"] == 0
+            and repeat_exp["pinned_outputs_unchanged_after_reseed"] is True,
+            {"before_counts": counts_before_repeat, "after_counts": counts_after_repeat},
+        )
+
+        # A separately-created RESP client reconnects to the same owned graph.
+        fresh_client = RespConnection("127.0.0.1", self.args.db_port, timeout=3.0)
+        try:
+            fresh_dock_rows = result_rows(query_result(fresh_client.command("GRAPH.QUERY", self.db.graph, dock_role_query(DOCK_EFFECTIVE))))
+            fresh_event_rows = result_rows(query_result(fresh_client.command("GRAPH.QUERY", self.db.graph, CONVEYOR_EVENT_QUERY)))
+            fresh_path_rows = result_rows(query_result(fresh_client.command("GRAPH.QUERY", self.db.graph, CONVEYOR_PATH_QUERY)))
+        finally:
+            fresh_client.close()
+        _, after_reconnect = self.shift_board_request()
+        self.shift_check(
+            "empty-reseed-reconnect-and-owned-cleanup",
+            "a new FalkorDB client connection returns the same time-selected paths and event-backed outputs",
+            len(fresh_dock_rows) == 1
+            and [fresh_dock_rows[0]["incident_id"], fresh_dock_rows[0]["equipment_id"], fresh_dock_rows[0]["service_id"], fresh_dock_rows[0]["department_id"], fresh_dock_rows[0]["role_id"]] == after_reconnect["dock"]["role_path"]
+            and len(fresh_event_rows) == 2
+            and len(fresh_path_rows) == 2
+            and after_reconnect == board_before_repeat
+            and repeat_exp["new_client_reconnect_required"] is True
+            and repeat_exp["pinned_outputs_unchanged_after_reconnect"] is True,
+            {"fresh_dock_rows": fresh_dock_rows, "fresh_event_rows": fresh_event_rows, "fresh_path_count": len(fresh_path_rows)},
+        )
+
+        before_branch_reset = self.shift_board_request()[1]
+        branch_reset_status, branch_reset = self.post("/api/shift-board/branch/reset")
+        after_branch_reset = self.shift_board_request()[1]
+        self.shift_check(
+            "empty-reseed-reconnect-and-owned-cleanup",
+            "branch reset removes only the hypothetical overlay and preserves observed mainline paths",
+            branch_reset_status == 200
+            and branch_reset.get("overlay_removed") is True
+            and after_branch_reset["conveyor"]["branch"]["overlay_present"] is False
+            and after_branch_reset["conveyor"]["branch"]["event"] is None
+            and after_branch_reset["conveyor"]["branch"]["paths"] == []
+            and after_branch_reset["conveyor"]["branch"]["mainline_paths"] == before_branch_reset["conveyor"]["branch"]["mainline_paths"]
+            and after_branch_reset["conveyor"]["event"] == before_branch_reset["conveyor"]["event"]
+            and after_branch_reset["dock"] == before_branch_reset["dock"]
+            and repeat_exp["branch_reset_removes_only_branch_overlay"] is True
+            and repeat_exp["mainline_state_preserved_by_branch_reset"] is True,
+            {"reset": branch_reset, "after": after_branch_reset},
+        )
+        reset_status, reseed_reply = self.post("/api/scenario/reset")
+        _, reseeded = self.shift_board_request()
+        counts_after_reset = self._owned_graph_counts()
+        self.shift_check(
+            "empty-reseed-reconnect-and-owned-cleanup",
+            "owned scenario reseed restores both pinned cases and stable graph counts",
+            reset_status == 200
+            and reseed_reply.get("status") == "reset"
+            and reseeded == board_before_repeat
+            and counts_after_reset == baseline_seeded_counts,
+            {"reset": reseed_reply, "counts_after": counts_after_reset, "pinned_baseline_counts": baseline_seeded_counts},
+        )
+
+        # Return the app to a truly cold graph for the first browser render. The
+        # graph is owned by this verifier; browser reset then exercises reseed.
+        self.db.graph_query("ui-shift-cold-browser-graph", "MATCH (n) DETACH DELETE n")
+        cold_status, cold_ui_api = self.get("/api/shift-board?scope=operations")
+        self.shift_check(
+            "cold-empty-board",
+            "before first browser reset, a cleared owned graph still renders as empty/unknown through the live API",
+            cold_status == 200
+            and cold_ui_api.get("board_state") == "empty/unknown"
+            and cold_ui_api.get("seeded_board_row_count") == 0
+            and cold_ui_api.get("cases") == [],
+            cold_ui_api,
+        )
+
     def browser_suite(self) -> None:
         node = shutil.which("node")
         self.check("local Node runtime is available for browser assertions", node is not None, node)
@@ -297,6 +829,30 @@ class HospitalWorkflowVerifier:
         browser_report = json.loads(self.browser_report_path.read_text(encoding="utf-8"))
         self.check("browser report contains nonzero passing desktop/mobile assertions", browser_report.get("status") == "PASS" and browser_report.get("assertion_count", 0) >= 10 and len(browser_report.get("checks", [])) == browser_report.get("assertion_count"), browser_report)
         self.check("browser requested only the local product origin", browser_report.get("requested_hosts") == [f"127.0.0.1:{self.args.app_port}"], browser_report.get("requested_hosts"))
+        browser_checks = {row["name"]: row.get("passed") is True for row in browser_report.get("checks", [])}
+        self.shift_check(
+            "cold-empty-board",
+            "desktop browser initially renders the cold graph as empty/unknown before an explicit reseed",
+            browser_checks.get("cold browser board visibly says empty/unknown without default incident cases", False)
+            and browser_checks.get("cold browser has no invented incident, source, role, review, or SOP identifier", False),
+            {name: passed for name, passed in browser_checks.items() if name.startswith("cold browser")},
+        )
+        self.shift_check(
+            "explicit-local-confirmation-no-external-writes",
+            "browser draft remains unpersisted until explicit confirmation, then exactly one local action is saved with no external effects",
+            browser_checks.get("unconfirmed browser draft is not persisted", False)
+            and browser_checks.get("explicit in-app confirmation persists exactly one local draft", False)
+            and browser_checks.get("confirmation endpoint reports exactly one local action and zero external writes", False),
+            {name: passed for name, passed in browser_checks.items() if "draft" in name or "confirmation" in name},
+        )
+        self.shift_check(
+            "empty-reseed-reconnect-and-owned-cleanup",
+            "desktop/mobile browser resets the cold owned graph to its pinned scenario and can isolate/reset only the hypothetical overlay",
+            browser_checks.get("cold browser board visibly says empty/unknown without default incident cases", False)
+            and browser_checks.get("browser branch reset preserves the observed mainline impact", False)
+            and browser_checks.get("in-app reset reseeds the same pinned paths", False),
+            {name: passed for name, passed in browser_checks.items() if "reset" in name or name.startswith("cold browser")},
+        )
         state = self.state_dir / "confirmed-actions.json"
         self.check("confirmed handover is persisted only after in-app confirmation", state.is_file(), str(state))
         persisted = json.loads(state.read_text(encoding="utf-8")) if state.is_file() else {}
@@ -323,6 +879,12 @@ class HospitalWorkflowVerifier:
         self.api_suite()
         self.browser_suite()
         self.run_browser_smoke()
+        for case_id, assertion_names in self.shift_board_assertions.items():
+            self.check(
+                f"shift-board adversarial case {case_id} has a nonzero executed assertion count",
+                len(assertion_names) > 0,
+                {"assertion_count": len(assertion_names), "assertions": assertion_names},
+            )
         if self.args.verify_morning_status_and_feature_matrix:
             self.docs = validate_docs()
             self.check("morning status and implemented/verified/planned matrix are current", len(self.docs) == 2, self.docs)
@@ -369,6 +931,13 @@ class HospitalWorkflowVerifier:
             "database": db_report,
             "assertion_count": self.assertion_count,
             "assertions": self.assertions,
+            "shift_board_oracle": {
+                "expected_sha256": shift_board_contract.EXPECTED_ARTIFACT_SHA256,
+                "matrix_sha256": shift_board_contract.MATRIX_ARTIFACT_SHA256,
+                "case_assertion_counts": {case_id: len(names) for case_id, names in self.shift_board_assertions.items()},
+                "case_assertions": self.shift_board_assertions,
+                "cases": [row["id"] for row in self.shift_matrix["cases"]],
+            },
             "browser_smoke": self.browser_smoke,
             "browser_assertions_report": str(self.browser_report_path),
             "desktop_screenshot": str(self.args.evidence_dir / "desktop.png"),
@@ -401,6 +970,8 @@ def main() -> int:
     parser.add_argument("--evidence-dir", type=Path, required=True)
     parser.add_argument("--expected", type=Path, default=ROOT / "tests/expected-results.json")
     parser.add_argument("--matrix", type=Path, default=ROOT / "tests/adversarial-matrix.json")
+    parser.add_argument("--shift-board-expected", type=Path, default=ROOT / "tests/shift-board-expected-results.json")
+    parser.add_argument("--shift-board-matrix", type=Path, default=ROOT / "tests/shift-board-adversarial-matrix.json")
     args = parser.parse_args()
     if not (1024 <= args.app_port <= 65535 and 1024 <= args.db_port <= 65535):
         parser.error("both ports must be explicitly selected high ports")
@@ -415,12 +986,24 @@ def main() -> int:
     try:
         expected = json.loads(args.expected.read_text(encoding="utf-8"))
         matrix = json.loads(args.matrix.read_text(encoding="utf-8"))
+        shift_expected_bytes = args.shift_board_expected.read_bytes()
+        shift_matrix_bytes = args.shift_board_matrix.read_bytes()
+        shift_expected = json.loads(shift_expected_bytes.decode("utf-8"))
+        shift_matrix = json.loads(shift_matrix_bytes.decode("utf-8"))
         if expected.get("product") != "WardAtlas" or len(expected.get("scenarios", [])) != 8 or len(matrix.get("cases", [])) != 8:
             raise VerificationFailure("the pinned eight-scenario WardAtlas oracle and matrix are required")
+        shift_board_contract.validate_artifacts(
+            shift_expected,
+            shift_matrix,
+            hashlib.sha256(shift_expected_bytes).hexdigest(),
+            hashlib.sha256(shift_matrix_bytes).hexdigest(),
+            require_eight_cases=True,
+        )
+        shift_board_contract.validate_plan_mappings(shift_expected, shift_matrix)
         if args.assert_provenance is not True or args.assert_permissions is not True or args.assert_confirmation is not True:
             raise VerificationFailure("original provenance, permissions, and confirmation assertions are mandatory")
         args.evidence_dir.mkdir(parents=True, exist_ok=True)
-        verifier = HospitalWorkflowVerifier(args, expected, matrix)
+        verifier = HospitalWorkflowVerifier(args, expected, matrix, shift_expected, shift_matrix)
         verifier.run()
         if args.fail_on_zero and verifier.assertion_count <= 0:
             raise VerificationFailure("--fail-on-zero: workflow completed with zero assertions")
@@ -432,6 +1015,24 @@ def main() -> int:
     finally:
         if verifier:
             verifier.stop_app()
+            if status == "PASS":
+                try:
+                    cleanup_expected = verifier.shift_expected_by_id["empty-reseed-reconnect-and-owned-cleanup"]
+                    verifier.shift_check(
+                        "empty-reseed-reconnect-and-owned-cleanup",
+                        "cleanup deletes only the task-owned graph and stops only task-owned app/database processes",
+                        verifier.cleanup.get("owned_app_stopped") is True
+                        and verifier.cleanup.get("owned_graph_deleted") is True
+                        and verifier.cleanup.get("owned_database_process_stopped") is True
+                        and verifier.cleanup.get("temporary_local_state_removed") is True
+                        and cleanup_expected["cleanup_deletes_only_unique_task_owned_graph"] is True
+                        and cleanup_expected["cleanup_stops_only_task_owned_processes"] is True,
+                        verifier.cleanup,
+                    )
+                except Exception as exc:
+                    error = f"VerificationFailure: {exc}"
+                    verifier.failures.append(error)
+                    status = "FAIL"
             if status == "PASS" and not all(verifier.cleanup.values()):
                 error = f"VerificationFailure: owned cleanup incomplete: {verifier.cleanup}"
                 verifier.failures.append(error)
