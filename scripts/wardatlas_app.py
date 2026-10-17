@@ -41,6 +41,15 @@ from wardatlas_sop_impact import (
     assemble_response as assemble_sop_impact_response,
 )
 from wardatlas_handover import compare_graph_witness, has_complete_sop_witness, snapshot_from_impact, source_ids_from_snapshot
+from wardatlas_evidence_watch import (
+    DEFAULT_EFFECTIVE_AT as WATCH_DEFAULT_EFFECTIVE_AT,
+    DEFAULT_KNOWN_AT as WATCH_DEFAULT_KNOWN_AT,
+    STATUS_MESSAGES as WATCH_STATUS_MESSAGES,
+    WATCH_ID,
+    normalize_watch_axes,
+    public_refresh as public_watch_refresh,
+    witness_from_dock,
+)
 from wardatlas_shift_board import (
     BRANCH_AT,
     BRANCH_EVENT_QUERY,
@@ -212,6 +221,21 @@ APP_HTML = r'''<!doctype html>
     .branch-box p { margin:5px 0 0; color:#c4c8bd; font-size:10px; line-height:1.5; }
     .shift-unknown { color:#f1c278; }
     .shift-case[hidden] { display:none; }
+    .evidence-watch { margin:0 0 18px; border-color:#46616a; background:linear-gradient(145deg,#1c3039,#14242e 68%); }
+    .watch-intro { max-width:900px; color:#bfcecf; font-size:12px; line-height:1.6; margin:4px 0 13px; }
+    .watch-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:12px 0; }
+    .watch-controls label { display:grid; gap:6px; color:#afc2bf; font-size:10px; }
+    .watch-controls input { width:100%; min-width:0; color:var(--ink); background:#1a3038; border:1px solid #426067; border-radius:7px; padding:9px 10px; font:inherit; font-size:11px; }
+    .watch-actions { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+    .watch-preview,.watch-result { border:1px solid #35534e; border-radius:10px; padding:12px; margin-top:11px; background:#10231f; overflow-wrap:anywhere; }
+    .watch-preview[hidden] { display:none; }
+    .watch-result h3,.watch-preview h3 { margin:0 0 8px; font-size:12px; }
+    .watch-status { color:#a9e9cd; font-size:11px; font-weight:800; }
+    .watch-status.unknown { color:#f1c278; }
+    .watch-witness { color:#d1dfdb; font-size:10px; line-height:1.6; margin-top:7px; }
+    .watch-boundary { color:#9fb3b7; font-size:10px; line-height:1.55; }
+    .watch-result[hidden] { display:none; }
+    @media (max-width:560px) { .watch-controls { grid-template-columns:1fr; } }
     .sop-impact { margin:0 0 18px; border-color:#5b4d38; background:linear-gradient(145deg,#302a22,#182832 64%); }
     .sop-impact-intro { color:#bfcbc7; font-size:12px; line-height:1.55; margin:4px 0 15px; max-width:880px; }
     .sop-impact-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:14px; }
@@ -293,6 +317,19 @@ APP_HTML = r'''<!doctype html>
           </article>
         </div>
         <div id="shift-board-notice" class="notice" aria-live="polite"></div>
+      </section>
+      <section id="evidence-watch" class="card evidence-watch" aria-labelledby="evidence-watch-title">
+        <div class="card-head"><div><div class="eyebrow">Graph-backed continuity watch · local only</div><h2 id="evidence-watch-title">Next-shift dock evidence watch</h2></div><span id="watch-badge" class="tag blue">No saved watch</span></div>
+        <p class="watch-intro">Preview the INC-207 ownership witness, then explicitly confirm one local watch. Refresh compares its saved baseline with new FalkorDB evidence using independent effective-at and known-at times. Unknown means insufficient evidence—not no owner, safe, or resolved.</p>
+        <div class="watch-controls">
+          <label for="watch-effective-at">Effective at · ISO-8601 with explicit offset<input id="watch-effective-at" type="text" value="2026-10-14T20:29:00Z" autocomplete="off" spellcheck="false"></label>
+          <label for="watch-known-at">Sources known by · ISO-8601 with explicit offset<input id="watch-known-at" type="text" value="2026-10-14T20:17:59Z" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <div class="watch-actions"><button id="watch-preview-button" class="button primary" type="button">Preview R1 witness</button><button id="watch-refresh-button" class="button" type="button">Refresh saved watch</button></div>
+        <div id="watch-preview" class="watch-preview" hidden></div>
+        <div id="watch-live" class="watch-result" aria-live="polite">No confirmed watch. Previewing does not save a watch.</div>
+        <div id="watch-notice" class="notice" aria-live="polite"></div>
+        <p class="watch-boundary">Confirmation writes one record to a separate local watch-state file; it never edits confirmed handovers, writes to FalkorDB, sends messages, makes calls, creates tickets, or performs external writes.</p>
       </section>
       <section id="sop-impact" class="card sop-impact" aria-labelledby="sop-impact-title">
         <div class="card-head"><div><div class="eyebrow">Graph-native evidence trace</div><h2 id="sop-impact-title">When an SOP conflict touches an outage</h2></div><span id="sop-impact-badge" class="tag amber">Loading linked evidence…</span></div>
@@ -429,6 +466,36 @@ APP_HTML = r'''<!doctype html>
         else branchBox.textContent=`${branch.branch_id} · ${branch.status} · ${branch.event?`${branch.event.event_id} at ${branch.event.event_at} · ${branch.event.evidence_label}`:'no branch event'} · ${branch.paths.length} branch impact paths. Mainline remains ${branch.mainline_status} with ${branch.mainline_paths.length} paths; observed state mutated: ${branch.observed_state_mutated}.`;
         $('conveyor-evidence-label').textContent='Observed event/source facts are separate from graph-derived impact paths. Branch assumptions are hypothetical only; an unknown or unlinked fact remains unknown.';
       }
+    }
+    function appendWatchWitness(parent, title, witness) {
+      const section=element('div','watch-witness'); section.append(element('strong','',`${title} · Effective ${witness.effective_at} · known by ${witness.known_at}`));
+      section.append(element('div','',witness.role_path.length?`Path · ${witness.role_path.join('  →  ')}`:'Ownership path · unknown / incomplete'));
+      if(witness.source_versions.length) for(const source of witness.source_versions) section.append(element('div','',`Source · ${source.source_id} · ${source.title} · observed ${source.observed_at}${source.status?` · ${source.status}`:''}`));
+      else section.append(element('div','','No source versions are visible for this cutoff.'));
+      section.append(element('div','',`Explicit review candidates · ${witness.review_candidates.length?witness.review_candidates.join(', '):'none visible'}`));
+      parent.append(section);
+    }
+    function renderEvidenceWatch(data) {
+      const root=$('watch-live'); root.replaceChildren();
+      if(!data.watch) {
+        $('watch-badge').textContent='No saved watch';
+        root.append(element('div','subtle','No confirmed watch. Previewing does not save a watch.'));
+        return;
+      }
+      const current=data.current_result; const status=current?.status||'unknown';
+      $('watch-badge').textContent=status;
+      $('watch-badge').className=`tag${status==='unknown'?' amber':''}`;
+      root.append(element('h3','',`Saved local watch · ${data.watch.id}`));
+      appendWatchWitness(root,'Saved baseline',data.watch.baseline);
+      if(current) {
+        const statusBox=element('div',`watch-status${status==='unknown'?' unknown':''}`,`${status} · ${current.status_message}`); root.append(statusBox);
+        appendWatchWitness(root,'Fresh graph result',current);
+      } else root.append(element('div','watch-status unknown','Current graph result · unknown'));
+      root.append(element('p','watch-boundary','This is a comparison of source-backed evidence only. It does not change a handover, task, ticket, owner assignment, or other work item.'));
+    }
+    async function loadEvidenceWatch() {
+      const data=await api('/api/evidence-watch?scope=operations');
+      renderEvidenceWatch(data); $('watch-notice').textContent=''; return data;
     }
     function renderSopImpact(data) {
       const empty=data.board_state==='empty/unknown';
@@ -657,10 +724,10 @@ APP_HTML = r'''<!doctype html>
       }
     }
      async function loadAll() {
-      const [health, data, graph, actions, shiftBoard, timeline]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadKnowledgeTimeline()]);
-      $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
-      renderBriefing(data,graph); renderActions(actions.actions);
-    }
+       const [health, data, graph, actions, shiftBoard, timeline, watch]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadKnowledgeTimeline(),loadEvidenceWatch()]);
+       $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
+       renderBriefing(data,graph); renderActions(actions.actions);
+     }
     function renderHandoverSnapshot(snapshot, saved=false) {
       const root=element('section',saved?'handover-snapshot saved-snapshot':'handover-snapshot');
       if(!saved) root.id='handover-snapshot';
@@ -762,6 +829,29 @@ APP_HTML = r'''<!doctype html>
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('knowledge-replay').addEventListener('click',()=>loadKnowledgeTimeline());
     for(const button of document.querySelectorAll('[data-known-at]')) button.addEventListener('click',()=>{ $('knowledge-time').value=button.dataset.knownAt; loadKnowledgeTimeline(); });
+    $('watch-preview-button').addEventListener('click',async()=>{
+      const button=$('watch-preview-button'); button.disabled=true; $('watch-notice').textContent='';
+      try {
+        const draft=await api('/api/evidence-watch/draft',{method:'POST',body:JSON.stringify({effective_at:$('watch-effective-at').value,known_at:$('watch-known-at').value})});
+        const box=$('watch-preview'); box.replaceChildren(element('h3','',`Preview · ${draft.preview.role_id||'ownership unknown'}`));
+        appendWatchWitness(box,'Unsaved graph witness',draft.preview);
+        box.append(element('p','watch-boundary','Preview only · no watch state or graph was written. Confirm explicitly to save this one baseline separately from confirmed handovers.'));
+        const confirm=element('button','button primary','Confirm & save watch locally'); confirm.type='button'; confirm.id='confirm-evidence-watch';
+        confirm.addEventListener('click',async()=>{
+          confirm.disabled=true;
+          try { const saved=await api('/api/evidence-watch/confirm',{method:'POST',body:JSON.stringify({token:draft.confirmation_token,confirm:true})}); $('watch-notice').textContent=`Saved ${saved.watch.id} locally. No external action was taken.`; box.hidden=true; await loadEvidenceWatch(); }
+          catch(error) { $('watch-notice').textContent=`Watch not saved: ${error.message}`; confirm.disabled=false; }
+        });
+        box.append(confirm); box.hidden=false; $('watch-notice').textContent='Preview prepared in memory only. Nothing has been saved.';
+      } catch(error) { $('watch-notice').textContent=`Could not prepare watch preview: ${error.message}`; }
+      finally { button.disabled=false; }
+    });
+    $('watch-refresh-button').addEventListener('click',async()=>{
+      const button=$('watch-refresh-button'); button.disabled=true;
+      try { const params=new URLSearchParams({scope:'operations',effective_at:$('watch-effective-at').value,known_at:$('watch-known-at').value}); renderEvidenceWatch(await api(`/api/evidence-watch?${params.toString()}`)); $('watch-notice').textContent='Read-only FalkorDB refresh complete. The saved baseline is unchanged.'; }
+      catch(error) { $('watch-notice').textContent=`Watch refresh rejected: ${error.message}`; }
+      finally { button.disabled=false; }
+    });
     for(const input of [$('dock-time'),$('dock-known-time')]) input.addEventListener('change',()=>loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`));
     for(const button of document.querySelectorAll('[data-conveyor-at]')) button.addEventListener('click',()=>{ conveyorAt=button.dataset.conveyorAt; loadShiftBoard().catch(e=>$('shift-board-notice').textContent=`Board unavailable: ${e.message}`); });
     $('branch-reset').addEventListener('click',async()=>{ const button=$('branch-reset'); button.disabled=true; try { await api('/api/shift-board/branch/reset',{method:'POST',body:'{}'}); $('shift-board-notice').textContent='Only the named hypothetical overlay was reset; observed events were preserved.'; await loadShiftBoard(); } catch(e) { $('shift-board-notice').textContent=`Branch reset failed: ${e.message}`; } finally { button.disabled=false; } });
@@ -794,9 +884,12 @@ class WardAtlasService:
         self.graph_name = graph_name
         self.state_dir = resolved_state
         self.action_file = self.state_dir / "confirmed-actions.json"
+        self.watch_file = self.state_dir / "evidence-watch.json"
         self.graph_lock = threading.RLock()
         self.action_lock = threading.RLock()
+        self.watch_lock = threading.RLock()
         self.pending: dict[str, dict] = {}
+        self.pending_watches: dict[str, dict] = {}
         self.scenario_seeded_by_this_process = False
 
     def _connection(self) -> RespConnection:
@@ -1227,7 +1320,107 @@ class WardAtlasService:
                 connection.close()
         with self.action_lock:
             self.pending.clear()
+        with self.watch_lock:
+            self.pending_watches.clear()
         return {"status": "reset", "scenario": "INC-204 synthetic outage", "scope": "operations", "included_shift_board_cases": ["INC-207", "INC-204"]}
+
+    def _watch_document(self) -> dict:
+        if not self.watch_file.exists():
+            return {"schema_version": 1, "items": []}
+        value = json.loads(self.watch_file.read_text(encoding="utf-8"))
+        if value.get("schema_version") != 1 or not isinstance(value.get("items"), list) or len(value["items"]) > 1:
+            raise RuntimeError("local evidence-watch state has an unsupported format")
+        return value
+
+    @staticmethod
+    def _public_watch(record: dict) -> dict:
+        return {key: value for key, value in record.items() if key != "confirmation_token_sha256"}
+
+    def saved_evidence_watch(self) -> dict | None:
+        with self.watch_lock:
+            items = self._watch_document()["items"]
+            return self._public_watch(items[0]) if items else None
+
+    def evidence_watch_preview(self, effective_at: str, known_at: str) -> dict:
+        effective_at, known_at = normalize_watch_axes(effective_at, known_at)
+        # The projection reuses the accepted two-axis FalkorDB board query. No
+        # graph or local watch-state write occurs before explicit confirmation.
+        board = self.shift_board(dock_at=effective_at, known_at=known_at)
+        witness = witness_from_dock(board.get("dock"), effective_at, known_at)
+        if witness["role_status"] != "known":
+            raise RuntimeError("No complete operations-visible INC-207 ownership witness is available to preview.")
+        token = secrets.token_urlsafe(32)
+        now = time.time()
+        with self.watch_lock:
+            self.pending_watches = {
+                key: item for key, item in self.pending_watches.items()
+                if now - item["created_epoch"] < 1800
+            }
+            self.pending_watches[token] = {"baseline": witness, "created_epoch": now}
+        return {
+            "confirmation_token": token,
+            "preview": witness,
+            "confirmation_required": True,
+            "storage_boundary": "separate-local-evidence-watch",
+            "graph_writes": 0,
+            "external_writes": [],
+        }
+
+    def confirm_evidence_watch(self, token: str, confirmed: bool) -> dict:
+        if not confirmed:
+            raise ValueError("Explicit in-app confirmation is required; no watch was saved.")
+        if not isinstance(token, str) or not token or len(token) > 100:
+            raise ValueError("Evidence-watch confirmation token is invalid.")
+        import hashlib
+
+        token_digest = hashlib.sha256(token.encode("utf-8")).hexdigest()
+        with self.watch_lock:
+            document = self._watch_document()
+            if document["items"]:
+                existing = document["items"][0]
+                if existing.get("confirmation_token_sha256") == token_digest:
+                    return {"watch": self._public_watch(existing), "persisted": True, "idempotent_replay": True, "external_writes": []}
+                raise ValueError("The single INC-207 evidence watch is already configured.")
+            pending = self.pending_watches.get(token)
+            if pending is None or time.time() - pending["created_epoch"] >= 1800:
+                raise ValueError("Evidence-watch preview is unavailable or expired; preview it again.")
+            record = {
+                "id": WATCH_ID,
+                "incident_id": "INC-207",
+                "baseline": pending["baseline"],
+                "confirmed_at": utc_now(),
+                "storage": "local-only",
+                "confirmation_token_sha256": token_digest,
+            }
+            self.state_dir.mkdir(parents=True, exist_ok=True)
+            temporary = self.state_dir / f".evidence-watch-{secrets.token_hex(6)}.tmp"
+            try:
+                temporary.write_text(json.dumps({"schema_version": 1, "items": [record]}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                temporary.replace(self.watch_file)
+            finally:
+                if temporary.exists():
+                    temporary.unlink()
+            del self.pending_watches[token]
+            return {"watch": self._public_watch(record), "persisted": True, "idempotent_replay": False, "external_writes": []}
+
+    def refresh_evidence_watch(self, effective_at: str | None = None, known_at: str | None = None) -> dict:
+        # Validate supplied axes before reading the graph. A missing half of the
+        # pair is never replaced with a local-clock or guessed value.
+        if (effective_at is None) != (known_at is None):
+            raise ValueError("Both effective_at and known_at are required together.")
+        normalized = normalize_watch_axes(effective_at, known_at) if effective_at is not None else None
+        watch = self.saved_evidence_watch()
+        if watch is None:
+            return {"scope": "operations", "watch_count": 0, "watch": None, "current_result": None, "external_writes": []}
+        if normalized is None:
+            effective_at = watch["baseline"]["effective_at"]
+            known_at = watch["baseline"]["known_at"]
+        else:
+            effective_at, known_at = normalized
+        board = self.shift_board(dock_at=effective_at, known_at=known_at)
+        current = witness_from_dock(board.get("dock"), effective_at, known_at)
+        result = public_watch_refresh(watch, current)
+        return {"scope": "operations", "watch_count": 1, "watch": watch, "current_result": result, "external_writes": []}
 
     def saved_actions(self) -> list[dict]:
         with self.action_lock:
@@ -1422,7 +1615,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -1473,6 +1666,14 @@ class Handler(BaseHTTPRequestHandler):
                     values.get("branch_at", [BRANCH_AT])[0],
                 )
                 self._send(200, data)
+            elif parsed.path == "/api/evidence-watch":
+                values = parse_qs(parsed.query, keep_blank_values=True)
+                for key in ("effective_at", "known_at"):
+                    if key in values and len(values[key]) != 1:
+                        raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
+                effective_at = values.get("effective_at", [None])[0]
+                known_at = values.get("known_at", [None])[0]
+                self._send(200, service.refresh_evidence_watch(effective_at, known_at))
             elif parsed.path == "/api/actions":
                 items = service.saved_actions()
                 self._send(200, {"actions": items, "count": len(items), "storage": "local-only"})
@@ -1484,9 +1685,9 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._error(503, "Local graph or action state is unavailable.")
         except ValueError as exc:
-            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare"}:
+            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare", "/api/evidence-watch"}:
                 message = str(exc)
-                if parsed.path != "/api/handover/compare" and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
+                if parsed.path not in {"/api/handover/compare", "/api/evidence-watch"} and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
                     message = "Invalid timestamp; use an explicit ISO-8601 offset."
                 self._error(400, message or "Invalid timestamp; use an explicit ISO-8601 offset.")
             else:
@@ -1542,6 +1743,32 @@ class Handler(BaseHTTPRequestHandler):
                 self._error(400, str(exc))
             except Exception:
                 self._error(503, "The local handover could not be saved.")
+            return
+        if parsed.path == "/api/evidence-watch/draft":
+            try:
+                body = self._json_body()
+                self._send(201, service.evidence_watch_preview(
+                    body.get("effective_at", WATCH_DEFAULT_EFFECTIVE_AT),
+                    body.get("known_at", WATCH_DEFAULT_KNOWN_AT),
+                ))
+            except ValueError as exc:
+                self._error(400, str(exc))
+            except RuntimeError as exc:
+                self._error(409, str(exc))
+            except Exception:
+                self._error(503, "A local evidence-watch preview could not be prepared.")
+            return
+        if parsed.path == "/api/evidence-watch/confirm":
+            try:
+                body = self._json_body()
+                token = body.get("token")
+                if not isinstance(token, str) or len(token) > 100:
+                    raise ValueError("Evidence-watch confirmation token is invalid.")
+                self._send(201, service.confirm_evidence_watch(token, body.get("confirm") is True))
+            except ValueError as exc:
+                self._error(400, str(exc))
+            except Exception:
+                self._error(503, "The local evidence watch could not be saved.")
             return
         self._error(404, "Not found.")
 

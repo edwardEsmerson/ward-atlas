@@ -153,3 +153,17 @@ python3 scripts/verify_dock_bitemporal_live.py --require-live --all-ten-groups -
 ```
 
 The live report checks all 60 mapped assertions from the ten fixed groups, cold/empty, edge removal and reseed, denied-source invariance, reconnection, and desktop/mobile API agreement. It starts an owned loopback FalkorDB/app and removes only its own graph/process/state directory. The expected-results and adversarial matrix remain candidate-independent and frozen.
+
+## INC-207 next-shift evidence watch
+
+The watch card previews the R1 ownership witness at `effective_at=20:29Z` and `known_at=20:17:59Z` from the accepted live FalkorDB shift-board query. Preview is read-only. An explicit in-app confirmation saves exactly one local baseline to `evidence-watch.json`, separate from `confirmed-actions.json`; replaying its confirmation token is idempotent. Refresh re-queries both time axes and compares the ordered path and source versions, yielding only `unchanged`, `new-source-known`, `unknown`, or `changed`. R2 remains pending review at 20:29Z when newly known; at the 20:30Z boundary early knowledge remains unknown, while known R2 selects the swing path. Missing edges or source evidence do not become “no owner,” safe, current, or resolved. No graph, handover, ticket, message, call, or external state is written.
+
+Run the candidate-independent nine-group contract, focused projection/mutation tests, and actual-FalkorDB/API/browser workflow:
+
+```sh
+python3 scripts/verify_evidence_watch_contract.py --expected tests/evidence-watch-expected-results.json --matrix tests/evidence-watch-adversarial-matrix.json --pinned-plan /workspace/worktrees/planner-3bfe3e5297d44e829f1f958a41c6c772/plans/planner-3bfe3e5297d44e829f1f958a41c6c772.md --require-nine-cases --check-frozen-oracle-hashes --review-receipt tests/evidence-watch-independent-review.json
+python3 -m unittest tests.test_evidence_watch tests.test_evidence_watch_contract
+python3 scripts/verify_evidence_watch_live.py --require-live-falkordb --all-nine-groups --assert-api --assert-browser --desktop-mobile --assert-acl --assert-confirmation-boundary --assert-reconnect --assert-owned-cleanup
+```
+
+The live verifier selects DB/app ports at offsets +40/+41 inside the current `WORKSHOP_PORT_BASE`/`WORKSHOP_PORT_SPAN`, uses a unique lane-named graph and state directory, and deletes only its owned graph, process, runtime directory and watch state. It checks all 86 frozen assertions, edge/source sensitivity, denied-source API and accessible desktop/mobile DOM invariance, explicit browser confirmation, reconnect/reseed and cleanup. This is synthetic operations evidence, not real roster validation or a hospital system.
