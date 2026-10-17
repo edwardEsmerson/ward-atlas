@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -204,6 +205,33 @@ def _pinned_additive_files() -> dict[str, str]:
             require(isinstance(digest, str) and len(digest) == 64, f"invalid pinned SHA-256 for additive artifact {path}")
             files[path] = digest
     return files
+
+
+def _discover_oracle_matrix_files(root: Path) -> set[str]:
+    """Enumerate matching test files without following untrusted directory links.
+
+    ``Path.rglob`` does not descend into symlinked directories. Rejecting those
+    directories (and walking ordinary directories with ``followlinks=False``)
+    prevents an unlisted oracle from being hidden behind an alias or cycle.
+    """
+    tests_root = root / "tests"
+    require(not tests_root.is_symlink(), "test oracle/matrix inventory rejects a symlinked tests directory")
+    discovered: set[str] = set()
+
+    def fail_walk(error: OSError) -> None:
+        raise ContractFailure(f"cannot enumerate test oracle/matrix inventory: {error}") from error
+
+    for current, directories, filenames in os.walk(tests_root, topdown=True, onerror=fail_walk, followlinks=False):
+        current_path = Path(current)
+        for name in directories:
+            linked_directory = current_path / name
+            if linked_directory.is_symlink():
+                relative = linked_directory.relative_to(root)
+                raise ContractFailure(f"test oracle/matrix inventory rejects symlink directory: {relative}")
+        for name in filenames:
+            if name.endswith(("expected-results.json", "adversarial-matrix.json")):
+                discovered.add(str((current_path / name).relative_to(root)))
+    return discovered
 
 
 def validate_structure(expected: dict[str, Any], matrix: dict[str, Any], require_twelve_groups: bool) -> int:
@@ -442,15 +470,13 @@ def verify_existing_oracles(root: Path, expected: dict[str, Any]) -> dict[str, s
     require(expected.get("frozen_preexisting_oracle_hashes") == _expected_frozen_manifest(), "frozen hash manifest differs from the independently pinned file list")
     additive_files = _pinned_additive_files()
     pinned_files = set(PINNED_EXISTING) | set(additive_files)
-    discovered = {
-        str(path.relative_to(root))
-        for pattern in ("*expected-results.json", "*adversarial-matrix.json")
-        for path in (root / "tests").rglob(pattern)
-        if str(path.relative_to(root)) not in {
+    discovered = _discover_oracle_matrix_files(root)
+    discovered.difference_update(
+        {
             "tests/conveyor-bitemporal-expected-results.json",
             "tests/conveyor-bitemporal-adversarial-matrix.json",
         }
-    }
+    )
     require(discovered == pinned_files, "test oracle/matrix file set differs from the frozen and explicitly additive inventories")
     digests: dict[str, str] = {}
     for relative, pinned in {**PINNED_EXISTING, **additive_files}.items():

@@ -237,6 +237,16 @@ class ConveyorBitemporalContractTests(unittest.TestCase):
 
             nested.unlink()
             nested.parent.rmdir()
+
+            outside = temp_root / "outside-tests"
+            outside.mkdir()
+            (outside / "rogue-expected-results.json").write_text("{}\n", encoding="utf-8")
+            linked_directory = temp_root / "tests/linked-oracles"
+            linked_directory.symlink_to(outside, target_is_directory=True)
+            with self.assertRaisesRegex(contract.ContractFailure, "rejects symlink directory"):
+                contract.verify_existing_oracles(temp_root, self.expected)
+            linked_directory.unlink()
+
             for relative in contract._pinned_additive_files():
                 artifact = temp_root / relative
                 original_bytes = (ROOT / relative).read_bytes()
