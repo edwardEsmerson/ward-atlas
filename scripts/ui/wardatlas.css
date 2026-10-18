@@ -1,0 +1,102 @@
+/* WardAtlas shared shell and type. Served at /ui/wardatlas.css after each page's own styles. */
+:root {
+  color-scheme: light;
+  --wa-bg: #f4f3ef;
+  --wa-surface: #ffffff;
+  --wa-well: #f8f7f4;
+  --wa-line: #e1dfd8;
+  --wa-line-2: #cfccc4;
+  --wa-ink: #16181b;
+  --wa-ink-2: #464b52;
+  --wa-ink-3: #6f747b;
+  --wa-alert: #b4441c;
+  --wa-ok: #1d6b45;
+  --wa-sans: Inter, "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --wa-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+}
+html { background: var(--wa-bg); }
+body {
+  background: var(--wa-bg);
+  color: var(--wa-ink);
+  font-family: var(--wa-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button, input, select, textarea { font-family: inherit; }
+code, pre, kbd, samp, .mono, .evidence-id, .decision-edges, .knowledge-path { font-family: var(--wa-mono); font-feature-settings: normal; }
+::selection { background: #16181b; color: #fff; }
+a { color: var(--wa-ink); text-decoration-color: var(--wa-line-2); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--wa-ink); }
+:focus-visible { outline: 2px solid var(--wa-ink); outline-offset: 2px; }
+
+/* Global navigation, injected by the server into every page. */
+.wa-nav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 22px;
+  min-height: 54px; padding: 0 clamp(16px, 3vw, 36px);
+  background: rgba(255, 255, 255, .94);
+  border-bottom: 1px solid var(--wa-line);
+  -webkit-backdrop-filter: saturate(1.4) blur(8px); backdrop-filter: saturate(1.4) blur(8px);
+  font-family: var(--wa-sans);
+}
+.wa-brand { display: flex; align-items: center; gap: 9px; color: var(--wa-ink); text-decoration: none; font-weight: 700; font-size: 15.5px; letter-spacing: -.015em; white-space: nowrap; }
+.wa-brand svg { display: block; flex: none; }
+.wa-nav nav { display: flex; gap: 2px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.wa-nav nav::-webkit-scrollbar { display: none; }
+.wa-nav nav a { padding: 7px 11px; border-radius: 6px; color: var(--wa-ink-2); text-decoration: none; font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+.wa-nav nav a:hover { color: var(--wa-ink); background: #f0efea; }
+.wa-nav nav a[aria-current="page"] { color: var(--wa-ink); background: #ebeae4; font-weight: 600; }
+.wa-env { display: flex; align-items: center; gap: 8px; color: var(--wa-ink-3); font-size: 12.5px; white-space: nowrap; }
+.wa-env i { width: 7px; height: 7px; border-radius: 50%; background: #2f9e62; }
+@media (max-width: 980px) { .wa-env { display: none; } }
+@media (max-width: 560px) { .wa-nav { gap: 12px; min-height: 50px; } .wa-brand span { display: none; } }
+
+/* Per-page brand blocks and back links are replaced by the global navigation. */
+.brand, .topbar .brand, main > a[href="/"]:first-child, header:not(.wa-nav) > a[href="/"] { display: none !important; }
+
+/* Type */
+h1 { font-family: var(--wa-sans); font-weight: 680; letter-spacing: -.028em; color: var(--wa-ink); }
+h2, h3 { font-family: var(--wa-sans); letter-spacing: -.012em; color: var(--wa-ink); }
+.eyebrow, .kicker, .shift-kicker {
+  color: var(--wa-ink-3) !important; text-transform: none !important; letter-spacing: 0 !important;
+  font-size: 12.5px !important; font-weight: 600 !important;
+}
+.subtle, .intro, .hero p { color: var(--wa-ink-2); }
+
+/* Surfaces */
+.card, section.card {
+  background: var(--wa-surface); border: 1px solid var(--wa-line); border-radius: 10px; box-shadow: none;
+}
+.card-head { border-bottom: 1px solid var(--wa-line); padding-bottom: 14px; margin-bottom: 16px; }
+.card h2 { font-size: 19px; font-weight: 650; }
+
+/* Controls */
+.button, button.button, a.button {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--wa-surface); color: var(--wa-ink); border: 1px solid var(--wa-line-2); border-radius: 7px;
+  font-weight: 550; text-decoration: none; box-shadow: 0 1px 0 rgba(0, 0, 0, .03); transform: none;
+}
+.button:hover { background: #f6f5f1; border-color: #a9a69e; transform: none; }
+.button.primary, button.primary { background: var(--wa-ink); color: #fff; border-color: var(--wa-ink); }
+.button.primary:hover, button.primary:hover { background: #2c2f34; border-color: #2c2f34; }
+input, select, textarea { background: var(--wa-surface); color: var(--wa-ink); border-color: var(--wa-line-2); }
+.tag, .pill { border-radius: 5px; font-weight: 600; letter-spacing: 0; }
+.dot { box-shadow: none; background: #2f9e62; }
+.safety { background: var(--wa-well); border-color: var(--wa-line); }
+
+/* Shift board page */
+.topbar { justify-content: flex-end; border-bottom: 0; padding: 18px 0 0; }
+.hero { padding-top: 18px; }
+.incident-card { background: #fff7f1; border-color: #f0cdb4; box-shadow: none; }
+.incident-card .status { color: var(--wa-alert); letter-spacing: .02em; }
+.shift-case, .sop-impact-pane, .source-branch-pane, .drift-pane { background: var(--wa-well); }
+.grid { margin-bottom: 18px; }
+.graph-node text { font-size: 11px; font-family: var(--wa-sans); }
+.graph-node .kind { font-size: 7.5px; letter-spacing: .4px; fill: #6f747b; }
+.graph-node rect { fill: #fff; stroke: #c9c6bd; }
+.graph-node.incident rect { fill: #fff3ea; stroke: #d98a5a; }
+.graph-node.role rect { fill: #edf7f1; stroke: #5fa77e; }
+.graph-node.sop rect { fill: #fbf5e6; stroke: #c9a24f; }
+.graph-edge { stroke: #a9aaa6; }
+.graph-edge.ownership { stroke: #2f8a5b; }
+.graph-edge.conflict { stroke: #c08a1e; }

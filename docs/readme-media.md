@@ -1,7 +1,7 @@
 # README screenshots
 
 These are real element/clipped screenshots of WardAtlas, rendered at a **1440 px
-desktop viewport**, device scale 1, in the unchanged dark theme. No captions,
+desktop viewport**, device scale 1, in the light theme (redesigned 2026-10-18). No captions,
 overlays, mock responses, DOM edits, compositing or pixel rescaling are used.
 Each crop focuses on the relevant panel so GitHub need not shrink a full desktop.
 
