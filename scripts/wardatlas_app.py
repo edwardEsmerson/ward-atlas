@@ -28,6 +28,7 @@ from verify_falkordb_live import (
     text,
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
+from wardatlas_resilience import experiment as resilience_experiment, validate_request as validate_resilience_request
 from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
 from wardatlas_knowledge_timeline import (
     build_queries as build_knowledge_timeline_queries,
@@ -311,6 +312,7 @@ APP_HTML = r'''<!doctype html>
       <div class="top-actions"><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
+      <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
       <section class="hero" aria-labelledby="main-title">
         <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
         <aside class="incident-card"><div id="incident-status" class="status">No graph-backed incident</div><strong id="incident-title">No incident in graph</strong><p id="incident-summary">Empty/unknown is not evidence of safety or no operational risk.</p></aside>
@@ -1156,6 +1158,18 @@ class WardAtlasService:
             stale,
         )
 
+    def evidence_resilience(self, mode: str = "baseline") -> dict:
+        # Input validation precedes opening a connection. GRAPH.RO_QUERY adds
+        # a database-enforced read-only boundary around both pane traversals.
+        validate_resilience_request("mode=" + mode)
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                return resilience_experiment(mode, lambda query: result_rows(query_result(
+                    connection.command("GRAPH.RO_QUERY", self.graph_name, query))))
+            finally:
+                connection.close()
+
     def decision_docket(self) -> dict:
         """Read the operations docket through its register and source edges."""
         with self.graph_lock:
@@ -1760,6 +1774,15 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
+            elif parsed.path == "/resilience":
+                self._send(200, (ROOT / "scripts/ui/resilience.html").read_text(encoding="utf-8"))
+            elif parsed.path == "/api/evidence-resilience":
+                try:
+                    mode = validate_resilience_request(parsed.query)
+                except ValueError:
+                    self._error(400, "Invalid evidence experiment request.")
+                    return
+                self._send(200, service.evidence_resilience(mode))
             elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
