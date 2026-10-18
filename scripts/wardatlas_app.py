@@ -57,6 +57,7 @@ from wardatlas_evidence_watch import (
     public_refresh as public_watch_refresh,
     witness_from_dock,
 )
+from wardatlas_clock_atlas import mount_clock_atlas
 from wardatlas_shift_board import (
     BRANCH_AT,
     BRANCH_EVENT_QUERY,
@@ -311,6 +312,7 @@ APP_HTML = r'''<!doctype html>
       <div class="top-actions"><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
+      <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
         <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
         <aside class="incident-card"><div id="incident-status" class="status">No graph-backed incident</div><strong id="incident-title">No incident in graph</strong><p id="incident-summary">Empty/unknown is not evidence of safety or no operational risk.</p></aside>
@@ -1758,6 +1760,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_clock_atlas(self, service, parsed):
+                return
             if parsed.path == "/":
                 self._send(200, APP_HTML)
             elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
