@@ -59,6 +59,15 @@ class ReadmeMediaTests(unittest.TestCase):
         self.text += "\n[missing guide](docs/no-such-guide.md)"
         self.reject("broken relative link")
 
+    def test_broken_anchor(self):
+        self.text += "\n[missing section](README.md#not-a-heading)"
+        self.reject("Broken relative link anchor")
+
+    def test_valid_anchor(self):
+        self.text += "\n[query](#why-a-graph)"
+        self.write()
+        self.assertEqual(verify(self.root)["status"], "PASS")
+
     def test_missing_cypher(self):
         self.text = self.text.replace("```cypher", "```text")
         self.reject("Missing opening fenced cypher")

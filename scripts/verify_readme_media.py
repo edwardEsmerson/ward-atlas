@@ -71,6 +71,19 @@ def local_target(root, url):
         raise MediaError(f"Relative link escapes repository: {url}")
     if not target.exists():
         raise MediaError(f"Missing image or broken relative link: {url}")
+    if parsed.fragment and target.suffix.lower() == ".md":
+        content = target.read_text(encoding="utf-8")
+        anchors = set(re.findall(r'\bid=["\']([^"\']+)["\']', content))
+        seen = {}
+        for heading in re.findall(r"^#{1,6}\s+(.+?)(?:\s+#+)?$", content, re.M):
+            heading = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", heading)
+            heading = re.sub(r"<[^>]*>|[`*_]", "", html.unescape(heading)).casefold()
+            slug = re.sub(r"[^\w\- ]", "", heading).replace(" ", "-")
+            count = seen.get(slug, 0)
+            anchors.add(slug + (f"-{count}" if count else ""))
+            seen[slug] = count + 1
+        if unquote(parsed.fragment) not in anchors:
+            raise MediaError(f"Broken relative link anchor: {url}")
     return target
 
 

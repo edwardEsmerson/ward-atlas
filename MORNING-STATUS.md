@@ -192,6 +192,12 @@ The database and UI slices both passed from a fresh source-only integration chec
 - Broad discovery run found 218 passing tests and two errors in the existing `test_conveyor_bitemporal_contract` inventory check: it rejects the already-present evidence-watch expected/matrix JSON as new files because its accepted allowlist does not include that pair. This build deliberately preserved the accepted suite inventory per task scope; focused evidence-watch tests and the original dock bitemporal live regression pass. No oracle bytes were edited.
 - Scope remains one synthetic, operations-only dock watch; no real rosters, clinical decisions, source ingestion, external writes, or claim of hospital validation. A fresh independent reverify remains separate from this builder evidence.
 
+## Judge-facing README media — 2026-10-18
+
+- Plain 66-line opening, impact-map hero and seven expandable workflow screenshots; prior technical sections and the concurrent historical-evidence briefcase section are retained. No product behavior changed.
+- Eight native 1440px-desktop dark-theme crops from an actual FalkorDB 6.0.2 run after synthetic reset: **about 1.51 MB total**, largest **401,199 bytes**. Capture checks passed **21 assertions**; owned app, graph, state, database process and runtime directory were all removed.
+- Regenerate with `python3 scripts/capture_readme_screenshots.py`; check with `python3 scripts/verify_readme_media.py --fail-on-zero` and `python3 -m unittest tests.test_readme_media` (**13 tests**, including missing/corrupt/oversized media, broken links/anchors, missing/wrong Cypher and forbidden wording). Dependencies bootstrap project-locally; details: `docs/readme-media.md`.
+
 ## Historical evidence briefcase increment
 
 - Source-clock repair checkpoint: independent verification of `9d70fd7` found that hypothetical 16:06Z could incorrectly label its assumed observation as actual when V3's real observation moved to 16:07Z beyond the mainline cutoff. The briefcase now reads actual time from the accepted single-source branch witness, never by timestamp coincidence; original fixture/oracle bytes and all 72 mappings stay intact. Two focused regressions and eleven supplemental live checks exercise the later actual clock, unaffected V2, new-client equality, reseed and zero writes; the browser checks actual downloaded JSON and the same offline HTML citation/source-fact sections on desktop/mobile. Run both original commands above for current evidence; independent acceptance remains separate.

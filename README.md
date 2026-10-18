@@ -1,19 +1,68 @@
 # WardAtlas
 
-**Hospital operations lose continuity when an outage, an ownership roster and contradictory SOPs live in separate places.** WardAtlas connects them into an evidence-linked control room for the **Company Brain** track: see who is affected, why that role is accountable, and what remains unknown—without turning an unverified SOP claim into a procedure.
+WardAtlas connects hospital incidents, SOPs and shift ownership in FalkorDB so operations teams can trace an outage to the departments and roles affected — a **Company Brain** built for hospital operations.
 
-## Play the evidence time machine
+![Control-room impact map and source trail: one outage reaches two departments and their operating roles](docs/media/control-room.png)
 
-Open **Evidence time machine** from the control room (`/time-machine`). Play, pause, step or scrub four mainline knowledge frames and explicitly switch to two hypothetical frames. This is a live typed relationship graph, not a cached animation: every selected frame reuses the accepted FalkorDB timeline/branch services. An early frame reveals no future source or decision-record identity. Inspect any node/link with keyboard arrows or the evidence detail list. Solid unverified-claim edges and dashed graph-derived links have textual labels; mobile stacks the graph and details, with reduced-motion support.
+## What you can do
 
-`GET /api/replay-frame?frame=3&mode=mainline&scope=operations` returns only that frame. Mainline indices **0–3** select **15:59:59, 16:00, 16:04, 16:05 UTC on 2026-10-14**; hypothetical indices **4–5** select **16:05, 16:06 UTC**. Frame and mode are required exactly once; optional scope is operations-only. The hypothetical V3 observation remains actually **16:04**, with a separately labeled **16:06 assumption**, never a source correction or resolved conflict. Missing branch support is generic unknown without fallback. Offline graph access is unavailable, never canned facts. Playback reset changes no scenario, action or watch data.
+- **Spot contradictory SOPs:** inspect unresolved V2/V3 claims beside stale V1, without picking a winner. <details><summary>SOP conflict screenshot</summary><img src="docs/media/sop-conflict.png" alt="SOP conflict and dated sources"></details>
+- **Replay a shift boundary:** separate when a roster takes effect from when its revision was known. <details><summary>Shift board screenshot</summary><img src="docs/media/shift-board.png" alt="INC-207 at the 20:30Z ownership boundary"></details>
+- **Compare four ownership clocks:** see how the same incident changes across effective and knowledge times. <details><summary>Ownership atlas screenshot</summary><img src="docs/media/ownership-clocks.png" alt="Ownership clock atlas"></details>
+- **Explain an answer change:** compare recorded knowledge with a clearly labeled hypothetical snapshot. <details><summary>Knowledge diff screenshot</summary><img src="docs/media/knowledge-diff.png" alt="Knowledge diff semantic comparison"></details>
+- **Ask a grounded question:** inspect the answer, relationship paths and dated citations. <details><summary>Answer and citations screenshot</summary><img src="docs/media/ask-citations.png" alt="Ask WardAtlas answer with citations"></details>
+- **Test missing support:** remove one relationship hypothetically and see which conclusion loses its evidence. <details><summary>Missing-edge experiment screenshot</summary><img src="docs/media/evidence-resilience.png" alt="Evidence resilience with one supporting edge missing"></details>
+- **Prepare a handover:** preview evidence, then explicitly confirm a local save — never an external send. <details><summary>Preview and confirmation screenshot</summary><img src="docs/media/handover.png" alt="Handover preview confirmation and a saved local handover"></details>
 
-```sh
-python3 scripts/verify_evidence_replay.py --all --require-live-falkordb --desktop-mobile --assert-keyboard --assert-reduced-motion --fail-on-zero
-python3 -m unittest tests.test_evidence_replay
+## Why a graph
+
+This actual query follows **incident → equipment → service → department → operating role**, returning the sources behind the path, not just matching words. Copied verbatim from [`CONVEYOR_PATH_QUERY`](scripts/wardatlas_shift_board.py); [query walkthrough](docs/falkordb-query-walkthrough.md).
+
+```cypher
+MATCH (i:Incident {id: 'INC-204'})-[aff:AFFECTS]->(e:Equipment {id: 'CONVEYOR-C4'})
+      -[sup:SUPPORTS]->(s:Service {id: 'SVC-MATERIAL-TRANSFER'})
+      -[serves:SERVES]->(d:Department)-[owns:OWNED_BY]->(r:Role),
+      (r)-[roster:EVIDENCED_BY]->(rsrc:Evidence),
+      (i)-[iev:EVIDENCED_BY]->(isrc:Evidence),
+      (e)-[eev:EVIDENCED_BY]->(esrc:Evidence),
+      (s)-[sev:EVIDENCED_BY]->(ssrc:Evidence)
+WHERE owns.current = true
+  AND i.access = 'operations' AND e.access = 'operations' AND s.access = 'operations'
+  AND d.access = 'operations' AND r.access = 'operations'
+  AND aff.access = 'operations' AND sup.access = 'operations' AND serves.access = 'operations'
+  AND owns.access = 'operations' AND roster.access = 'operations' AND rsrc.access = 'operations'
+  AND owns.source_id = rsrc.id
+  AND iev.access = 'operations' AND eev.access = 'operations'
+  AND sev.access = 'operations' AND isrc.access = 'operations' AND esrc.access = 'operations'
+  AND ssrc.access = 'operations'
+RETURN i.id AS incident_id, e.id AS equipment_id, s.id AS service_id,
+       d.id AS department_id, r.id AS role_id,
+       isrc.id AS incident_source_id, isrc.title AS incident_source_title,
+       isrc.observed_at AS incident_observed_at,
+       esrc.id AS equipment_source_id, esrc.title AS equipment_source_title,
+       esrc.observed_at AS equipment_observed_at,
+       ssrc.id AS service_source_id, ssrc.title AS service_source_title,
+       ssrc.observed_at AS service_observed_at,
+       rsrc.id AS ownership_source_id, rsrc.title AS ownership_source_title,
+       owns.observed_at AS ownership_observed_at
+ORDER BY d.id
 ```
 
-These checks passed in the builder and a fresh source-only clone: **12 groups / 85 mapped live assertions**, **18 focused tests**, real FalkorDB, cold/reseed/reconnect, owned mutations, ACL/decoy invariance, keyboard/reduced-motion desktop/mobile, abort-ignoring response races and cleanup. The live check bootstraps the existing digest-pinned module locally, selects free lane/ephemeral ports (or accepts `--db-port` / `--app-port`), and overwrites only its own reports/screenshots under `$WORKSHOP_RUN_DIR/evidence-replay/`. No new queries, fixtures, writes or model route. Supervisor integration acceptance remains separate from builder evidence.
+## Quickstart
+
+With your own **FalkorDB 6.x+ server** already running (setup options below):
+
+```sh
+git clone https://github.com/edwardEsmerson/ward-atlas.git
+cd ward-atlas
+python3 scripts/wardatlas_attach.py --db-host 127.0.0.1 --db-port 6379
+```
+
+Open the printed loopback URL; **Reset synthetic scenario** restores the demo. Ctrl-C cleans up only this run's graph and local state. [Judge guide](docs/judge-guide.md) · [Regenerate screenshots](docs/readme-media.md).
+
+**AI & limits:** AI coding agents generated substantial code, fixtures, tests and documentation. The core graph workflow is deterministic. All data is synthetic and non-clinical; this is not a validated hospital system or medical device.
+
+## Technical details
 
 ## Start with your FalkorDB server
 
@@ -37,7 +86,20 @@ See the [judge guide](docs/judge-guide.md) for the demo route, existing-server c
 
 `Incident → Equipment → Service → Department → current Role` is an explicit multi-hop ownership/impact path. `EVIDENCED_BY → Evidence` carries source IDs and observation times; SOP version/applicability/conflict edges keep competing claims separate. Effective-time and knowledge-time views expose why an answer changed, and scenario overlays label assumptions rather than rewriting source truth. Python's loopback HTTP app queries actual FalkorDB over RESP and projects deterministic, source-linked results into the responsive UI; human confirmation is required before local action storage. See the [actual Cypher, schema and architecture walkthrough](docs/falkordb-query-walkthrough.md).
 
-**Limits & AI disclosure:** all people, departments, incidents and sources are fictional. No patient data, diagnosis, treatment, autonomous clinical triage, real-hospital validation or compliance certification. AI agents generated substantial code, fixtures, tests and documentation; the core graph workflow is deterministic. Optional model-assisted layout on Ask WardAtlas is described below and is **not claimed live-model verified**. Participant technical understanding and meaningful human contribution have **not been verified**; official rules warn that AI-only entries may be rejected. Automated checks do not establish submission eligibility. Publishing/submission and recording approval are separate from this local setup.
+**Limits & AI disclosure:** all people, departments, incidents and sources are fictional. No patient data, diagnosis, treatment, autonomous clinical triage, real-hospital validation or compliance certification. AI agents generated substantial code, fixtures, tests and documentation; the core graph workflow is deterministic. Optional model-assisted layout on Ask WardAtlas is described below and is **not claimed live-model verified**. Publishing/submission and recording approval are separate from this local setup.
+
+## Play the evidence time machine
+
+Open **Evidence time machine** from the control room (`/time-machine`). Play, pause, step or scrub four mainline knowledge frames and explicitly switch to two hypothetical frames. This is a live typed relationship graph, not a cached animation: every selected frame reuses the accepted FalkorDB timeline/branch services. An early frame reveals no future source or decision-record identity. Inspect any node/link with keyboard arrows or the evidence detail list. Solid unverified-claim edges and dashed graph-derived links have textual labels; mobile stacks the graph and details, with reduced-motion support.
+
+`GET /api/replay-frame?frame=3&mode=mainline&scope=operations` returns only that frame. Mainline indices **0–3** select **15:59:59, 16:00, 16:04, 16:05 UTC on 2026-10-14**; hypothetical indices **4–5** select **16:05, 16:06 UTC**. Frame and mode are required exactly once; optional scope is operations-only. The hypothetical V3 observation remains actually **16:04**, with a separately labeled **16:06 assumption**, never a source correction or resolved conflict. Missing branch support is generic unknown without fallback. Offline graph access is unavailable, never canned facts. Playback reset changes no scenario, action or watch data.
+
+```sh
+python3 scripts/verify_evidence_replay.py --all --require-live-falkordb --desktop-mobile --assert-keyboard --assert-reduced-motion --fail-on-zero
+python3 -m unittest tests.test_evidence_replay
+```
+
+These checks passed in the builder and a fresh source-only clone: **12 groups / 85 mapped live assertions**, **18 focused tests**, real FalkorDB, cold/reseed/reconnect, owned mutations, ACL/decoy invariance, keyboard/reduced-motion desktop/mobile, abort-ignoring response races and cleanup. The live check bootstraps the existing digest-pinned module locally, selects free lane/ephemeral ports (or accepts `--db-port` / `--app-port`), and overwrites only its own reports/screenshots under `$WORKSHOP_RUN_DIR/evidence-replay/`. No new queries, fixtures, writes or model route. Supervisor integration acceptance remains separate from builder evidence.
 
 ## Product workflow
 
