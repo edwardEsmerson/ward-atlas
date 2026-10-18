@@ -1,0 +1,13 @@
+{
+  "schema_version":1,
+  "groups":[
+    {"id":"actual-supplied-server","checks":["digest-pinned verifier-owned module","MODULE LIST before owned graph creation","exact independently pinned path IDs","reject plain Redis before seed"]},
+    {"id":"explicit-host-port","checks":["constructor keyword forwarding","legacy positional constructor","legacy CLI parser","documented command uses localhost on second run"]},
+    {"id":"app-port-collision","checks":["bind before DB connection","listening owned occupant receives no connection","supplied server command count unchanged","no state/graph created"]},
+    {"id":"unique-owned-resources","checks":["two random identities","EXISTS collision refuses deletion","sentinel exact graph query unchanged","state roots remain project-local"]},
+    {"id":"sigint-cleanup","checks":["foreground process SIGINT","graph key absent","state directory absent","app port bind succeeds","PING and sentinel query succeed"]},
+    {"id":"startup-failure","checks":["plain verifier-owned Redis rejected","injected seeding exception after partial seed cleans graph","invalid state path rejected","supplied FalkorDB and sentinel survive"]},
+    {"id":"repeat-run","checks":["same documented command twice","no warm app or graph","fresh API connections match original oracle","all processes reaped"]},
+    {"id":"desktop-mobile-home","checks":["real browser renders home twice","desktop screenshot","mobile screenshot","live API parity","no overflow or page errors"]}
+  ]
+}
