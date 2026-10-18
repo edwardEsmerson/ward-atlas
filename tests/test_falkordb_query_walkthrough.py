@@ -203,6 +203,9 @@ for _name in (
     "invented-clinical-validation", "invented-clinical-action", "false-sop-authority",
     "false-owner-authority", "unknown-as-absence", "branch-rewrites-mainline",
     "restricted-metadata-leak", "false-eligibility-certification", "private-path", "private-media",
+    "wrong-v2-role-provenance", "wrong-record-observation-provenance",
+    "swapped-query-hash-attribution", "swapped-source-hash-attribution",
+    "swapped-oracle-hash-attribution", "swapped-report-hash-attribution",
 ):
     setattr(QueryWalkthroughTests, "test_mutation_" + _name.replace("-", "_"), _mutation_test(_name))
 

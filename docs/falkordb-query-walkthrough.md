@@ -193,6 +193,16 @@ SHA-256 of the exact UTF-8 query strings above (the fence-delimiter newline is n
 
 The [pre-test expectation manifest](../tests/falkordb-query-walkthrough-expected.json) also pins source files, exact symbol-source hashes, all eleven constant/16:04/16:05/16:06 generated-query hashes and seven oracle outcome fragments. The static checker parses only a small allowlisted AST expression subset; it never imports or executes the application. It compares working and accepted-commit source bytes, generated strings and fences without whitespace normalization. Any drift fails closed, rather than regenerating expectations.
 
+Accepted source-file SHA-256 (including the literal-quoting and register-ID dependencies):
+
+| File | Source SHA-256 |
+| --- | --- |
+| [`scripts/wardatlas_shift_board.py`](../scripts/wardatlas_shift_board.py) | `893460656966003bdd16161966f966be1369a1b54f527956f544d5e47092aaa4` |
+| [`scripts/wardatlas_knowledge_timeline.py`](../scripts/wardatlas_knowledge_timeline.py) | `4542af5916d16a5c1a2cfb5fc387b1ebab4b60b4a9b51ea44445aed8353bc583` |
+| [`scripts/wardatlas_source_branch.py`](../scripts/wardatlas_source_branch.py) | `6a5718bda62dd3ad9f1e9f63bebd9e70a0e65f7c6faa4c47fb9671116c1758f3` |
+| [`scripts/wardatlas_fixtures.py`](../scripts/wardatlas_fixtures.py) | `02a869139a956d0675d6238e23358e5c122b61f7af27d91df9c26ce55c793b43` |
+| [`scripts/wardatlas_decisions.py`](../scripts/wardatlas_decisions.py) | `0cf8a5be6bcbfa27cac6ef3742c5ac9d2a048cff7bd06c2b02786b33c42c69be` |
+
 Accepted oracle/receipt SHA-256 identifiers:
 
 - [Original outage oracle](../tests/expected-results.json): `c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87`.

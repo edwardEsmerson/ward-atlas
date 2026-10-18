@@ -179,6 +179,30 @@ def verify_oracles(root: Path, expected: dict[str, Any]) -> dict[str, Any]:
     return documents
 
 
+def oracle_provenance_statements(oracles: dict[str, Any]) -> list[str]:
+    """Bind prose associations to independently frozen facts, not mere IDs."""
+    branch = oracles["contracts/decision-source-branch/expected-results.json"]
+    groups = {row["id"]: row["expected"] for row in branch["groups"]}
+    projection = groups["mainline-at-16-05"]["projection"]
+    statements = []
+    for claim in projection["claims"]:
+        version = claim["version_id"].rsplit("-", 1)[-1]
+        source = claim["source"]
+        observation_label = "actually observed" if version == "V3" else "observed"
+        statements.append(
+            f"{version} claims `{claim['role_id']}` from `{source['id']}` "
+            f"(*{source['title']}*, {observation_label} `{source['observed_at']}`)."
+        )
+    record = projection["decision_record"]
+    source = record["source"]
+    statements.append(
+        f"The separately sourced decision `{record['id']}` is recorded as "
+        f"`{record['recorded_state']}` by `{source['id']}` "
+        f"(*{source['title']}*, observed `{source['observed_at']}`)."
+    )
+    return statements
+
+
 # These detect positive overclaims even if the correct caveats remain elsewhere.
 # Required statements independently reject omission/negation of each boundary.
 UNSAFE_PATTERNS = (
@@ -211,11 +235,24 @@ def validate_document(doc: str, expected: dict[str, Any], queries: dict[str, str
         require(prose.count(text) == 1, f"required semantic statement missing/duplicated: {text}")
     actual_rows = [line for line in prose.splitlines() if re.match(r"\| (?:Mainline|Hypothetical|Missing )", line)]
     require(actual_rows == [o["doc_row"] for o in expected["outcomes"]], "pinned boundary/outcome table differs")
-    for digest in (*expected["oracle_sha256"].values(), *expected["accepted_reports"].values()):
-        require(digest in prose, "accepted oracle/report digest missing or changed")
+    for path, digest in expected["oracle_sha256"].items():
+        citation = r"\[[^\]\n]+\]\(\.\./" + re.escape(path) + r"\): `" + digest + r"`"
+        require(re.search(citation, prose) is not None, f"accepted oracle/report digest attribution drift: {path}")
+    for label, digest in expected["accepted_reports"].items():
+        citation = f"- {label[0].upper() + label[1:]}: `{digest}`."
+        require(citation in prose, f"accepted oracle/report digest attribution drift: {label}")
     for query in expected["queries"]:
         key = "constant" if "constant" in query["generated_sha256"] else expected["fence_cutoff"]
-        require(query["generated_sha256"][key] in prose, f"documented query hash missing: {query['id']}")
+        symbol = query["symbol"] + ("" if key == "constant" else f"({key[11:16]}Z)")
+        row = f"| {symbol} | `{query['generated_sha256'][key]}` |"
+        require(prose.count(row) == 1, f"documented query hash attribution drift: {query['id']}")
+        link = f"[`{Path(query['file']).name}:{query['symbol']}`](../{query['file']})"
+        require(prose.count(link) == 1, f"source symbol link attribution drift: {query['id']}")
+    for path, digest in expected["source_sha256"].items():
+        row = f"| [`{path}`](../{path}) | `{digest}` |"
+        require(prose.count(row) == 1, f"documented source hash attribution drift: {path}")
+    for statement in oracle_provenance_statements(oracles):
+        require(prose.count(statement) == 1, f"frozen claim/record provenance prose drift: {statement}")
     original = oracles["tests/expected-results.json"]
     for evidence in original["expected_evidence_by_path"]:
         require(" → ".join(evidence["path"]) in prose, "outage ownership path missing/changed")
@@ -255,11 +292,22 @@ def document_mutations(doc: str, expected: dict[str, Any]) -> list[tuple[str, st
         ("missing-ai-disclosure", expected["required_statements"][-5], "", "required semantic statement"),
         ("missing-human-confirmation", expected["required_statements"][-4], "", "required semantic statement"),
         ("wrong-report-hash", next(iter(expected["accepted_reports"].values())), "0" * 64, "oracle/report digest"),
+        ("wrong-v2-role-provenance", "V2 claims `ROLE-FACILITIES-DUTY`", "V2 claims `ROLE-MATERIALS-LEAD`", "frozen claim/record provenance"),
+        ("wrong-record-observation-provenance", "(*Synthetic Decision Register: SOP-OPS-9 Reconciliation*, observed `2026-10-14T16:05:00Z`)", "(*Synthetic Decision Register: SOP-OPS-9 Reconciliation*, observed `2026-10-14T16:06:00Z`)", "frozen claim/record provenance"),
     ]
     results = []
     for name, before, after, diagnostic in changes:
         require(before in doc and before != after, f"zero mutation: {name}")
         results.append((name, doc.replace(before, after, 1), diagnostic))
+    for name, first, second, diagnostic in (
+        ("swapped-query-hash-attribution", expected["queries"][1]["generated_sha256"][expected["fence_cutoff"]], expected["queries"][2]["generated_sha256"][expected["fence_cutoff"]], "documented query hash attribution"),
+        ("swapped-source-hash-attribution", expected["source_sha256"]["scripts/wardatlas_shift_board.py"], expected["source_sha256"]["scripts/wardatlas_knowledge_timeline.py"], "documented source hash attribution"),
+        ("swapped-oracle-hash-attribution", expected["oracle_sha256"]["contracts/decision-knowledge-timeline/expected-results.json"], expected["oracle_sha256"]["contracts/decision-source-branch/expected-results.json"], "oracle/report digest attribution"),
+        ("swapped-report-hash-attribution", *expected["accepted_reports"].values(), "oracle/report digest attribution"),
+    ):
+        require(first in doc and second in doc and first != second, f"zero mutation: {name}")
+        mutant = doc.replace(first, "\x00HASH_SWAP\x00", 1).replace(second, first, 1).replace("\x00HASH_SWAP\x00", second, 1)
+        results.append((name, mutant, diagnostic))
     for name, claim in (
         ("invented-runtime-model", "A runtime model generates the answer."),
         ("invented-publication", "The entry has been publicly published."),
