@@ -29,6 +29,37 @@ WardAtlas connects hospital incidents, SOPs and shift ownership in FalkorDB so o
 </tr>
 </table>
 
+## WardAtlas agent
+
+`scripts/wardatlas_agent.py` puts an LLM on top of the graph. The model cannot see the database; it can only call seven WardAtlas tools, and each tool is one live FalkorDB-backed API call: trace outage impact, the two-clock shift board, the SOP decision timeline and docket, the cited question answerer, and drafting a handover. Saving a handover asks the human at the terminal first. Every answer prints the graph tool calls behind it.
+
+```sh
+export WARDATLAS_AGENT_BASE_URL=https://api.openai.com/v1   # any OpenAI-compatible endpoint with tool calls
+export WARDATLAS_AGENT_API_KEY=...                            # your key; never commit it
+export WARDATLAS_AGENT_MODEL=gpt-4.1-mini                     # or your deployment name
+python3 scripts/wardatlas_agent.py "Conveyor C4 went down at 18:30Z. Who is affected, who owns it, and what should I flag before handover?"
+```
+
+It queries the public live demo by default (`--app-url` points it at your own run), and with no question it starts an interactive session. Standard library only. A real run against the live demo with `gpt-6-luna` on Azure OpenAI (`--reasoning-effort none`, which that model needs for tools):
+
+```text
+  -> trace_outage_impact(as_of=2026-10-14T18:30:00Z)
+  -> decision_timeline(known_at=2026-10-14T18:30:00Z)
+  -> shift_board(effective_at=2026-10-14T18:30:00Z, known_at=2026-10-14T18:30:00Z, conveyor_at=2026-10-14T18:30:00Z)
+
+- Affected: the outage maps through the material-transfer service to Central Sterile and Materials Logistics.
+  The rostered roles on those paths are Sterile Ops Coordinator and Materials Duty. (SRC-INC-204 18:00Z;
+  SRC-ASSET-C4 18:02Z; SRC-SERVICE-CATALOG 18:03Z; SRC-OPS-ROSTER 18:04Z/18:05Z)
+- SOP flag for handover: SOP-OPS-9 V2 and V3 both apply to C4 but make conflicting, unverified role claims:
+  V2 names Facilities Duty; V3 names Materials Lead. The conflict is unresolved, and the decision record says
+  no version is selected. Don't treat either SOP claim as the current owner. (SRC-SOP-CURRENT-V2 16:00Z;
+  SRC-SOP-CURRENT-V3 16:04Z; SRC-DEC-OPS-9-REVIEW-01 16:05Z)
+
+[3 graph tool call(s): trace_outage_impact, decision_timeline, shift_board]
+```
+
+The agent was added on the final day. It reuses the app's existing graph queries unchanged; the model only chooses tools and phrases the answer from their results.
+
 ## Why a graph
 
 This actual query follows **incident → equipment → service → department → operating role**, returning the sources behind the path, not just matching words. Copied verbatim from [`CONVEYOR_PATH_QUERY`](scripts/wardatlas_shift_board.py); [query walkthrough](docs/falkordb-query-walkthrough.md).
@@ -113,7 +144,7 @@ WardAtlas was built by AI coding agents working under my direction, inside a bui
 
 My part: I set priorities and decided what to build, cut and ship; reviewed the product and sent back what wasn't good enough, including the final-day frontend redesign; and approved the publishing setup, the final-day pushes and the live deployment, which runs on infrastructure I own. The idea is mine, a Company Brain for hospital operations, and so are the graph model ideas the agents built from: tracing impact from incident to accountable role, a dated source behind every hop, contradictory SOPs kept side by side, and separate clocks for when something took effect and when it was known.
 
-By default no model runs when WardAtlas answers; retrieval is deterministic Cypher over FalkorDB. All data is synthetic and non-clinical; this is not a validated hospital system or medical device.
+The web app runs no model by default; its retrieval is deterministic Cypher over FalkorDB. The [WardAtlas agent](#wardatlas-agent) adds an LLM that can only reach the graph through those same queries. All data is synthetic and non-clinical; this is not a validated hospital system or medical device.
 
 ---
 
