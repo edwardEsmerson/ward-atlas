@@ -36,6 +36,24 @@ def validate_app_port(port: int) -> int:
     return port
 
 
+class AttachmentHandler(Handler):
+    # One request per connection: draining must not wait for an idle HTTP/1.1
+    # keepalive client. API payloads, routes and the legacy server are unchanged.
+    protocol_version = "HTTP/1.0"
+
+    def setup(self):
+        self.request.settimeout(3.0)
+        super().setup()
+
+
+class AttachmentHTTPServer(WardAtlasHTTPServer):
+    # ThreadingMixIn.server_close closes the listener and joins every accepted
+    # request when these are non-daemon. In-flight resets/confirmations must
+    # finish BEFORE deleting their graph/state, not recreate them afterwards.
+    daemon_threads = False
+    block_on_close = True
+
+
 class Attachment:
     def __init__(self, host: str, port: int):
         lane = re.sub(r"[^a-zA-Z0-9_]", "_", os.environ.get("WORKSHOP_LANE", "local"))[:24]
@@ -106,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
         validate_app_port(args.app_port)
         attachment = Attachment(args.db_host, args.db_port)
         # Bind first. An app-port collision must not contact either occupant or DB.
-        server = WardAtlasHTTPServer(("127.0.0.1", args.app_port), Handler, attachment.service)
+        server = AttachmentHTTPServer(("127.0.0.1", args.app_port), AttachmentHandler, attachment.service)
         for sig in (signal.SIGINT, signal.SIGTERM):
             old_signals[sig] = signal.signal(sig, interrupt)
         print("WARDATLAS_OWNED " + json.dumps({"graph": attachment.graph, "state": str(attachment.state)}), flush=True)
@@ -124,6 +142,8 @@ def main(argv: list[str] | None = None) -> int:
         for sig in old_signals:
             signal.signal(sig, signal.SIG_IGN)
         if server is not None:
+            # serve_forever has stopped accepting. Drain both graph writes and
+            # local action/watch writes, including queued accepted requests.
             server.server_close()
         if attachment is not None:
             try:

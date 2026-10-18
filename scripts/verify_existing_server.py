@@ -10,16 +10,18 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import signal
 import socket
 import subprocess
 import sys
 import tarfile
 import tempfile
+import threading
 import time
 import uuid
 from pathlib import Path
-from urllib.request import ProxyHandler, build_opener
+from urllib.request import ProxyHandler, Request, build_opener
 
 from verify_falkordb_live import LiveVerifier, RespConnection, VerificationFailure, query_result, result_rows, text
 
@@ -243,6 +245,48 @@ class Check:
             self.check("app-port-collision", "no graph/state adopted", "WARDATLAS_OWNED" not in log.read_text())
         self.survives("app-port-collision")
 
+    def reset_interrupts(self):
+        # Regression for independent verifier's real-request race: no injected
+        # handler delay, DB shim or application patch. Observe live seed progress
+        # on our own DB before interrupting, not just an idle ready application.
+        def query_calls():
+            stats = text(self.command("INFO", "commandstats"))
+            match = re.search(r"cmdstat_graph.query:calls=(\d+)", stats, re.I)
+            return int(match.group(1)) if match else 0
+
+        for attempt in range(5):
+            process, log = self.spawn(f"reset-interrupt-{attempt}", [sys.executable, "scripts/wardatlas_attach.py", "--db-host", "127.0.0.1", "--db-port", str(self.db.port)])
+            owned = self.wait_ready(process, log)
+            response = {}
+            def reset():
+                try:
+                    request = Request(owned["url"] + "/api/scenario/reset", data=b"{}", headers={"Content-Type": "application/json"})
+                    with build_opener(ProxyHandler({})).open(request, timeout=15) as result:
+                        response["status"] = result.status
+                        response["body"] = json.load(result)
+                except Exception as exc:
+                    response["error"] = str(exc)
+            baseline = query_calls()
+            request_thread = threading.Thread(target=reset)
+            request_thread.start()
+            try:
+                deadline = time.monotonic() + 5
+                observed = 0
+                while time.monotonic() < deadline and request_thread.is_alive():
+                    observed = query_calls() - baseline
+                    if observed >= 10:
+                        break
+                    time.sleep(0.0005)
+                in_flight = request_thread.is_alive()
+                self.check("sigint-cleanup", f"attempt {attempt} real reset is in flight after seed progress", observed >= 10 and in_flight, {"seed_commands_observed": observed, "request_in_flight": in_flight})
+                code = self.interrupt(process)
+                request_thread.join(15)
+                self.check("sigint-cleanup", f"attempt {attempt} SIGINT drains accepted reset", code == 0 and not request_thread.is_alive() and response.get("status") == 200, {"app_exit": code, "response": response, "log": log.read_text()[-1500:]})
+                self.assert_removed("sigint-cleanup", owned)
+                self.survives("sigint-cleanup")
+            finally:
+                request_thread.join(20)
+
     def failures(self):
         # Deliberately fail AFTER a real partial seed on the actual supplied DB.
         # This is a fault injection into the unchanged launcher, not a fake DB.
@@ -295,6 +339,7 @@ raise SystemExit(a.main(sys.argv[1:]))
         self.collision()
         self.failures()
         self.success_runs()
+        self.reset_interrupts()
         groups = {row["group"] for row in self.assertions if row["passed"]}
         self.check("repeat-run", "all eight groups executed with nonzero assertions", groups == {g["id"] for g in self.expected["groups"]}, sorted(groups))
 

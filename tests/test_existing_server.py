@@ -4,6 +4,7 @@ import json
 import socket
 import sys
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -139,6 +140,58 @@ class ExistingServerTests(unittest.TestCase):
         with patch.object(sys, "argv", ["wardatlas_app.py", "--app-port", "18733", "--db-host", "localhost", "--db-port", "18732", "--graph-name", "wardatlas_cli_unit"]), patch.object(wardatlas_app, "WardAtlasService") as service, patch.object(wardatlas_app, "WardAtlasHTTPServer", side_effect=OSError("occupied")):
             self.assertEqual(wardatlas_app.main(), 2)
         self.assertEqual(service.call_args.kwargs["db_host"], "localhost")
+
+    def test_attachment_server_drains_accepted_writes(self):
+        started = threading.Event()
+        release = threading.Event()
+        finished = threading.Event()
+        closed = threading.Event()
+
+        class DelayedWrite(self.attach.AttachmentHandler):
+            def do_GET(self):
+                started.set()
+                release.wait(5)
+                finished.set()  # stands for either graph or action-state write
+
+        server = self.attach.AttachmentHTTPServer(("127.0.0.1", 0), DelayedWrite, Mock())
+        worker = threading.Thread(target=server.handle_request)
+        worker.start()
+        client = socket.create_connection(server.server_address)
+        closer = None
+        try:
+            client.sendall(b"GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")
+            self.assertTrue(started.wait(2))
+            worker.join(2)
+            def close():
+                server.server_close()
+                closed.set()
+            closer = threading.Thread(target=close)
+            closer.start()
+            self.assertFalse(closed.wait(0.1), "cleanup must not run while a handler can write")
+            release.set()
+            self.assertTrue(closed.wait(2))
+            self.assertTrue(finished.is_set())
+        finally:
+            release.set()
+            client.close()
+            worker.join(5)
+            if closer:
+                closer.join(5)
+            server.server_close()
+
+    def test_attachment_connections_do_not_keepalive(self):
+        self.assertEqual(self.attach.AttachmentHandler.protocol_version, "HTTP/1.0")
+        self.assertFalse(self.attach.AttachmentHTTPServer.daemon_threads)
+        self.assertTrue(self.attach.AttachmentHTTPServer.block_on_close)
+
+    def test_attachment_slow_client_has_read_timeout(self):
+        request = Mock()
+        with patch("wardatlas_attach.Handler.setup"):
+            # Construct without BaseRequestHandler.__init__ dispatching handle.
+            handler = object.__new__(self.attach.AttachmentHandler)
+            handler.request = request
+            handler.setup()
+        request.settimeout.assert_called_once_with(3.0)
 
 
 if __name__ == "__main__":

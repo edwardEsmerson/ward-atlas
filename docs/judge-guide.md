@@ -14,6 +14,8 @@ Use the supplied server's explicit hostname and port instead of the example. Ope
 
 Every launch creates a UUID/lane-qualified `wardatlas_attach_…` graph and private `.local/attachments/…` directory. It checks module identity before creating/seeding that graph, refuses a generated-name collision, and never enumerates or resets other graphs. Ctrl-C (also SIGTERM) closes the foreground app and removes **only its own graph and state**. No background app/database daemon is launched. Existing database processes, configuration and unrelated graphs survive. Demo actions disappear at exit by design. SIGKILL, host failure or a disconnected server can prevent cleanup; errors are reported, not represented as successful cleanup. There is no recovery supervisor or automatic deletion of old runs.
 
+On interrupt the attachment stops accepting connections, drains accepted requests (including a scenario reset or local confirmation), then deletes its graph/state so no handler can recreate them after cleanup. Attachment connections close after one response; idle/partial clients have a three-second read timeout. The legacy app entrypoint and its API payloads are unchanged.
+
 ### If you do not already have FalkorDB
 
 Judges may run the official server themselves in a separate terminal, for example:
