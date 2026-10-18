@@ -39,6 +39,11 @@ Reports overwrite their own file under `$WORKSHOP_RUN_DIR` or ignored
 | `evidence-resilience` | One hypothetically missing Central Sterile ownership-support edge; unchanged two-path live baseline |
 | `handover` | A second unsaved preview's confirmation control above the first genuinely confirmed local handover |
 
+The README gallery shows `ask-citations-top.png` and `handover-top.png`: the top
+1225 px and 635 px of `ask-citations.png` and `handover.png`, cropped with Pillow
+so the gallery rows stay balanced; the full captures are linked beside them. Re-crop
+them after regenerating.
+
 The handover crop is one continuous part of the running page, not a before/after
 montage. The capture verifies zero saved actions before preview confirmation and
 exactly one after it. The second preview remains unsaved and is discarded on exit.

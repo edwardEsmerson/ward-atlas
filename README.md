@@ -6,13 +6,24 @@ WardAtlas connects hospital incidents, SOPs and shift ownership in FalkorDB so o
 
 ## What you can do
 
-- **Spot contradictory SOPs:** inspect unresolved V2/V3 claims beside stale V1, without picking a winner. <details><summary>SOP conflict screenshot</summary><img src="docs/media/sop-conflict.png" alt="SOP conflict and dated sources"></details>
-- **Replay a shift boundary:** separate when a roster takes effect from when its revision was known. <details><summary>Shift board screenshot</summary><img src="docs/media/shift-board.png" alt="INC-207 at the 20:30Z ownership boundary"></details>
-- **Compare four ownership clocks:** see how the same incident changes across effective and knowledge times. <details><summary>Ownership atlas screenshot</summary><img src="docs/media/ownership-clocks.png" alt="Ownership clock atlas"></details>
-- **Explain an answer change:** compare recorded knowledge with a clearly labeled hypothetical snapshot. <details><summary>Knowledge diff screenshot</summary><img src="docs/media/knowledge-diff.png" alt="Knowledge diff semantic comparison"></details>
-- **Ask a grounded question:** inspect the answer, relationship paths and dated citations. <details><summary>Answer and citations screenshot</summary><img src="docs/media/ask-citations.png" alt="Ask WardAtlas answer with citations"></details>
-- **Test missing support:** remove one relationship hypothetically and see which conclusion loses its evidence. <details><summary>Missing-edge experiment screenshot</summary><img src="docs/media/evidence-resilience.png" alt="Evidence resilience with one supporting edge missing"></details>
-- **Prepare a handover:** preview evidence, then explicitly confirm a local save — never an external send. <details><summary>Preview and confirmation screenshot</summary><img src="docs/media/handover.png" alt="Handover preview confirmation and a saved local handover"></details>
+<table>
+<tr>
+<td width="50%" valign="top"><img src="docs/media/sop-conflict.png" alt="SOP conflict and dated sources"><br><b>Contradictory SOPs stay visible.</b> Versions 2 and 3 name different responsible roles; WardAtlas shows both with their sources and never picks a winner. The archived V1 still points at the old conveyor.</td>
+<td width="50%" valign="top"><img src="docs/media/shift-board.png" alt="INC-207 at the 20:30Z ownership boundary"><br><b>Two clocks for every handoff.</b> When a roster change takes effect is kept apart from when anyone knew about it, so a replay never applies knowledge early.</td>
+</tr>
+<tr>
+<td valign="top"><img src="docs/media/ownership-clocks.png" alt="Ownership clock atlas"><br><b>Ownership clock atlas.</b> The same dock incident at four effective-time × knowledge-time cells. A gap stays unknown instead of being filled from later evidence.</td>
+<td valign="top"><img src="docs/media/ask-citations-top.png" alt="Ask WardAtlas answer with citations"><br><b>Ask, get a cited answer.</b> The answer is a graph path plus dated source records, retrieved deterministically. <a href="docs/media/ask-citations.png">Full answer</a>.</td>
+</tr>
+<tr>
+<td valign="top"><img src="docs/media/knowledge-diff.png" alt="Knowledge diff semantic comparison"><br><b>Why did the answer change?</b> Compare two knowledge snapshots, recorded or clearly labelled hypothetical, as typed changes.</td>
+<td valign="top"><img src="docs/media/evidence-resilience.png" alt="Evidence resilience with one supporting edge missing"><br><b>Pull one edge, see what breaks.</b> Hypothetically remove one supporting relationship: the conclusion that depended on it becomes unknown, not silently wrong.</td>
+</tr>
+<tr>
+<td valign="top"><img src="docs/media/handover-top.png" alt="Handover preview confirmation and a saved local handover"><br><b>Human-confirmed handover.</b> Preview the exact evidence snapshot, explicitly confirm, and it is saved locally. Nothing is sent anywhere. <a href="docs/media/handover.png">Full handover</a>.</td>
+<td valign="top"><b>Also in the app</b><ul><li><b>Evidence time machine:</b> play relationships arriving minute by minute.</li><li><b>Role desk:</b> each role's source-backed responsibilities.</li><li><b>SOP claim comparison:</b> any two versions, side by side.</li><li><b>Evidence briefcase:</b> download the displayed evidence as an offline ZIP.</li><li><b>Evidence watch:</b> save an ownership baseline; a refresh reports whether its evidence changed.</li></ul>Every view is a live FalkorDB read over one synthetic hospital graph.</td>
+</tr>
+</table>
 
 ## Why a graph
 
@@ -48,6 +59,38 @@ RETURN i.id AS incident_id, e.id AS equipment_id, s.id AS service_id,
 ORDER BY d.id
 ```
 
+## Graph data model
+
+Fourteen node labels and eighteen relationship types, read from the seeded graph:
+
+```mermaid
+flowchart LR
+  Incident -->|AFFECTS| Equipment
+  Equipment -->|SUPPORTS| Service
+  Service -->|SERVES| Department
+  Department -->|OWNED_BY| Role
+  SOPVersion -->|APPLIES_TO| Equipment
+  SOPVersion -->|CLAIMS_ROLE| Role
+  SOPVersion -.->|SOP_CONFLICT| SOPVersion
+  DecisionRegister -->|TRACKS| DecisionRecord
+  DecisionRecord -->|CONSIDERS| SOPVersion
+  Incident -->|HAS_STATE_EVENT| StateEvent
+  ScenarioBranch -->|HAS_HYPOTHETICAL_EVENT| StateEvent
+  ScenarioBranch -->|HAS_HYPOTHETICAL_OBSERVATION| ObservationOverride
+  ObservationOverride -->|FOR_SOURCE| Evidence
+  Handover -->|CITES_SOURCE| Evidence
+  Ticket -->|CITES_SOURCE| Evidence
+  Evidence -->|SUPERSEDES| Evidence
+```
+
+| Idea | How the graph holds it |
+| --- | --- |
+| Every fact has a source | Incident, Equipment, Service, Role, SOPVersion, StateEvent and DecisionRecord each have `EVIDENCED_BY → Evidence {id, title, observed_at}`; answers return those source IDs. |
+| Two clocks | `OWNED_BY {effective_from, effective_to}` says when an assignment holds; `Evidence.observed_at <= known_at` says whether it was known yet. Queries take both times explicitly. |
+| Conflicts stay open | `SOP_CONFLICT` links competing SOP versions; a `DecisionRecord` `CONSIDERS` both and the app never picks a winner. |
+| What-ifs never overwrite facts | A `ScenarioBranch` adds hypothetical `StateEvent`s or an `ObservationOverride` beside the source facts, which stay unchanged. |
+| Access on every hop | Every node and relationship carries `access`; each query filters it on every hop, so restricted evidence cannot leak into a path. |
+
 ## Quickstart
 
 With your own **FalkorDB 6.x+ server** already running (setup options below):
@@ -62,7 +105,9 @@ Open the printed loopback URL; **Reset synthetic scenario** restores the demo. C
 
 **AI & limits:** AI coding agents generated substantial code, fixtures, tests and documentation. The core graph workflow is deterministic. All data is synthetic and non-clinical; this is not a validated hospital system or medical device.
 
-## Technical details
+---
+
+# Technical details
 
 ## Start with your FalkorDB server
 
@@ -84,9 +129,9 @@ See the [judge guide](docs/judge-guide.md) for the demo route, existing-server c
 
 ### Why a graph, not a chat wrapper?
 
-`Incident → Equipment → Service → Department → current Role` is an explicit multi-hop ownership/impact path. `EVIDENCED_BY → Evidence` carries source IDs and observation times; SOP version/applicability/conflict edges keep competing claims separate. Effective-time and knowledge-time views expose why an answer changed, and scenario overlays label assumptions rather than rewriting source truth. Python's loopback HTTP app queries actual FalkorDB over RESP and projects deterministic, source-linked results into the responsive UI; human confirmation is required before local action storage. See the [actual Cypher, schema and architecture walkthrough](docs/falkordb-query-walkthrough.md).
+`Incident → Equipment → Service → Department → current Role` is an explicit multi-hop ownership/impact path. `EVIDENCED_BY → Evidence` carries source IDs and observation times; SOP version/applicability/conflict edges keep competing claims separate. Effective-time and knowledge-time views expose why an answer changed, and scenario overlays label assumptions rather than rewriting source truth. Python's loopback HTTP app queries actual FalkorDB over RESP and projects deterministic, source-linked results into the responsive UI; human confirmation is required before local action storage. See the [actual Cypher, schema and architecture walkthrough](docs/falkordb-query-walkthrough.md#1-outage--service--department--current-role).
 
-**Limits & AI disclosure:** all people, departments, incidents and sources are fictional. No patient data, diagnosis, treatment, autonomous clinical triage, real-hospital validation or compliance certification. AI agents generated substantial code, fixtures, tests and documentation; the core graph workflow is deterministic. Optional model-assisted layout on Ask WardAtlas is described below and is **not claimed live-model verified**. Publishing/submission and recording approval are separate from this local setup.
+**Limits & AI disclosure:** all people, departments, incidents and sources are fictional. No patient data, diagnosis, treatment, autonomous clinical triage, real-hospital validation or compliance certification. AI agents generated substantial code, fixtures, tests and documentation; the core graph workflow is deterministic. Optional model-assisted layout on Ask WardAtlas is described below and is **not claimed live-model verified**.
 
 ## Play the evidence time machine
 
@@ -114,9 +159,7 @@ This check bootstraps the existing digest-pinned local FalkorDB module, selects 
 
 WardAtlas is a local synthetic hospital-operations control room for the Company Brain track. It uses actual FalkorDB queries to trace a fictional equipment outage through a service to impacted departments and explicitly current operating roles, preserve source provenance, reveal a stale SOP reference and unresolved conflict, and exclude inaccessible evidence. Its integrated shift board keeps the INC-207 dock roster revision separate from INC-204 conveyor event replay: effective-dated ownership, explicit-edge review candidates, observed restoration, and a forked hypothetical drill are inspectable at pinned times. The responsive UI separates source facts, graph inference and missing evidence. A handover preview carries an inspectable, timestamped snapshot of the exact impact paths and explicit source-backed SOP witness from the existing read-only graph query; missing edges stay incomplete/unknown. The confirmed local action stores that same snapshot only after an explicit confirmation click. It does not send messages, make calls, create tickets, or perform external writes. Fixtures are invented and non-clinical; WardAtlas is not a validated hospital system or medical device.
 
-For the short operator-focused private demo path, see the [demo runbook](docs/demo-runbook.md).
-
-For exact source-bound Cypher and graph/evidence/time semantics, see the [FalkorDB query walkthrough](docs/falkordb-query-walkthrough.md).
+For the short operator-focused demo path, see the [demo runbook](docs/demo-runbook.md).
 
 ## Explain why two graph answers differ
 

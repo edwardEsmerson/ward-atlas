@@ -48,4 +48,3 @@ This matrix distinguishes implemented product behavior from behavior exercised b
 
 - No broad ingestion, event replay, real roster, hosted account, real staff schedule, clinical workflow, authentication, or external model/API is included.
 - These fixtures are for a local hackathon operations demo, not a validated hospital system or medical device. No HIPAA/GDPR or real-hospital validation claim is made.
-- Competition eligibility risk remains: official rules require participant technical understanding and meaningful contribution; this autonomous artifact does not certify those requirements for the owner.

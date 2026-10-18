@@ -1,4 +1,4 @@
-# WardAtlas private demo runbook
+# WardAtlas demo runbook
 
 This is the short operator path for the four accepted synthetic workflows: the original INC-204 outage trace, its shift-board event/branch view, the SOP-impact witness, and the confirmed handover snapshot. It does not cover other product areas. Start in the repository root. The demo uses two foreground processes; this is not a one-command launcher.
 

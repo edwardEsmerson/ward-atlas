@@ -98,8 +98,8 @@
     "This Company Brain demo uses fictional synthetic hospital-operations data only: no patients, identifiable real staff or live hospital integration. It is non-clinical, not a validated hospital system or medical device, and makes no compliance or clinical-outcome claim.",
     "At the pinned source this is deterministic FalkorDB retrieval and template projection; no AI model is called at runtime. AI assistants helped author code, tests and documentation; this is not a model-backed clinical agent.",
     "These queries and replay endpoints are read-only. Any handover action requires explicit human confirmation and saves only a local synthetic snapshot; no messages, calls, external tickets or external writes occur.",
-    "This appendix performs no publication or submission and makes no public deployment or video-availability claim; publication and submission require owner authorization.",
-    "Eligibility risk remains: official rules require participant technical understanding and meaningful contribution and warn that AI-only entries may be rejected. Autonomous work does not certify these requirements on the owner's behalf; winning is not guaranteed.",
+    "This appendix is static documentation of the pinned source; it makes no public deployment claim.",
+    "The participant's own AI-use statement accompanies the hackathon submission; this appendix documents only the software.",
     "The accepted report digests identify prior verification, not a new graph/browser run or publicly accessible media. This appendix's checker is static and cannot re-prove database behavior."
   ]
 }

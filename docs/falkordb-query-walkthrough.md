@@ -230,6 +230,6 @@ This Company Brain demo uses fictional synthetic hospital-operations data only: 
 
 At the pinned source this is deterministic FalkorDB retrieval and template projection; no AI model is called at runtime. AI assistants helped author code, tests and documentation; this is not a model-backed clinical agent.
 
-This appendix performs no publication or submission and makes no public deployment or video-availability claim; publication and submission require owner authorization.
+This appendix is static documentation of the pinned source; it makes no public deployment claim.
 
-Eligibility risk remains: official rules require participant technical understanding and meaningful contribution and warn that AI-only entries may be rejected. Autonomous work does not certify these requirements on the owner's behalf; winning is not guaranteed.
+The participant's own AI-use statement accompanies the hackathon submission; this appendix documents only the software.

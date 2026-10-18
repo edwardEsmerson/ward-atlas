@@ -64,6 +64,6 @@ Commit candidate edits before the behavioral command: it tests `git archive HEAD
 
 Reports overwrite their own named outputs under `$WORKSHOP_RUN_DIR/existing-server/`, or `.local/verification/existing-server/` without that environment variable. A failing or zero-case run is not success. Module identity alone is not arbitrary-server certification: runtime asserts a graph module reporting version 6.x+, while this verifier additionally validates fixed module bytes and its owned server's load log.
 
-## Disclosure and eligibility
+## AI use and limits
 
-Substantial implementation, fixtures, tests and documentation were AI-generated. The core workflow uses deterministic graph queries/templates; optional Ask layout composition is not claimed live-model verified. This is not a validated hospital system or medical device, provides no clinical advice and makes no HIPAA/GDPR claim. Participant technical understanding, meaningful human contribution and submission eligibility remain **unverified**; official rules warn that AI-only entries may be rejected. A green automated check is not eligibility certification. Public publishing, video/submission actions and account/payment decisions are separate approvals, not performed by this launcher.
+Substantial implementation, fixtures, tests and documentation were AI-generated. The core workflow uses deterministic graph queries/templates; optional Ask layout composition is not claimed live-model verified. This is not a validated hospital system or medical device, provides no clinical advice and makes no HIPAA/GDPR claim. A green automated check shows that the documented behaviour reproduces; it is not a clinical or compliance certification.

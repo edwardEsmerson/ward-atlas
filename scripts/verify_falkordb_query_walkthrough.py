@@ -19,7 +19,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_COMMIT = "b540f032a50d14384602e638abc1ff59f50160cf"
-EXPECTED_SHA256 = "7008d30f6aa06990795bf5a958e99d54015ee6f11c8a07e06d4d40e6ca0a0fa1"
+EXPECTED_SHA256 = "2f842d6018043eed4231153e64274ab2b1388b3bee97b9789f8343f5ae56e819"
 EXPECTED_PATH = "tests/falkordb-query-walkthrough-expected.json"
 DOC_PATH = "docs/falkordb-query-walkthrough.md"
 FENCE = re.compile(r"<!-- query:([a-z0-9-]+) -->\n```cypher\n(.*?)\n```", re.S)
