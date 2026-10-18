@@ -20,6 +20,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from wardatlas_questions import HTML_PATH as QUESTIONS_HTML_PATH, post_questions
+
 from verify_falkordb_live import (
     RespConnection,
     module_list_maps,
@@ -309,7 +311,7 @@ APP_HTML = r'''<!doctype html>
   <div class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><span>WARDATLAS<small>HOSPITAL OPERATIONS BRAIN</small></span></div>
-      <div class="top-actions"><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
+      <div class="top-actions"><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
@@ -1764,6 +1766,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if parsed.path == "/":
                 self._send(200, APP_HTML)
+            elif parsed.path == "/ask":
+                self._send(200, QUESTIONS_HTML_PATH.read_text(encoding="utf-8"))
             elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
@@ -1853,6 +1857,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urlsplit(self.path)
         service = self.server.service
+        if parsed.path == "/api/questions":
+            post_questions(self, service)
+            return
         if parsed.path == "/api/shift-board/branch/reset":
             try:
                 self._json_body()

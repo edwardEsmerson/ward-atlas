@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen before questions behavior. Literal expectations from the two unchanged accepted oracles and the bounded questions task; never candidate output.",
+  "sources": {
+    "outage": {"path": "tests/expected-results.json", "sha256": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87"},
+    "timeline": {"path": "contracts/decision-knowledge-timeline/expected-results.json", "sha256": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"}
+  },
+  "groups": [
+    {"id": "impact", "source_pointers": ["outage#/expected_paths", "outage#/expected_evidence_by_path"], "expected": {
+      "paths": [["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"], ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]],
+      "source_ids": [["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"], ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"]],
+      "source_titles": [["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"], ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"]],
+      "observed_at": [["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:04:00Z"], ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z", "2026-10-14T18:05:00Z"]],
+      "path_kind": "graph-derived path", "status": "answered", "time": "2026-10-14T18:30:00Z", "roster_observation_variants": ["2026-10-14T18:04:00Z", "2026-10-14T18:05:00Z"]
+    }},
+    {"id": "restoration", "source_pointers": ["outage#/scenarios/3/expected", "timeline#/scope/unknown_semantics"], "expected": {
+      "paths": [], "status": "answered", "time": "2026-10-14T19:30:00Z", "safety_conclusion": false, "event_value": "available", "explicit_no_safety_conclusion": true
+    }},
+    {"id": "disagreement", "source_pointers": ["outage#/scenarios/4/expected", "timeline#/baseline/v2_claim", "timeline#/baseline/v3_claim", "timeline#/baseline/conflict"], "expected": {
+      "versions": ["SOP-OPS-9-V2", "SOP-OPS-9-V3"], "roles": ["ROLE-FACILITIES-DUTY", "ROLE-MATERIALS-LEAD"], "claim_label": "unverified SOP claim",
+      "source_ids": ["SRC-SOP-CURRENT-V2", "SRC-SOP-CURRENT-V3"], "source_titles": ["Synthetic SOP-OPS-9 Current Text v2", "Synthetic SOP-OPS-9 Current Text v3"], "observed_at": ["2026-10-14T16:00:00Z", "2026-10-14T16:04:00Z"],
+      "conflict": {"from": "SOP-OPS-9-V2", "relationship": "SOP_CONFLICT", "to": "SOP-OPS-9-V3", "status": "unresolved"}, "sop_selection": {"version": null, "owner": null, "procedure": null}
+    }},
+    {"id": "before", "source_pointers": ["timeline#/cases/1/expected"], "expected": {
+      "time": "2026-10-14T15:59:59Z", "status": "unknown", "source_facts": [], "graph_paths": [], "citations": [], "source_record_existence_hints": false
+    }},
+    {"id": "claims-known", "source_pointers": ["timeline#/cases/4/expected/projection"], "expected": {
+      "time": "2026-10-14T16:04:00Z", "versions": ["SOP-OPS-9-V2", "SOP-OPS-9-V3"], "conflict_kind": "graph-derived relationship", "record": null, "record_existence_hint": false, "source_quote": false
+    }},
+    {"id": "record-known", "source_pointers": ["timeline#/cases/6/expected/projection", "timeline#/baseline/decision_record"], "expected": {
+      "time": "2026-10-14T16:05:00Z", "record_id": "DEC-OPS-9-REVIEW-01", "record_title": "SOP-OPS-9 claim reconciliation review", "record_state": "open-unresolved",
+      "source": {"source_id": "SRC-DEC-OPS-9-REVIEW-01", "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation", "observed_at": "2026-10-14T16:05:00Z"},
+      "source_fact_kind": "source fact", "sop_selection": {"version": null, "owner": null, "procedure": null}
+    }},
+    {"id": "cold-offline", "source_pointers": ["outage#/scenarios/0/expected", "timeline#/cases/0/expected"], "expected": {
+      "cold_status": "unknown", "offline_status": "unknown", "source_facts": [], "graph_paths": [], "citations": [], "negative_conclusion": false
+    }},
+    {"id": "acl-decoy", "source_pointers": ["outage#/scenarios/5/expected", "timeline#/scope/acl_semantics", "timeline#/cases/9/expected"], "expected": {
+      "entire_answer_invariant": true, "citations_invariant": true, "sanitized_model_input_invariant": true, "browser_text_invariant": true, "browser_accessibility_invariant": true, "restricted_disclosure": false
+    }},
+    {"id": "validation", "source_pointers": ["timeline#/scope/unknown_semantics"], "expected": {
+      "invalid_time_status": 400, "duplicate_time_status": 400, "denied_scope_status": 403, "unsupported_status": "clarification", "ambiguous_status": "clarification", "unknown_identifier_status": "clarification", "queries_before_validation": 0
+    }},
+    {"id": "model-boundary", "source_pointers": ["timeline#/scope/citation_semantics", "timeline#/scope/acl_semantics"], "expected": {
+      "valid_method": "model-assisted", "fallback_method": "deterministic-graph", "failure_semantic_equality": true, "false_fact_valid_citation_rejected": true, "prompt_injection_rejected": true, "tool_request_rejected": true, "extra_fields_rejected": true, "unknown_fact_rejected": true
+    }},
+    {"id": "repeat-read-only", "source_pointers": ["outage#/scenarios/6/expected", "outage#/scenarios/7/expected", "timeline#/scope/external_writes"], "expected": {
+      "reseed_semantic_equality": true, "reconnect_entire_answer_equality": true, "second_seed_node_delta": 0, "second_seed_edge_delta": 0, "graph_state_unchanged": true, "action_watch_state_unchanged": true, "desktop_mobile_api_parity": true, "keyboard_submission": true, "output_escaped": true, "owned_cleanup": true
+    }}
+  ],
+  "task_specific_pins": {
+    "context": "inc204-operations", "scope": "operations", "date": "2026-10-14",
+    "unknown_text": "Insufficient evidence for this context and time. Unknown does not establish absence, resolution, ownership, or safety.",
+    "model_schema": {"template": "evidence-first", "fact_ids": ["allowlisted canonical IDs only; no generated text or extra fields"]},
+    "note": "API/presentation names, restoration event value and probe outcomes are literal requirements of the questions task; source pointers ground their underlying accepted graph semantics, not an invented prior API. UI output is escaped, no quotations are synthesized, and fallback equals the deterministic response exactly."
+  }
+}
