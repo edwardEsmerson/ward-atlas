@@ -49,7 +49,25 @@ class DecisionSourceBranchContractTests(unittest.TestCase):
         expected, matrix = documents()
         edge_case = group(expected, "missing-edge-no-fallback-and-reseed")["expected"]
         edge_case["missing_branch_to_override_edge_result"]["mainline_fallback_used"] = True
-        with self.assertRaisesRegex(contract.ContractError, "without mainline fallback"):
+        with self.assertRaisesRegex(contract.ContractError, "exact generic unknown projection"):
+            contract.validate_documents(expected, matrix, root=ROOT)
+
+    def test_rejects_mainline_record_leak_when_branch_edge_is_missing(self):
+        expected, matrix = documents()
+        edge_case = group(expected, "missing-edge-no-fallback-and-reseed")["expected"]
+        mainline_record = group(expected, "mainline-at-16-05")["expected"]["projection"]["decision_record"]
+        missing = edge_case["missing_branch_to_override_edge_result"]
+        missing["projection"]["decision_record"] = copy.deepcopy(mainline_record)
+        with self.assertRaisesRegex(contract.ContractError, "exact generic unknown projection"):
+            contract.validate_documents(expected, matrix, root=ROOT)
+
+    def test_rejects_mainline_claim_leak_when_source_edge_is_missing(self):
+        expected, matrix = documents()
+        edge_case = group(expected, "missing-edge-no-fallback-and-reseed")["expected"]
+        mainline_claims = group(expected, "mainline-at-16-05")["expected"]["projection"]["claims"]
+        missing = edge_case["missing_override_to_source_edge_result"]
+        missing["projection"]["claims"] = copy.deepcopy(mainline_claims)
+        with self.assertRaisesRegex(contract.ContractError, "exact generic unknown projection"):
             contract.validate_documents(expected, matrix, root=ROOT)
 
     def test_rejects_v3_fallback_in_1605_branch_projection(self):
@@ -105,6 +123,26 @@ class DecisionSourceBranchContractTests(unittest.TestCase):
             root=ROOT,
         )
         self.assertEqual(total, 74)
+
+    def test_rejects_review_receipt_without_named_criteria(self):
+        expected, matrix = documents()
+        manifest_path = ROOT / "contracts/decision-source-branch/frozen-sources.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        receipt = json.loads(
+            (ROOT / "contracts/decision-source-branch/independent-review.json").read_text(encoding="utf-8")
+        )
+        receipt["reviewed_criteria"] = {"unrelated": True}
+        with self.assertRaisesRegex(contract.ContractError, "exactly the named required review criteria"):
+            contract.validate_review_receipt(
+                receipt,
+                EXPECTED_PATH.resolve(),
+                MATRIX_PATH.resolve(),
+                manifest_path.resolve(),
+                expected,
+                matrix,
+                manifest,
+                ROOT,
+            )
 
 
 if __name__ == "__main__":

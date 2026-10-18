@@ -38,6 +38,35 @@ BRANCH_ASSUMPTION = {
     "source_fact_modified": False,
     "scenario_not_source_truth": True,
 }
+REQUIRED_REVIEW_CRITERIA = frozenset({
+    "full_mainline_at_16_04_utc_and_source_fact",
+    "branch_16_05_suppression_and_open_unresolved_record",
+    "branch_16_06_restoration",
+    "mainline_immutability",
+    "either_missing_branch_edge_unknown_without_fallback",
+    "decoy_and_restricted_full_view_invariance",
+    "repeat_reconnect_read_only_and_owned_cleanup",
+    "desktop_mobile_api_and_keyboard_agreement",
+    "scenario_branch_override_evidence_labels",
+})
+GENERIC_MISSING_BRANCH_RESULT = {
+    "branch_state": "unknown",
+    "claim_context_state": "incomplete/unknown",
+    "projection": {
+        "known_at": "2026-10-14T16:05:00Z",
+        "claim_context_state": "incomplete/unknown",
+        "claims": [],
+        "conflict": None,
+        "decision_record": None,
+        "decision_considers_edges": [],
+        "generic_unknown": True,
+        "negative_conclusion_asserted": False,
+        "current_owner_or_procedure_selected": False,
+        "contact_or_action_supplied": False,
+    },
+    "mainline_fallback_used": False,
+    "source_or_branch_identity_exposed": False,
+}
 
 
 class ContractError(ValueError):
@@ -276,10 +305,8 @@ def validate_required_outcomes(expected: dict[str, Any], root: Path) -> None:
         _fail("branch fixture must use the exact two explicit pinned relationships")
     for key in ("missing_branch_to_override_edge_result", "missing_override_to_source_edge_result"):
         outcome = edge_case.get(key, {})
-        if outcome.get("branch_state") != "unknown" or outcome.get("mainline_fallback_used") is not False:
-            _fail(f"{key} must be unknown without mainline fallback")
-        if outcome.get("projection", {}).get("claim_context_state") != "incomplete/unknown":
-            _fail(f"{key} must preserve incomplete/unknown semantics")
+        if outcome != GENERIC_MISSING_BRANCH_RESULT:
+            _fail(f"{key} must be the exact generic unknown projection with no mainline facts or fallback")
     if edge_case.get("mainline_fallback_used") is not False or edge_case.get("only_owned_edge_removed") is not True:
         _fail("missing branch-edge checks must never fall back and may remove only the owned edge")
 
@@ -430,8 +457,10 @@ def validate_review_receipt(
     if receipt.get("literal_mapping_total") != total:
         _fail("review receipt total mapping count does not bind the frozen matrix")
     criteria = receipt.get("reviewed_criteria", {})
-    if not criteria or any(value is not True for value in criteria.values()):
-        _fail("review receipt must affirm every required behavior group")
+    if not isinstance(criteria, dict) or set(criteria) != REQUIRED_REVIEW_CRITERIA:
+        _fail("review receipt must contain exactly the named required review criteria")
+    if any(criteria[key] is not True for key in REQUIRED_REVIEW_CRITERIA):
+        _fail("review receipt must affirm every named required behavior group")
 
     contract_paths = [
         "contracts/decision-source-branch/expected-results.json",
