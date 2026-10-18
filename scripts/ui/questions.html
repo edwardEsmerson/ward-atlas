@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1924">
+  <link rel="icon" href="data:,">
+  <title>WardAtlas · Ask operations</title>
+  <style>
+    :root { color-scheme:dark; --bg:#0d1924; --panel:#142431; --line:#304753; --ink:#edf4f2; --muted:#afc2c6; --mint:#91e5c3; --amber:#f1c47f; --blue:#add2f3; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    * { box-sizing:border-box; }
+    [hidden] { display:none !important; }
+    body { margin:0; min-width:280px; background:radial-gradient(ellipse at 12% 0,#203b46 0,transparent 44%),var(--bg); color:var(--ink); }
+    button,input { font:inherit; }
+    a { color:var(--mint); text-underline-offset:4px; }
+    button,input,a,[tabindex] { -webkit-tap-highlight-color:transparent; }
+    :focus-visible { outline:3px solid var(--mint); outline-offset:4px; }
+    .shell { max-width:1440px; margin:auto; padding:24px clamp(18px,4vw,56px) 48px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:20px; padding-bottom:24px; border-bottom:1px solid var(--line); }
+    .brand { display:flex; align-items:center; gap:12px; font-size:12px; font-weight:800; letter-spacing:.12em; }
+    .brand-mark { display:grid; place-items:center; width:36px; height:36px; background:#183b32; color:var(--mint); border:1px solid #77c6a8; border-radius:11px; font-size:17px; }
+    .brand small { display:block; margin-top:4px; color:var(--muted); font-size:11px; font-weight:500; letter-spacing:.03em; }
+    .topbar a { font-size:13px; }
+    .eyebrow { color:var(--mint); font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px; padding:34px 0 28px; }
+    h1 { margin:9px 0 12px; font-size:clamp(32px,4.5vw,54px); line-height:1.08; letter-spacing:-.045em; }
+    .hero p { max-width:660px; margin:0; color:var(--muted); font-size:15px; line-height:1.7; }
+    .scope-badge { border:1px solid #476050; border-radius:999px; padding:9px 13px; color:#cce6d8; background:#1a302b; font-size:12px; white-space:nowrap; }
+    .layout { display:grid; grid-template-columns:minmax(285px,360px) minmax(0,1fr); gap:24px; align-items:start; }
+    .panel { min-width:0; border:1px solid var(--line); border-radius:16px; background:linear-gradient(145deg,#172a36,#12212d); box-shadow:0 16px 45px #050c112a; }
+    .composer { padding:24px; }
+    h2 { margin:8px 0 12px; font-size:23px; line-height:1.25; letter-spacing:-.025em; }
+    h3 { margin:0; font-size:17px; letter-spacing:-.015em; }
+    p { line-height:1.6; }
+    .context { margin:17px 0 24px; padding:13px 14px; background:#10212a; border-left:2px solid var(--mint); border-radius:0 8px 8px 0; }
+    .context strong { display:block; font-size:14px; }
+    .context code { display:block; margin-top:5px; color:var(--muted); font-size:11px; overflow-wrap:anywhere; }
+    .hint { margin:7px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
+    fieldset { margin:0 0 22px; padding:0; border:0; min-width:0; }
+    legend,.field-label { display:block; margin:0 0 9px; font-size:12px; font-weight:750; }
+    .intents { display:grid; gap:8px; }
+    .intent { display:flex; gap:10px; align-items:center; min-height:48px; padding:11px 12px; border:1px solid var(--line); border-radius:9px; cursor:pointer; font-size:13px; }
+    .intent:has(input:checked) { border-color:#75bda5; background:#213b38; color:#d6f6e8; }
+    .intent input { margin:0; accent-color:var(--mint); flex-shrink:0; }
+    .field { margin-bottom:21px; }
+    input[type=text] { display:block; width:100%; min-width:0; min-height:46px; padding:11px 12px; color:var(--ink); background:#0e1c26; border:1px solid #48606b; border-radius:8px; font-size:13px; }
+    input[type=text]:hover { border-color:#79949e; }
+    #question-time { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; }
+    .axis { display:inline-block; margin-left:5px; color:var(--mint); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:10px; font-weight:500; }
+    .compose-option { display:flex; gap:10px; align-items:flex-start; font-size:12px; line-height:1.6; cursor:pointer; }
+    .compose-option input { accent-color:var(--mint); margin:4px 0 0; }
+    .button { display:block; width:100%; min-height:48px; margin-top:22px; padding:12px 16px; color:#10251c; background:var(--mint); border:1px solid var(--mint); border-radius:9px; font-weight:800; font-size:13px; cursor:pointer; }
+    .button:hover { background:#b2f4d9; }
+    .button:disabled { opacity:.65; cursor:wait; }
+    .read-only { margin:14px 0 0; text-align:center; color:var(--muted); font-size:11px; }
+    .workspace { min-width:0; }
+    .notice { margin:0 0 16px; padding:14px 17px; border:1px solid var(--line); border-radius:10px; background:#142630; color:var(--muted); font-size:13px; line-height:1.6; }
+    .notice[data-state=error] { color:#ffd8d0; border-color:#80554c; background:#322824; }
+    .empty { padding:clamp(26px,5vw,56px); min-height:340px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; }
+    .empty-mark { display:grid; place-items:center; width:46px; height:46px; margin-bottom:15px; border:1px solid #3e5d66; border-radius:13px; color:var(--mint); font-size:23px; }
+    .empty p { max-width:510px; margin:0; color:var(--muted); font-size:14px; }
+    .answer-header { padding:23px 25px; border-bottom:1px solid var(--line); }
+    .answer-topline { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .status { padding:5px 9px; border:1px solid #52715e; border-radius:6px; color:var(--mint); font-size:11px; }
+    .status[data-status=unknown],.status[data-status=clarification] { color:var(--amber); border-color:#716044; }
+    #answer-heading { margin-top:15px; }
+    #answer-heading:focus { outline-offset:6px; }
+    #submitted-question { margin:0 0 15px; color:var(--ink); font-size:14px; overflow-wrap:anywhere; }
+    .answer-meta { display:grid; gap:8px; color:var(--muted); font-size:12px; line-height:1.6; }
+    #answer-time { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:11px; overflow-wrap:anywhere; }
+    #answer-method { color:var(--mint); }
+    #method-detail { margin:0; color:var(--muted); font-size:12px; }
+    .answer-section { padding:24px 25px; border-bottom:1px solid var(--line); min-width:0; }
+    .section-label { margin:6px 0 17px; color:var(--muted); font-size:12px; line-height:1.6; }
+    .fact-list { display:grid; gap:14px; list-style:none; padding:0; margin:0; }
+    .fact { min-width:0; padding:17px; border:1px solid #36515b; border-radius:10px; background:#10212b; }
+    .canonical-kind { color:var(--mint); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+    [data-section=graph_paths] .canonical-kind { color:var(--blue); }
+    [data-section=missing_evidence] .fact { background:#282a25; border-color:#5d5541; }
+    [data-section=missing_evidence] .canonical-kind { color:var(--amber); }
+    .canonical-text { margin:9px 0 12px; line-height:1.7; font-size:13px; overflow-wrap:anywhere; }
+    .canonical-id { display:block; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:10px; overflow-wrap:anywhere; line-height:1.6; }
+    .record-title { margin:12px 0 0; font-size:13px; line-height:1.6; overflow-wrap:anywhere; }
+    .derived-evidence { margin-top:15px; padding:12px; border:1px solid #34576d; border-radius:7px; background:#142936; }
+    .derived-label { margin:0; color:var(--blue); font-size:11px; font-weight:700; line-height:1.6; }
+    .path { display:flex; flex-wrap:wrap; align-items:center; gap:7px; list-style:none; margin:14px 0; padding:0; }
+    .path li { display:flex; align-items:center; min-width:0; gap:7px; }
+    .path li:not(:last-child)::after { content:'→'; color:#8ba7b2; }
+    .path-node { padding:6px 8px; border:1px solid #34576d; border-radius:5px; background:#182f40; color:#d0e5f8; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+    .relationships { margin:12px 0; padding-left:16px; color:#c2d9e9; font:10px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+    .citations { list-style:none; padding:0; margin:14px 0 0; display:grid; gap:9px; }
+    .citation { display:grid; gap:3px; padding:9px 0 0; border-top:1px solid #2c434d; font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+    .citation-id { color:#c8dfdf; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .citation-title { color:var(--muted); }
+    .citation-time-label { color:#b4c6c8; font-size:10px; }
+    .canonical-details { margin-top:13px; color:var(--muted); font-size:11px; }
+    summary { cursor:pointer; padding:5px 0; }
+    .canonical-data { white-space:pre-wrap; overflow-wrap:anywhere; font-size:10px; line-height:1.7; }
+    .section-empty { margin:0; color:var(--muted); font-size:12px; line-height:1.7; }
+    .citation-section { border-bottom:0; }
+    .citation-section .citations { margin-top:0; }
+    .boundary { margin:18px 3px 0; color:var(--muted); font-size:12px; line-height:1.7; }
+    footer { display:flex; justify-content:space-between; gap:16px; margin-top:32px; padding-top:20px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; line-height:1.6; }
+    @media (min-width:1050px) { .composer { position:sticky; top:20px; } }
+    @media (max-width:900px) { .layout { grid-template-columns:minmax(260px,310px) minmax(0,1fr); gap:16px; } .composer,.answer-header,.answer-section { padding:20px; } }
+    @media (max-width:700px) { .shell { padding-top:18px; } .hero { display:block; padding:27px 0 23px; } .scope-badge { display:inline-block; margin-top:17px; } .layout { grid-template-columns:minmax(0,1fr); } .intents { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .intent { flex-direction:column; align-items:flex-start; justify-content:flex-start; padding:11px 9px; font-size:11px; line-height:1.5; } .empty { min-height:260px; } .answer-header,.answer-section { padding:20px 17px; } .fact { padding:14px; } footer { flex-direction:column; gap:4px; } }
+    @media (prefers-reduced-motion:no-preference) { .button { transition:background .15s; } }
+  </style>
+</head>
+<body>
+  <div class="shell" id="questions-app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><span>WARDATLAS<small>Operations evidence workspace</small></span></div>
+      <a href="/">Back to shift control</a>
+    </header>
+    <main>
+      <div class="hero">
+        <div><div class="eyebrow">Ask operations</div><h1>A question. An evidence trail.</h1><p>Explore operational impact and what was knowable at a specific time. Every answer stays grounded in the server’s canonical evidence.</p></div>
+        <span class="scope-badge">Operations scope · read only</span>
+      </div>
+      <div class="layout">
+        <form class="panel composer" id="questions-form" aria-labelledby="composer-heading">
+          <div class="eyebrow">01 / Frame the question</div>
+          <h2 id="composer-heading">Keep the context explicit.</h2>
+          <div class="context" id="question-context"><strong>INC-204 · operations</strong><code>inc204-operations</code><p class="hint">Requested context, not an established incident fact. Synthetic scenario date: 14 October 2026.</p></div>
+          <fieldset><legend>Question type</legend><div class="intents">
+            <label class="intent"><input id="question-impact" type="radio" name="intent" value="impact" checked><span>Outage impact</span></label>
+            <label class="intent"><input id="question-sop" type="radio" name="intent" value="sop_disagreement"><span>SOP disagreement</span></label>
+            <label class="intent"><input id="question-decision" type="radio" name="intent" value="decision"><span>As-known decision</span></label>
+          </div></fieldset>
+          <div class="field"><label class="field-label" for="question-input">Your question</label><input id="question-input" name="question" type="text" maxlength="500" required value="Who is affected by INC-204?" aria-describedby="question-help" autocomplete="off"><p class="hint" id="question-help">One supported question, up to 500 characters. Put the time in the field below, not in the question.</p></div>
+          <div class="field"><label class="field-label" for="question-time"><span id="question-time-label">Observed impact as of</span><span class="axis" id="question-axis">as_of</span></label><input id="question-time" name="as_of" type="text" value="2026-10-14T18:30:00Z" required maxlength="64" aria-describedby="question-time-help" autocomplete="off" spellcheck="false"><p class="hint" id="question-time-help">One explicit ISO-8601 timestamp with an offset, such as Z. No browser-local time conversion.</p></div>
+          <label class="compose-option"><input id="question-compose" type="checkbox" name="compose"><span>Allow model-assisted layout<span class="hint" style="display:block;margin-top:2px">Optional: reorder canonical fact IDs in a bounded template only. No generated prose, new evidence, or actions.</span></span></label>
+          <button class="button" id="question-submit" type="submit">Ask the evidence →</button>
+          <p class="read-only">Read only. No contact or external action.</p>
+        </form>
+        <div class="workspace">
+          <p class="notice" id="question-notice" role="status" aria-live="polite" aria-atomic="true">Ready. Choose a question and one explicit time.</p>
+          <section class="panel empty" id="question-empty" aria-labelledby="empty-heading"><div class="empty-mark" aria-hidden="true">↗</div><div class="eyebrow">02 / Inspect the evidence</div><h2 id="empty-heading">Evidence, not assumptions.</h2><p>Source facts, graph-derived paths, and missing evidence appear separately. Nothing here establishes an authoritative procedure, a person to contact, or a safety conclusion.</p></section>
+          <article class="panel" id="question-answer" aria-labelledby="answer-heading" aria-busy="false" hidden>
+            <header class="answer-header"><div class="answer-topline"><span class="eyebrow">02 / Evidence response</span><span class="status" id="answer-status"></span></div><h2 id="answer-heading" tabindex="-1">Evidence response</h2><p id="submitted-question"></p><div class="answer-meta"><div id="answer-time"></div><div id="answer-method"></div><p id="method-detail"></p></div></header>
+            <div id="answer-sections">
+              <section class="answer-section" data-section="source_facts" aria-labelledby="facts-heading"><h3 id="facts-heading">Canonical source facts</h3><p class="section-label">Server-supplied statements with their source observations; not synthesized quotations.</p><ul class="fact-list" id="source-facts"></ul><p class="section-empty" id="source-facts-empty">No source facts supplied for this response.</p></section>
+              <section class="answer-section" data-section="graph_paths" aria-labelledby="paths-heading"><h3 id="paths-heading">Graph-derived paths &amp; relationships</h3><p class="section-label">Explicit graph connections, not source quotations or authoritative instructions.</p><ul class="fact-list" id="graph-paths"></ul><p class="section-empty" id="graph-paths-empty">No graph paths supplied for this response.</p></section>
+              <section class="answer-section" data-section="missing_evidence" aria-labelledby="missing-heading"><h3 id="missing-heading">Missing evidence &amp; limits</h3><p class="section-label">Unknown is not absence, resolution, ownership, or safety.</p><ul class="fact-list" id="missing-evidence"></ul><p class="section-empty" id="missing-evidence-empty">No additional evidence statement supplied.</p></section>
+            </div>
+            <section class="answer-section citation-section" aria-labelledby="citations-heading"><h3 id="citations-heading">Source observation index</h3><p class="section-label">Source ID, title, and observed time. Different observations of the same source remain separate.</p><ul class="citations" id="answer-citations"></ul><p class="section-empty" id="answer-citations-empty">No source observations supplied for this response.</p></section>
+          </article>
+          <p class="boundary">This workspace does not choose an authoritative SOP, owner, procedure, or contact. Operational connections are not clinical advice or a safety determination.</p>
+        </div>
+      </div>
+    </main>
+    <footer><span>WardAtlas / bounded operations questions</span><span>Explicit context. Explicit time. Traceable evidence.</span></footer>
+  </div>
+  <script>
+    'use strict';
+    // Stable browser contract is documented in questions_browser_assertions.cjs.
+    // All user/server strings enter the DOM through textContent, never HTML.
+    const $ = id => document.getElementById(id);
+    const presets = {
+      impact: { question: 'Who is affected by INC-204?', axis: 'as_of', label: 'Observed impact as of', time: '2026-10-14T18:30:00Z' },
+      sop_disagreement: { question: 'Explain the SOP-OPS-9 disagreement', axis: 'known_at', label: 'Evidence known at', time: '2026-10-14T16:05:00Z' },
+      decision: { question: 'What was known about the decision?', axis: 'known_at', label: 'Evidence known at', time: '2026-10-14T16:05:00Z' }
+    };
+    const lists = { source_facts: 'source-facts', graph_paths: 'graph-paths', missing_evidence: 'missing-evidence' };
+    let selected = 'impact';
+    let generation = 0;
+    let pending = null;
+    function node(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+    function clearAnswer() {
+      $('question-answer').hidden = true;
+      $('question-empty').hidden = false;
+      for (const id of [...Object.values(lists), 'answer-citations']) {
+        $(id).replaceChildren();
+        $(id + '-empty').hidden = false;
+      }
+      for (const id of ['answer-status', 'submitted-question', 'answer-time', 'answer-method', 'method-detail']) $(id).textContent = '';
+      $('answer-heading').textContent = 'Evidence response';
+      $('question-answer').removeAttribute('data-status');
+      $('question-answer').removeAttribute('data-method');
+      $('question-answer').removeAttribute('data-template');
+    }
+    function notice(text, state = 'ready') {
+      $('question-notice').textContent = text;
+      $('question-notice').dataset.state = state;
+    }
+    function invalidate() {
+      generation++;
+      if (pending) pending.abort();
+      pending = null;
+      $('question-submit').disabled = false;
+      $('question-answer').setAttribute('aria-busy', 'false');
+      clearAnswer();
+      notice('Question changed. Submit again for evidence at the selected time.');
+    }
+    function citations(items) {
+      const list = node('ul', 'citations');
+      // Do not deduplicate by source_id: observation time is part of identity.
+      for (const item of items || []) {
+        const row = node('li', 'citation');
+        row.append(node('span', 'citation-id', item.source_id), node('span', 'citation-title', item.title));
+        const label = node('span', 'citation-time-label', 'Observed at ');
+        const time = node('time', 'citation-observed-at', item.observed_at);
+        time.dateTime = item.observed_at;
+        label.append(time);
+        row.append(label);
+        list.append(row);
+      }
+      return list;
+    }
+    function relationships(items) {
+      const edges = node('ul', 'relationships');
+      edges.setAttribute('aria-label', 'Explicit graph-derived relationships');
+      for (const edge of items) {
+        const line = node('li', 'relationship');
+        line.append(node('span', 'relationship-from', edge.from), document.createTextNode(' — '), node('span', 'relationship-type', edge.relationship), document.createTextNode(' → '), node('span', 'relationship-to', edge.to));
+        if (edge.status) line.append(document.createTextNode(' · '), node('span', 'relationship-status', edge.status));
+        edges.append(line);
+      }
+      return edges;
+    }
+    function fact(item) {
+      const row = node('li', 'fact');
+      row.dataset.factId = item.id;
+      row.append(node('div', 'canonical-kind', item.kind), node('p', 'canonical-text', item.text), node('code', 'canonical-id', item.id));
+      if (Array.isArray(item.path)) {
+        const trail = node('ol', 'path');
+        trail.setAttribute('aria-label', 'Graph path');
+        for (const identifier of item.path) {
+          const step = node('li');
+          step.append(node('span', 'path-node', identifier));
+          trail.append(step);
+        }
+        row.append(trail);
+      }
+      if (Array.isArray(item.relationships)) {
+        row.append(relationships(item.relationships));
+      }
+      if (item.data?.title) row.append(node('p', 'record-title', item.data.title));
+      const derived = [...(item.data?.provenance_path || []), ...(item.data?.decision_considers_edges || [])];
+      if (derived.length) {
+        const evidence = node('div', 'derived-evidence');
+        evidence.append(node('p', 'derived-label', 'Graph-derived provenance & considered relationships — not a source quotation or authoritative rule.'), relationships(derived));
+        row.append(evidence);
+      }
+      if (item.citations?.length) row.append(citations(item.citations));
+      if (item.data && Object.keys(item.data).length) {
+        const details = node('details', 'canonical-details');
+        details.append(node('summary', '', 'Canonical structured data'), node('pre', 'canonical-data', JSON.stringify(item.data, null, 2)));
+        row.append(details);
+      }
+      return row;
+    }
+    function render(answer, request) {
+      if (!['answered', 'unknown', 'clarification'].includes(answer.status) || !['deterministic-graph', 'model-assisted'].includes(answer.method) || !Array.isArray(answer.citations) || Object.keys(lists).some(key => !Array.isArray(answer[key]))) throw new Error('Invalid response');
+      const all = Object.keys(lists).flatMap(key => answer[key]);
+      const ids = all.map(item => item.id);
+      const presentation = answer.presentation;
+      const bounded = presentation && ['evidence-first', 'paths-first'].includes(presentation.template) && Array.isArray(presentation.fact_ids) && presentation.fact_ids.length === ids.length && new Set(presentation.fact_ids).size === ids.length && presentation.fact_ids.every(id => ids.includes(id));
+      if (answer.method === 'model-assisted' && !bounded) throw new Error('Invalid presentation');
+      const order = bounded ? presentation.fact_ids : ids;
+      const template = bounded ? presentation.template : 'evidence-first';
+      const sections = template === 'paths-first' ? ['graph_paths', 'source_facts', 'missing_evidence'] : Object.keys(lists);
+      // A bounded template can change section order, never their epistemic type.
+      for (const key of sections) {
+        const list = $(lists[key]);
+        list.replaceChildren(...[...answer[key]].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id)).map(fact));
+        $(lists[key] + '-empty').hidden = answer[key].length > 0;
+        $('answer-sections').append(list.closest('[data-section]'));
+      }
+      $('answer-citations').replaceChildren(...citations(answer.citations).childNodes);
+      $('answer-citations-empty').hidden = answer.citations.length > 0;
+      $('answer-status').textContent = { answered: 'Evidence returned', unknown: 'Unknown', clarification: 'Clarification needed' }[answer.status];
+      $('answer-status').dataset.status = answer.status;
+      $('answer-heading').textContent = { answered: 'An answer with its boundaries.', unknown: 'Insufficient evidence.', clarification: 'Keep the question bounded.' }[answer.status];
+      $('submitted-question').textContent = request.question;
+      $('answer-time').textContent = answer.time ? `${answer.time.axis === 'as_of' ? 'Observed impact as of' : 'Evidence known at'} ${answer.time.value}` : 'No explicit time established.';
+      $('answer-method').textContent = answer.method === 'model-assisted' ? 'Model-assisted layout · deterministic facts' : 'Deterministic graph retrieval';
+      $('method-detail').textContent = answer.method === 'model-assisted' ? `Canonical fact IDs ordered in the bounded ${template} template. No generated prose or new claims.` : `Canonical server evidence; no generated answer.${request.compose ? ' No model-assisted layout was applied.' : ''}`;
+      $('question-answer').dataset.status = answer.status;
+      $('question-answer').dataset.method = answer.method;
+      $('question-answer').dataset.template = template;
+      $('question-answer').hidden = false;
+      $('question-empty').hidden = true;
+      notice({ answered: 'Response ready. Inspect source facts, graph paths, and evidence limits separately.', unknown: 'Unknown at this context and time. No absence, resolution, ownership, or safety conclusion.', clarification: 'Clarification needed. Choose one supported question and one explicit time.' }[answer.status]);
+      $('answer-heading').focus({ preventScroll: true });
+    }
+    for (const radio of document.querySelectorAll('input[name=intent]')) radio.addEventListener('change', () => {
+      const previous = presets[selected];
+      selected = radio.value;
+      const next = presets[selected];
+      $('question-input').value = next.question;
+      if ($('question-time').value === previous.time) $('question-time').value = next.time;
+      $('question-time').name = next.axis;
+      $('question-time-label').textContent = next.label;
+      $('question-axis').textContent = next.axis;
+      invalidate();
+    });
+    for (const id of ['question-input', 'question-time', 'question-compose']) $(id).addEventListener('input', invalidate);
+    $('questions-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      if (pending) pending.abort();
+      const current = ++generation;
+      const controller = new AbortController();
+      pending = controller;
+      const request = { scope: 'operations', context: 'inc204-operations', question: $('question-input').value.trim(), [presets[selected].axis]: $('question-time').value.trim(), compose: $('question-compose').checked };
+      clearAnswer();
+      $('question-submit').disabled = true;
+      $('question-answer').setAttribute('aria-busy', 'true');
+      notice('Retrieving evidence for this context and time…', 'loading');
+      try {
+        const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(request), signal: controller.signal, cache: 'no-store', credentials: 'same-origin' });
+        if (!response.ok) {
+          const messages = { 400: 'Invalid question, context or timestamp. Supply one explicit time with an offset; do not repeat it in the question.', 403: 'This view is not available.' };
+          throw new Error(messages[response.status] || 'Questions are unavailable. No previous answer or current-time substitute is shown.');
+        }
+        const answer = await response.json();
+        if (current !== generation) return;
+        render(answer, request);
+      } catch (error) {
+        if (current !== generation || error.name === 'AbortError') return;
+        clearAnswer();
+        const safeMessages = ['Invalid question, context or timestamp. Supply one explicit time with an offset; do not repeat it in the question.', 'This view is not available.', 'Questions are unavailable. No previous answer or current-time substitute is shown.'];
+        notice(safeMessages.includes(error.message) ? error.message : 'Questions are unavailable. No previous answer or current-time substitute is shown.', 'error');
+      } finally {
+        if (current === generation) {
+          pending = null;
+          $('question-submit').disabled = false;
+          $('question-answer').setAttribute('aria-busy', 'false');
+        }
+      }
+    });
+  </script>
+</body>
+</html>

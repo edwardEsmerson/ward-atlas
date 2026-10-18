@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101e29"><title>WardAtlas · Ownership clock atlas</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#101e29;color:#edf4f0;--muted:#adc0c3;--line:#35505b;--mint:#9de8c8;--amber:#ffcf88}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 0 0,#22494366,transparent 50%);min-height:100vh}a{color:var(--mint)}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #fff;outline-offset:4px}
+    .shell{max-width:1380px;padding:26px clamp(16px,4vw,54px) 48px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid var(--line);padding-bottom:20px}.brand{font-weight:800;letter-spacing:.12em;font-size:12px}.brand small{display:block;letter-spacing:.03em;color:var(--muted);font-weight:400;margin-top:5px}.read-only{font-size:11px;border:1px solid #456557;border-radius:30px;padding:8px 12px;color:var(--mint)}
+    .intro{max-width:900px;margin:30px 0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--mint);font-weight:800}h1{font-size:clamp(30px,4vw,48px);line-height:1.08;letter-spacing:-.04em;margin:12px 0}p{line-height:1.6;color:var(--muted);font-size:14px}h2{font-size:20px;margin:4px 0 12px}h3{font-size:13px;margin:12px 0 8px}.context{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}.context span{border-left:2px solid var(--mint);padding-left:10px;font-size:12px;color:var(--muted)}
+    .layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}.panel{border:1px solid var(--line);border-radius:16px;padding:20px;background:#152936;box-shadow:0 12px 40px #0002;min-width:0}.matrix-help{font-size:12px;margin:0 0 14px}.axis{color:var(--mint);font-size:11px;letter-spacing:.08em;margin:12px 0;text-transform:uppercase}.matrix-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}.clock-cell{min-width:0;border:1px solid #405866;background:#10232d;border-radius:11px;overflow:hidden;padding:12px;overflow-wrap:anywhere}.clock-cell.selected{border:2px solid var(--mint);padding:11px;background:#17352f}.clock-cell button{width:100%;border:0;border-radius:6px;background:#243c48;text-align:left;padding:10px;line-height:1.6;font-size:12px}.clock-cell.selected button{background:#2e5348}.cell-state{font-size:12px;font-weight:800;color:var(--mint);margin:12px 0 5px}.unknown{color:var(--amber)}.cell-role{font-size:12px;line-height:1.5}.cell-path{font-size:10px;line-height:1.7;border-left:2px solid #6a9b8b;padding-left:7px;margin:10px 0}.cell-sources{font-size:10px;color:var(--muted);line-height:1.7}.cell-sources strong{color:#d0e5dd}.cell-reviews{font-size:10px;line-height:1.6;color:var(--amber);margin-top:9px}
+    #selected-detail{overflow-wrap:anywhere;min-height:340px}#selected-detail:focus{outline:none}.detail-axes{font-size:12px;line-height:1.7;color:#c1d7cf;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}.detail-status{font-size:14px;font-weight:800;color:var(--mint)}.detail-status.unknown{color:var(--amber)}.path-diagram{list-style:none;padding:0;margin:14px 0;display:flex;flex-direction:column;gap:0}.path-diagram li{padding:10px 12px;border:1px solid #406256;border-radius:7px;background:#153129;font-size:11px}.path-diagram li:not(:last-child)::after{content:'↓';display:block;margin:10px 0 -7px;color:var(--mint)}.path-kind{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}.source-card{border-left:2px solid var(--mint);padding:8px 10px;margin:10px 0;background:#10232b;font-size:11px;line-height:1.7}.source-card strong,.source-card span{display:block}.source-card strong{color:#d8eee5}.source-card span{color:var(--muted)}#detail-review{font-size:11px;color:var(--amber);line-height:1.8}.footnote{font-size:11px;border-top:1px solid var(--line);padding-top:12px;margin-top:20px}#atlas-status{margin:15px 0;min-height:24px;font-size:13px;color:var(--amber)}#atlas-retry{border:1px solid #648476;background:#25483c;border-radius:7px;padding:8px 12px;margin-left:12px}[hidden]{display:none!important}#selected-link{display:inline-block;margin-top:14px;font-size:12px}.safety{border:1px solid var(--line);border-radius:10px;padding:13px 16px;margin-top:22px;font-size:11px;line-height:1.6;color:var(--muted)}
+    @media(max-width:1050px){.layout{grid-template-columns:1fr}.path-diagram{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px}.path-diagram li{flex:1;min-width:130px}.path-diagram li:not(:last-child)::after{content:'→';margin:7px 0 0}}
+    @media(max-width:759px){.shell{padding:18px 14px 32px}header{flex-wrap:wrap}.matrix-row{grid-template-columns:1fr}.panel{padding:15px}.clock-cell{padding:14px}.clock-cell.selected{padding:13px}.path-diagram{flex-direction:column}.path-diagram li:not(:last-child)::after{content:'↓'}.intro{margin-top:24px}.cell-path,.cell-sources{font-size:11px}}
+  </style>
+</head>
+<body><div class="shell">
+  <header><div class="brand">WARDATLAS<small>HOSPITAL OPERATIONS BRAIN</small></div><a href="/">← Shift control</a><span class="read-only">READ ONLY · SYNTHETIC</span></header>
+  <main>
+    <section class="intro"><div class="eyebrow">Two clocks. Four graph witnesses.</div><h1>Ownership clock atlas</h1><p>See the difference between when an assignment is effective and when its evidence was known. Each snapshot independently queries the receiving-dock graph. A later snapshot cannot fill a gap in an earlier one.</p></section>
+    <div class="context"><span>INC-207 · fictional receiving-dock exercise</span><span>All instants: 14 October 2026 · UTC</span><span>No current real-world assignment claim</span></div>
+    <div id="atlas-status" role="status" aria-live="polite">Loading four live graph snapshots…</div><button id="atlas-retry" type="button" hidden>Retry graph read</button>
+    <div id="atlas-workbench" class="layout" aria-busy="true">
+      <section class="panel" aria-labelledby="matrix-title"><div class="eyebrow">Matrix overview · separately labeled snapshots</div><h2 id="matrix-title">Effective time × evidence-known time</h2><p id="matrix-help" class="matrix-help">Select a snapshot to inspect only its evidence. Arrow keys move across knowledge cutoffs and down effective times; Home/End select first/last.</p><div class="axis">Rows: effective at ↓ · Columns: known by →</div><div id="atlas-grid" role="grid" aria-label="Four ownership clock snapshots" aria-describedby="matrix-help" aria-rowcount="2" aria-colcount="2"></div><p class="footnote">Known path ≠ complete graph coverage. Review candidates require explicit citation and supersession edges; missing linkage stays unknown.</p></section>
+      <section id="selected-detail" class="panel" aria-label="Selected snapshot detail" aria-live="polite"><h2>Selected snapshot</h2><p>Waiting for graph evidence.</p></section>
+    </div>
+    <aside class="safety">Synthetic operational demo, not a validated hospital system or medical device. Unknown means insufficient evidence—not no owner, safe, resolved, or current. Selecting clocks does not update sources, rosters, watches, handovers or tickets, and performs no external action.</aside>
+  </main>
+</div>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const effective = ['2026-10-14T20:29:00Z','2026-10-14T20:30:00Z'];
+  const known = ['2026-10-14T20:17:59Z','2026-10-14T20:19:00Z'];
+  const short = time => time.slice(11).replace(':00Z','Z');
+  const el = (tag, cls, text) => {const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;};
+  let selection = {effective_at:effective[0],known_at:known[0]};
+  let sequence=0, controller=null;
+  const initial=new URLSearchParams(location.search);
+  // The server validates the pair before serving this page. Normalize valid
+  // offset deep links immediately, so a roving tab stop exists even while the
+  // first graph response is delayed or unavailable.
+  const normalizeInitial=(raw,allowed)=>{const time=new Date(raw);const value=Number.isNaN(time.valueOf())?null:time.toISOString().replace('.000Z','Z');return allowed.includes(value)?value:allowed[0];};
+  if(initial.has('effective_at'))selection.effective_at=normalizeInitial(initial.get('effective_at'),effective);
+  if(initial.has('known_at'))selection.known_at=normalizeInitial(initial.get('known_at'),known);
+  function selectedId(){return `e${effective.indexOf(selection.effective_at)}-k${known.indexOf(selection.known_at)}`;}
+  function renderSelection(){
+    for(const button of document.querySelectorAll('button[data-cell-id]')){
+      const selected=button.dataset.cellId===selectedId();button.setAttribute('aria-pressed',String(selected));button.tabIndex=selected?0:-1;button.closest('.clock-cell').classList.toggle('selected',selected);
+    }
+  }
+  function clearDetail(message){delete $('selected-detail').dataset.cellId;$('selected-detail').replaceChildren(el('h2','','Selected snapshot'),el('p','',message));}
+  function sourceCard(source){
+    const card=el('article','source-card');card.dataset.sourceId=source.source_id;
+    card.append(el('strong','',source.source_id),el('span','source-title',source.title),el('span','source-observed',`Observed ${source.observed_at}`));
+    if(source.effective_at)card.append(el('span','',`Effective ${source.effective_at}`));
+    if(source.supersedes)card.append(el('span','',`Explicitly supersedes ${source.supersedes}`));
+    if(source.status)card.append(el('span','',source.status));return card;
+  }
+  function renderDetail(cell){
+    const box=$('selected-detail');box.replaceChildren();box.dataset.cellId=cell.id;
+    box.append(el('div','eyebrow','Selected snapshot · isolated evidence'),el('h2','',`Effective ${short(cell.effective_at)} · known by ${short(cell.known_at)}`));
+    box.append(el('div','detail-axes',`Effective at ${cell.effective_at} · sources known by ${cell.known_at}`));
+    box.append(el('div',`detail-status${cell.role_status==='unknown'?' unknown':''}`,cell.role_path.length?`Known path · ${cell.role_id}`:'Ownership unknown · no complete path'));
+    box.append(el('h3','','Graph-derived ownership witness'));
+    const path=el('ol','path-diagram');path.id='detail-path';path.setAttribute('aria-label','Selected ownership path');
+    const kinds=['Incident','Equipment','Service','Department','Role'];
+    cell.role_path.forEach((id,index)=>{const item=el('li','');item.dataset.nodeId=id;item.append(el('span','path-kind',kinds[index]),el('span','',id));path.append(item);});box.append(path);
+    if(!cell.role_path.length)box.append(el('p','unknown','The selected clocks do not establish an ownership path. No role is inferred from other snapshots.'));
+    const sources=el('div','');sources.id='detail-sources';box.append(el('h3','','Exact visible source cards'),sources);
+    for(const source of cell.source_versions)sources.append(sourceCard(source));
+    if(!cell.source_versions.length)sources.append(el('p','','No source evidence is available at this cutoff.'));
+    const review=el('div','');review.id='detail-review';box.append(el('h3','','Explicit-edge review candidates'),review);
+    for(const id of cell.review_candidates)review.append(el('div','',`${id} · pending review`));
+    if(!cell.review_candidates.length)review.append(el('div','','No explicit review candidate established. Linkage is unknown.'));
+    if(cell.candidate_disposition)review.append(el('div','',cell.candidate_disposition));
+    box.append(el('p','footnote',`Ownership is a graph-derived witness, not a source quotation. Coverage: ${cell.coverage_status}. Missing evidence is unknown, not proof of absence or safety.`));
+    const link=el('a','','Link to this clock pair');link.id='selected-link';link.href=`/clocks?${new URLSearchParams({scope:'operations',effective_at:cell.effective_at,known_at:cell.known_at})}`;box.append(link);
+  }
+  function createGrid(){
+    for(let r=0;r<2;r++){
+      const row=el('div','matrix-row');row.setAttribute('role','row');
+      for(let c=0;c<2;c++){
+        const id=`e${r}-k${c}`,card=el('article','clock-cell');card.id=`cell-${id}`;card.dataset.cellId=id;card.setAttribute('role','gridcell');card.setAttribute('aria-rowindex',r+1);card.setAttribute('aria-colindex',c+1);
+        const button=el('button','',`Effective ${short(effective[r])} · known by ${short(known[c])}`);button.type='button';button.dataset.cellId=id;button.setAttribute('aria-label',`Effective ${effective[r]} · known by ${known[c]}`);button.addEventListener('click',()=>choose(r,c));
+        button.addEventListener('keydown',event=>{
+          const moves={ArrowRight:[r,Math.min(1,c+1)],ArrowLeft:[r,Math.max(0,c-1)],ArrowDown:[Math.min(1,r+1),c],ArrowUp:[Math.max(0,r-1),c],Home:[0,0],End:[1,1]};
+          if(!moves[event.key])return;event.preventDefault();const [nr,nc]=moves[event.key];choose(nr,nc);document.querySelector(`button[data-cell-id="e${nr}-k${nc}"]`).focus();
+        });
+        card.append(button,el('div','cell-state','Waiting for live graph'),el('div','cell-role',''),el('div','cell-path',''),el('div','cell-sources',''),el('div','cell-reviews',''));row.append(card);
+      }$('atlas-grid').append(row);
+    }renderSelection();
+  }
+  function renderCells(cells){
+    for(const cell of cells){
+      const card=$(`cell-${cell.id}`),state=card.querySelector('.cell-state');state.textContent=cell.role_status==='known'?'KNOWN PATH':'UNKNOWN · incomplete evidence';state.className=`cell-state${cell.role_status==='unknown'?' unknown':''}`;
+      card.querySelector('.cell-role').textContent=cell.role_id||'No role established';
+      card.querySelector('.cell-path').textContent=cell.role_path.length?cell.role_path.join(' → '):'No complete ownership path';
+      const sources=card.querySelector('.cell-sources');sources.replaceChildren();
+      for(const source of cell.source_versions){const item=el('div','');item.append(el('strong','',source.source_id),el('div','',source.title),el('div','',`Observed ${source.observed_at}${source.effective_at?` · effective ${source.effective_at}`:''}${source.status?` · ${source.status}`:''}`));sources.append(item);}
+      if(!cell.source_versions.length)sources.textContent='No visible source evidence';
+      card.querySelector('.cell-reviews').textContent=cell.review_candidates.length?`${cell.review_candidates.join(' · ')} · pending review`:'Review linkage not established';
+    }renderSelection();
+  }
+  async function load(){
+    const request=++sequence;controller?.abort();controller=new AbortController();
+    $('atlas-workbench').setAttribute('aria-busy','true');$('atlas-status').textContent='Busy · reading four live graph snapshots…';$('atlas-retry').hidden=true;
+    clearDetail('Busy · waiting for the selected snapshot. Previous evidence has been cleared.');
+    try{
+      const response=await fetch(`/api/clock-atlas?${new URLSearchParams({scope:'operations',...selection})}`,{signal:controller.signal});
+      const data=await response.json();if(request!==sequence)return;if(!response.ok)throw new Error(data.error||'Graph request failed.');
+      selection={effective_at:data.selected_cell.effective_at,known_at:data.selected_cell.known_at};
+      renderCells(data.cells);renderDetail(data.selected_cell);$('atlas-status').textContent='Ready · four independent live graph snapshots';$('atlas-workbench').setAttribute('aria-busy','false');
+      history.replaceState(null,'',`/clocks?${new URLSearchParams({scope:'operations',...selection})}`);
+    }catch(error){
+      if(request!==sequence)return;
+      $('atlas-workbench').setAttribute('aria-busy','false');$('atlas-status').textContent='Error · graph evidence unavailable. Retry the read-only query.';clearDetail('Error · no selected evidence is displayed.');$('atlas-retry').hidden=false;
+      for(const card of document.querySelectorAll('.clock-cell')){card.querySelector('.cell-state').textContent='ERROR · evidence unavailable';for(const cls of ['.cell-role','.cell-path','.cell-sources','.cell-reviews'])card.querySelector(cls).replaceChildren();}
+    }
+  }
+  function choose(row,column){selection={effective_at:effective[row],known_at:known[column]};renderSelection();load();}
+  $('atlas-retry').addEventListener('click',load);
+  createGrid();load();
+})();
+</script></body></html>

@@ -6,6 +6,25 @@ For the short operator-focused private demo path, see the [demo runbook](docs/de
 
 For exact source-bound Cypher and graph/evidence/time semantics, see the [FalkorDB query walkthrough](docs/falkordb-query-walkthrough.md).
 
+## Ask WardAtlas
+
+Open **Ask WardAtlas** from the control room, or visit `/ask` on the same local app. Select the requested synthetic INC-204 operations context, ask one supported question, and supply one explicit time:
+
+- “Who is affected by INC-204?” — impact `as_of` **2026-10-14T18:30:00Z**; compare **19:30Z** restoration without inferring safety.
+- “Explain the SOP-OPS-9 disagreement” — evidence `known_at` **2026-10-14T16:05:00Z**; neither claim becomes an owner or procedure.
+- “What was known about the decision?” — compare **15:59:59Z**, **16:04Z**, and **16:05Z**. The record appears only at its own source boundary.
+
+`POST /api/questions` accepts JSON fields `scope: "operations"`, `context: "inc204-operations"`, `question`, one of `as_of`/`known_at`, and optional boolean `compose`. Bounded wording is intentional: ambiguous, unsupported, or unestablished identifiers ask for clarification. Retrieval reuses the live FalkorDB `sop_impact` and `decision_timeline` services, never the current briefing for a past cutoff. Canonical source facts, graph paths, missing evidence, and exact source ID/title/observation tuples are inspectable separately. This endpoint creates no actions or watches.
+
+Optional **model-assisted layout** reads server-only `WARDATLAS_LLM_BASE_URL` (default `WORKSHOP_LLM_BASE_URL`), `WARDATLAS_LLM_API_KEY`, and `WARDATLAS_LLM_MODEL`. Only a configured numeric-loopback HTTP proxy and pinned `gpt-6.1-sol` model are permitted; the proxy may use a nonempty `proxy` placeholder instead of a key. Nothing is sent by default. No browser keys or provider fallback are used. The model can only permute all canonical fact IDs and select one of two layouts; prose, false assertions even with valid citations, tools, extra fields, unavailable/malformed responses, or timeout return the **identical deterministic graph answer**. A live model is not required or claimed verified.
+
+```sh
+python3 scripts/verify_questions.py --all --stub-model --require-live-falkordb --desktop-mobile --fail-on-zero
+python3 -m unittest tests.test_questions
+```
+
+The verifier bootstraps the digest-pinned FalkorDB module below from a source-only checkout, chooses free allocated/ephemeral loopback ports, exercises 11 frozen groups / 78 mapped assertions plus graph mutations and local model adversaries, captures keyboard/desktop/mobile evidence under `$WORKSHOP_RUN_DIR/questions/`, and stops/removes only its owned resources. Expectations were committed before behavior in `8877158`; both accepted source-oracle hashes are checked unchanged.
+
 ## Clean setup and verification
 
 Requirements: Python 3.10+, an existing `redis-server` executable, Node.js and the workshop's local Playwright browser for browser acceptance, and outbound access to the public Docker Hub OCI registry on the first run from a source-only checkout. No Docker daemon/socket, Python package install, account, credentials, `sudo`, or host service change is used. The database binary and provenance receipt are installed under ignored `.local/` only.
