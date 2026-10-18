@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "purpose": "Freeze source-pinned expectations and matrix bytes before inspecting any source-observation-branch candidate query, fixture, endpoint, UI, or browser behavior.",
+  "frozen_before_candidate_behavior": true,
+  "candidate_output_used": false,
+  "sources": [
+    {
+      "id": "decision-source-branch-planner-packet",
+      "path": "/workspace/worktrees/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0/plans/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0.md",
+      "sha256": "e6660a488b3985575a20ef1e77bc2b415fd89ce0e2ed5e1fb95be0c5ec7ad426",
+      "kind": "approved-planner-packet",
+      "outcome_lines": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "id": "decision-knowledge-timeline-expected-results",
+      "path": "contracts/decision-knowledge-timeline/expected-results.json",
+      "sha256": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076",
+      "kind": "accepted-oracle"
+    },
+    {
+      "id": "decision-knowledge-timeline-adversarial-matrix",
+      "path": "contracts/decision-knowledge-timeline/adversarial-matrix.json",
+      "sha256": "75a88572303e8fe98e14eadddf7aeab1cb0caead48a8552cfa6551284eaa1de4",
+      "kind": "accepted-matrix"
+    },
+    {
+      "id": "sop-impact-expected-results",
+      "path": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca",
+      "kind": "accepted-oracle"
+    },
+    {
+      "id": "sop-impact-adversarial-matrix",
+      "path": "tests/sop-impact-adversarial-matrix.json",
+      "sha256": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6",
+      "kind": "accepted-matrix"
+    },
+    {
+      "id": "decision-provenance-expected-results",
+      "path": "tests/decision-provenance-expected-results.json",
+      "sha256": "4143bbc135b32ed6fb89444f2c32b01bfd5ca89d50127cea5e4099fdffed5c5d",
+      "kind": "accepted-oracle"
+    },
+    {
+      "id": "decision-provenance-adversarial-matrix",
+      "path": "tests/decision-provenance-adversarial-matrix.json",
+      "sha256": "256048400ee304f59884ecf3393f9a59e30d76f29281c9c6ea5378740dd71ad3",
+      "kind": "accepted-matrix"
+    }
+  ]
+}

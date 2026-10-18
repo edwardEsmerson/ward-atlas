@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "receipt_id": "independent-source-review-decision-source-branch",
+  "reviewer": {
+    "reviewer_type": "fresh independent source reviewer",
+    "session_id": "ses_eb3598977ffeE7unU4OUuLoiT1"
+  },
+  "reviewed_before_candidate_behavior": true,
+  "candidate_behavior_read": false,
+  "candidate_output_used_to_derive_expectations": false,
+  "result": "accepted",
+  "group_ids": [
+    "cold-empty-branch-lookup",
+    "mainline-at-16-05",
+    "branch-at-16-05-suppression",
+    "branch-at-16-06-restoration",
+    "mainline-isolation",
+    "missing-edge-no-fallback-and-reseed",
+    "decoy-and-restricted-invariance",
+    "repeat-reconnect-read-only-desktop-mobile-cleanup"
+  ],
+  "mapping_counts": [8, 8, 12, 8, 9, 10, 8, 11],
+  "literal_mapping_total": 74,
+  "reviewed_criteria": {
+    "full_mainline_at_16_04_utc_and_source_fact": true,
+    "branch_16_05_suppression_and_open_unresolved_record": true,
+    "branch_16_06_restoration": true,
+    "mainline_immutability": true,
+    "either_missing_branch_edge_unknown_without_fallback": true,
+    "decoy_and_restricted_full_view_invariance": true,
+    "repeat_reconnect_read_only_and_owned_cleanup": true,
+    "desktop_mobile_api_and_keyboard_agreement": true,
+    "scenario_branch_override_evidence_labels": true
+  },
+  "source_hashes": [
+    {
+      "path": "/workspace/worktrees/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0/plans/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0.md",
+      "sha256": "e6660a488b3985575a20ef1e77bc2b415fd89ce0e2ed5e1fb95be0c5ec7ad426"
+    },
+    {
+      "path": "contracts/decision-knowledge-timeline/expected-results.json",
+      "sha256": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"
+    },
+    {
+      "path": "contracts/decision-knowledge-timeline/adversarial-matrix.json",
+      "sha256": "75a88572303e8fe98e14eadddf7aeab1cb0caead48a8552cfa6551284eaa1de4"
+    },
+    {
+      "path": "contracts/decision-knowledge-timeline/frozen-sources.json",
+      "sha256": "46fd3792487da192dfd08fc26d15e3f2153d13e57ad1a2a7704bab125f0dacf8"
+    },
+    {
+      "path": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "path": "tests/sop-impact-adversarial-matrix.json",
+      "sha256": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6"
+    },
+    {
+      "path": "tests/decision-provenance-expected-results.json",
+      "sha256": "4143bbc135b32ed6fb89444f2c32b01bfd5ca89d50127cea5e4099fdffed5c5d"
+    },
+    {
+      "path": "tests/decision-provenance-adversarial-matrix.json",
+      "sha256": "256048400ee304f59884ecf3393f9a59e30d76f29281c9c6ea5378740dd71ad3"
+    },
+    {
+      "path": "tests/decision-provenance-frozen-hashes.json",
+      "sha256": "7e7cd9e87d9cd36bfae26ee49d32dc1efa09c0f1c27bc1660e72467aecd11eab"
+    },
+    {
+      "path": "tests/handover-brief-expected-results.json",
+      "sha256": "932ada7d43688b8bd1e4f147ac06dd585982d784ef8577f05cc00b07a97199f1"
+    }
+  ],
+  "contract_hashes": {
+    "contracts/decision-source-branch/expected-results.json": "e209aeab5af266abd6940619727295ea50c0ad2707f47c2d4df37d24cb37da23",
+    "contracts/decision-source-branch/adversarial-matrix.json": "4a07df2def7244b3008e912a5c617fbc75d080999071f3b48a556f27b65698c5",
+    "contracts/decision-source-branch/frozen-sources.json": "55b8f5cd90e6589e752072eb5d64875221c16b99f0df9a71a40f78778b0bc9e4"
+  },
+  "review_summary": "Exactly eight groups and 74 unique pointer mappings resolve; the complete mainline and hypothetical projections, unknown/no-fallback edge removals, ACL invariance, read-only/reconnect behavior, and responsive agreement are source-pinned before candidate inspection."
+}

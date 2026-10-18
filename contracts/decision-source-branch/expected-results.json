@@ -1,0 +1,2322 @@
+{
+  "schema_version": 1,
+  "product": "WardAtlas",
+  "purpose": "Candidate-independent outcomes for a graph-selected hypothetical source-observation-time branch, kept separate from the unchanged source-time mainline.",
+  "oracle_policy": "Values are pinned only from the approved planner packet and byte-frozen accepted source oracles. Candidate query, fixture, endpoint, UI, browser, or verifier output never supplies or amends expected values.",
+  "candidate_output_is_oracle": false,
+  "frozen_source_manifest": "contracts/decision-source-branch/frozen-sources.json",
+  "pinned_sources": [
+    {
+      "id": "decision-source-branch-planner-packet",
+      "path": "/workspace/worktrees/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0/plans/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0.md",
+      "sha256": "e6660a488b3985575a20ef1e77bc2b415fd89ce0e2ed5e1fb95be0c5ec7ad426"
+    },
+    {
+      "id": "decision-knowledge-timeline-expected-results",
+      "path": "contracts/decision-knowledge-timeline/expected-results.json",
+      "sha256": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"
+    },
+    {
+      "id": "decision-knowledge-timeline-adversarial-matrix",
+      "path": "contracts/decision-knowledge-timeline/adversarial-matrix.json",
+      "sha256": "75a88572303e8fe98e14eadddf7aeab1cb0caead48a8552cfa6551284eaa1de4"
+    },
+    {
+      "id": "sop-impact-expected-results",
+      "path": "tests/sop-impact-expected-results.json",
+      "sha256": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca"
+    },
+    {
+      "id": "sop-impact-adversarial-matrix",
+      "path": "tests/sop-impact-adversarial-matrix.json",
+      "sha256": "f5aa441a636b45b4222716d4a003afc91cf7598439833e36f390523b55f161c6"
+    },
+    {
+      "id": "decision-provenance-expected-results",
+      "path": "tests/decision-provenance-expected-results.json",
+      "sha256": "4143bbc135b32ed6fb89444f2c32b01bfd5ca89d50127cea5e4099fdffed5c5d"
+    },
+    {
+      "id": "decision-provenance-adversarial-matrix",
+      "path": "tests/decision-provenance-adversarial-matrix.json",
+      "sha256": "256048400ee304f59884ecf3393f9a59e30d76f29281c9c6ea5378740dd71ad3"
+    }
+  ],
+  "scope": {
+    "synthetic_only": true,
+    "clinical_decisions": false,
+    "actual_source_fact": "SRC-SOP-CURRENT-V3 observed_at remains 2026-10-14T16:04:00Z on mainline.",
+    "hypothetical_branch_fact": "The branch alone assumes observed_at 2026-10-14T16:06:00Z; this is not a corrected source fact or reporting-delay finding.",
+    "graph_semantics": "The branch is selected through ScenarioBranch -[:HAS_HYPOTHETICAL_OBSERVATION]-> ObservationOverride -[:FOR_SOURCE]-> Evidence; each edge is required.",
+    "unknown_semantics": "Missing branch/source evidence is unknown/incomplete, never evidence for fallback, nonexistence, conflict absence, resolution, current ownership, or safety.",
+    "acl_semantics": "The complete operations API/browser/accessibility projection is invariant under disconnected-decoy and connected restricted-only injection; inaccessible facts, identifiers, counts, relationships, paths, existence, or paraphrases do not leak.",
+    "read_only": true,
+    "external_writes": false
+  },
+  "test_setup_only": {
+    "restricted_branch_tripwires": [
+      "BR-RESTRICTED-OPS-77",
+      "OBS-RESTRICTED-OPS-77",
+      "SRC-RESTRICTED-OPS-77",
+      "Restricted synthetic source observation canary 77",
+      "ROLE-RESTRICTED-OPS-77"
+    ],
+    "note": "These synthetic tripwires exist only to test non-disclosure and are not expected visible values."
+  },
+  "groups": [
+    {
+      "id": "cold-empty-branch-lookup",
+      "planner_refs": [
+        "planner-packet#outcome-1"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/cold-empty-unknown",
+        "tests/decision-provenance-expected-results.json#cases/empty-unknown"
+      ],
+      "expected": {
+        "branch_state": "unknown",
+        "projection": {
+          "known_at": null,
+          "claim_context_state": "unknown",
+          "claims": [],
+          "conflict": null,
+          "decision_record": null,
+          "decision_considers_edges": [],
+          "generic_unknown": true,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "exposed_ids": [],
+        "exposed_titles": [],
+        "exposed_count_fields": [],
+        "existence_hint_exposed": false,
+        "no_decision_or_conflict_absence_concluded": false,
+        "current_owner_or_procedure_selected": false,
+        "mainline_fallback_used": false
+      }
+    },
+    {
+      "id": "mainline-at-16-05",
+      "planner_refs": [
+        "planner-packet#outcome-2"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/record-source-boundary",
+        "tests/sop-impact-expected-results.json#cases/sop-impact-conflict-provenance",
+        "tests/decision-provenance-expected-results.json#cases/exact-one-record-baseline"
+      ],
+      "expected": {
+        "projection": {
+          "known_at": "2026-10-14T16:05:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-MATERIALS-LEAD"
+              },
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V3"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            },
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V3"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "v3_source_observed_at": "2026-10-14T16:04:00Z",
+        "conflict_edge": {
+          "from": "SOP-OPS-9-V2",
+          "relationship": "SOP_CONFLICT",
+          "to": "SOP-OPS-9-V3",
+          "status": "unresolved"
+        },
+        "decision_record_state": "open-unresolved",
+        "considered_edges": [
+          {
+            "from": "DEC-OPS-9-REVIEW-01",
+            "relationship": "CONSIDERS",
+            "to": "SOP-OPS-9-V2"
+          },
+          {
+            "from": "DEC-OPS-9-REVIEW-01",
+            "relationship": "CONSIDERS",
+            "to": "SOP-OPS-9-V3"
+          }
+        ],
+        "claim_labels": [
+          "unverified SOP claim",
+          "unverified SOP claim"
+        ],
+        "selected_version": null,
+        "hypothetical_override_applied": false
+      }
+    },
+    {
+      "id": "branch-at-16-05-suppression",
+      "planner_refs": [
+        "planner-packet#outcome-3"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/v3-observation-time-shift/at_16_05",
+        "tests/decision-provenance-expected-results.json#cases/exact-one-record-baseline"
+      ],
+      "expected": {
+        "projection": {
+          "known_at": "2026-10-14T16:05:00Z",
+          "claim_context_state": "incomplete/unknown",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": null,
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "branch_assumption": {
+          "label": "Hypothetical observation-time branch",
+          "assumed_observed_at": "2026-10-14T16:06:00Z",
+          "actual_source_observed_at": "2026-10-14T16:04:00Z",
+          "source_fact_modified": false,
+          "scenario_not_source_truth": true
+        },
+        "v2_claim": {
+          "version_id": "SOP-OPS-9-V2",
+          "claim_edge": {
+            "from": "SOP-OPS-9-V2",
+            "relationship": "CLAIMS_ROLE",
+            "to": "ROLE-FACILITIES-DUTY"
+          },
+          "role_id": "ROLE-FACILITIES-DUTY",
+          "claim_label": "unverified SOP claim",
+          "source": {
+            "id": "SRC-SOP-CURRENT-V2",
+            "title": "Synthetic SOP-OPS-9 Current Text v2",
+            "observed_at": "2026-10-14T16:00:00Z",
+            "evidence_link": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "EVIDENCED_BY",
+              "to": "SRC-SOP-CURRENT-V2"
+            }
+          },
+          "applicability_edge": {
+            "from": "SOP-OPS-9-V2",
+            "relationship": "APPLIES_TO",
+            "to": "CONVEYOR-C4"
+          },
+          "discovery_path": "existing SOP-impact graph path"
+        },
+        "decision_record_state": "open-unresolved",
+        "considered_edges": [
+          {
+            "from": "DEC-OPS-9-REVIEW-01",
+            "relationship": "CONSIDERS",
+            "to": "SOP-OPS-9-V2"
+          }
+        ],
+        "claim_context_state": "incomplete/unknown",
+        "conflict": null,
+        "forbidden_v3_literals": [
+          "SOP-OPS-9-V3",
+          "ROLE-MATERIALS-LEAD",
+          "SRC-SOP-CURRENT-V3",
+          "Synthetic SOP-OPS-9 Current Text v3"
+        ],
+        "forbidden_v3_paths": [
+          [
+            "SOP-OPS-9-V3",
+            "APPLIES_TO",
+            "CONVEYOR-C4"
+          ],
+          [
+            "SOP-OPS-9-V3",
+            "CLAIMS_ROLE",
+            "ROLE-MATERIALS-LEAD"
+          ],
+          [
+            "SOP-OPS-9-V3",
+            "EVIDENCED_BY",
+            "SRC-SOP-CURRENT-V3"
+          ],
+          [
+            "DEC-OPS-9-REVIEW-01",
+            "CONSIDERS",
+            "SOP-OPS-9-V3"
+          ]
+        ],
+        "forbidden_v3_relationships": [
+          {
+            "from": "SOP-OPS-9-V3",
+            "relationship": "CLAIMS_ROLE",
+            "to": "ROLE-MATERIALS-LEAD"
+          },
+          {
+            "from": "SOP-OPS-9-V3",
+            "relationship": "EVIDENCED_BY",
+            "to": "SRC-SOP-CURRENT-V3"
+          },
+          {
+            "from": "SOP-OPS-9-V3",
+            "relationship": "APPLIES_TO",
+            "to": "CONVEYOR-C4"
+          },
+          {
+            "from": "DEC-OPS-9-REVIEW-01",
+            "relationship": "CONSIDERS",
+            "to": "SOP-OPS-9-V3"
+          }
+        ],
+        "v3_count_or_path_exposed": false,
+        "v2_selected_or_conflict_resolved": false
+      }
+    },
+    {
+      "id": "branch-at-16-06-restoration",
+      "planner_refs": [
+        "planner-packet#outcome-4"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/v3-observation-time-shift/at_16_06",
+        "tests/sop-impact-expected-results.json#cases/sop-impact-conflict-provenance"
+      ],
+      "expected": {
+        "projection": {
+          "known_at": "2026-10-14T16:06:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-MATERIALS-LEAD"
+              },
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:06:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V3"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            },
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V3"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "branch_assumption": {
+          "label": "Hypothetical observation-time branch",
+          "assumed_observed_at": "2026-10-14T16:06:00Z",
+          "actual_source_observed_at": "2026-10-14T16:04:00Z",
+          "source_fact_modified": false,
+          "scenario_not_source_truth": true
+        },
+        "claim_context_state": "evidence-backed",
+        "v3_hypothetical_observed_at": "2026-10-14T16:06:00Z",
+        "conflict_edge": {
+          "from": "SOP-OPS-9-V2",
+          "relationship": "SOP_CONFLICT",
+          "to": "SOP-OPS-9-V3",
+          "status": "unresolved"
+        },
+        "considered_edges": [
+          {
+            "from": "DEC-OPS-9-REVIEW-01",
+            "relationship": "CONSIDERS",
+            "to": "SOP-OPS-9-V2"
+          },
+          {
+            "from": "DEC-OPS-9-REVIEW-01",
+            "relationship": "CONSIDERS",
+            "to": "SOP-OPS-9-V3"
+          }
+        ],
+        "actual_source_observed_at": "2026-10-14T16:04:00Z",
+        "scenario_not_source_truth": true
+      }
+    },
+    {
+      "id": "mainline-isolation",
+      "planner_refs": [
+        "planner-packet#outcome-5"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/record-source-boundary",
+        "tests/sop-impact-expected-results.json#cases/sop-impact-conflict-provenance"
+      ],
+      "expected": {
+        "mainline_at_16_04": {
+          "known_at": "2026-10-14T16:04:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {"from": "SOP-OPS-9-V2", "relationship": "CLAIMS_ROLE", "to": "ROLE-FACILITIES-DUTY"},
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {"from": "SOP-OPS-9-V2", "relationship": "EVIDENCED_BY", "to": "SRC-SOP-CURRENT-V2"}
+              },
+              "applicability_edge": {"from": "SOP-OPS-9-V2", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4"},
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {"from": "SOP-OPS-9-V3", "relationship": "CLAIMS_ROLE", "to": "ROLE-MATERIALS-LEAD"},
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z",
+                "evidence_link": {"from": "SOP-OPS-9-V3", "relationship": "EVIDENCED_BY", "to": "SRC-SOP-CURRENT-V3"}
+              },
+              "applicability_edge": {"from": "SOP-OPS-9-V3", "relationship": "APPLIES_TO", "to": "CONVEYOR-C4"},
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {"from": "SOP-OPS-9-V2", "relationship": "SOP_CONFLICT", "to": "SOP-OPS-9-V3", "status": "unresolved"},
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": null,
+          "decision_considers_edges": [],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "mainline_at_16_05": {
+          "known_at": "2026-10-14T16:05:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-MATERIALS-LEAD"
+              },
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V3"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            },
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V3"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "mainline_at_16_06": {
+          "known_at": "2026-10-14T16:06:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-MATERIALS-LEAD"
+              },
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V3"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            },
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V3"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "v3_source_observed_at": "2026-10-14T16:04:00Z",
+        "mainline_16_05_unchanged_after_branch_query": true,
+        "mainline_16_06_unchanged_after_branch_query": true,
+        "base_timeline_16_05_and_16_06_unchanged": true,
+        "stored_source_fact_unchanged": true,
+        "branch_query_graph_writes": 0
+      }
+    },
+    {
+      "id": "missing-edge-no-fallback-and-reseed",
+      "planner_refs": [
+        "planner-packet#outcome-6"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/separate-evidence-edge-removals",
+        "tests/decision-provenance-expected-results.json#cases/decision-evidence-link-removed"
+      ],
+      "expected": {
+        "required_branch_edges": [
+          {
+            "from": "BR-SOP-V3-LATE-OBS",
+            "relationship": "HAS_HYPOTHETICAL_OBSERVATION",
+            "to": "OBS-SOP-V3-LATE-OBS"
+          },
+          {
+            "from": "OBS-SOP-V3-LATE-OBS",
+            "relationship": "FOR_SOURCE",
+            "to": "SRC-SOP-CURRENT-V3"
+          }
+        ],
+        "branch_node_labels": ["ScenarioBranch", "ObservationOverride", "Evidence"],
+        "missing_branch_to_override_edge_result": {
+          "branch_state": "unknown",
+          "claim_context_state": "incomplete/unknown",
+          "projection": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "incomplete/unknown",
+            "claims": [],
+            "conflict": null,
+            "decision_record": null,
+            "decision_considers_edges": [],
+            "generic_unknown": true,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          },
+          "mainline_fallback_used": false,
+          "source_or_branch_identity_exposed": false
+        },
+        "missing_override_to_source_edge_result": {
+          "branch_state": "unknown",
+          "claim_context_state": "incomplete/unknown",
+          "projection": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "incomplete/unknown",
+            "claims": [],
+            "conflict": null,
+            "decision_record": null,
+            "decision_considers_edges": [],
+            "generic_unknown": true,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          },
+          "mainline_fallback_used": false,
+          "source_or_branch_identity_exposed": false
+        },
+        "mainline_at_16_05_after_edge_removal": {
+          "known_at": "2026-10-14T16:05:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-MATERIALS-LEAD"
+              },
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V3"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            },
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V3"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "reseeded_branch_at_16_05": {
+          "scenario": {
+            "label": "Hypothetical observation-time branch",
+            "assumed_observed_at": "2026-10-14T16:06:00Z",
+            "actual_source_observed_at": "2026-10-14T16:04:00Z",
+            "source_fact_modified": false,
+            "scenario_not_source_truth": true
+          },
+          "projection": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "incomplete/unknown",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": null,
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          }
+        },
+        "reseeded_branch_at_16_06": {
+          "scenario": {
+            "label": "Hypothetical observation-time branch",
+            "assumed_observed_at": "2026-10-14T16:06:00Z",
+            "actual_source_observed_at": "2026-10-14T16:04:00Z",
+            "source_fact_modified": false,
+            "scenario_not_source_truth": true
+          },
+          "projection": {
+            "known_at": "2026-10-14T16:06:00Z",
+            "claim_context_state": "evidence-backed",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              },
+              {
+                "version_id": "SOP-OPS-9-V3",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-MATERIALS-LEAD"
+                },
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V3",
+                  "title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:06:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V3",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V3"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": {
+              "edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "epistemic_type": "graph-derived relationship",
+              "source_quote": false,
+              "authoritative_rule": false
+            },
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V3"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          }
+        },
+        "only_owned_edge_removed": true,
+        "mainline_fallback_used": false,
+        "reseed_restores_exact_branch_views": true
+      }
+    },
+    {
+      "id": "decoy-and-restricted-invariance",
+      "planner_refs": [
+        "planner-packet#outcome-7"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/decoy-and-restricted-invariance",
+        "tests/decision-provenance-expected-results.json#cases/disconnected-decoy-excluded",
+        "tests/decision-provenance-expected-results.json#cases/restricted-source-operations-invariance",
+        "tests/sop-impact-expected-results.json#cases/sop-impact-denied-source-invariance"
+      ],
+      "expected": {
+        "test_setup_only": {
+          "restricted_tripwires": [
+            "BR-RESTRICTED-OPS-77",
+            "OBS-RESTRICTED-OPS-77",
+            "SRC-RESTRICTED-OPS-77",
+            "Restricted synthetic source observation canary 77",
+            "ROLE-RESTRICTED-OPS-77"
+          ],
+          "viewer_scope": "operations",
+          "acl": "restricted"
+        },
+        "clean_full_operations_projection": {
+          "scope": "operations",
+          "mainline": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "evidence-backed",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              },
+              {
+                "version_id": "SOP-OPS-9-V3",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-MATERIALS-LEAD"
+                },
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V3",
+                  "title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:04:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V3",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V3"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": {
+              "edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "epistemic_type": "graph-derived relationship",
+              "source_quote": false,
+              "authoritative_rule": false
+            },
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V3"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          },
+          "hypothetical_branch": {
+            "scenario": {
+              "label": "Hypothetical observation-time branch",
+              "assumed_observed_at": "2026-10-14T16:06:00Z",
+              "actual_source_observed_at": "2026-10-14T16:04:00Z",
+              "source_fact_modified": false,
+              "scenario_not_source_truth": true
+            },
+            "projection": {
+              "known_at": "2026-10-14T16:05:00Z",
+              "claim_context_state": "incomplete/unknown",
+              "claims": [
+                {
+                  "version_id": "SOP-OPS-9-V2",
+                  "claim_edge": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "CLAIMS_ROLE",
+                    "to": "ROLE-FACILITIES-DUTY"
+                  },
+                  "role_id": "ROLE-FACILITIES-DUTY",
+                  "claim_label": "unverified SOP claim",
+                  "source": {
+                    "id": "SRC-SOP-CURRENT-V2",
+                    "title": "Synthetic SOP-OPS-9 Current Text v2",
+                    "observed_at": "2026-10-14T16:00:00Z",
+                    "evidence_link": {
+                      "from": "SOP-OPS-9-V2",
+                      "relationship": "EVIDENCED_BY",
+                      "to": "SRC-SOP-CURRENT-V2"
+                    }
+                  },
+                  "applicability_edge": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "APPLIES_TO",
+                    "to": "CONVEYOR-C4"
+                  },
+                  "discovery_path": "existing SOP-impact graph path"
+                }
+              ],
+              "conflict": null,
+              "decision_record": {
+                "id": "DEC-OPS-9-REVIEW-01",
+                "title": "SOP-OPS-9 claim reconciliation review",
+                "recorded_state": "open-unresolved",
+                "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+                "register_id": "REGISTER-OPS-DECISIONS-01",
+                "register_edge": {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                "source": {
+                  "id": "SRC-DEC-OPS-9-REVIEW-01",
+                  "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                  "observed_at": "2026-10-14T16:05:00Z",
+                  "evidence_link": {
+                    "from": "DEC-OPS-9-REVIEW-01",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-DEC-OPS-9-REVIEW-01"
+                  }
+                },
+                "provenance_path": [
+                  {
+                    "from": "REGISTER-OPS-DECISIONS-01",
+                    "relationship": "TRACKS",
+                    "to": "DEC-OPS-9-REVIEW-01"
+                  },
+                  {
+                    "from": "DEC-OPS-9-REVIEW-01",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-DEC-OPS-9-REVIEW-01"
+                  }
+                ]
+              },
+              "decision_considers_edges": [
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "CONSIDERS",
+                  "to": "SOP-OPS-9-V2"
+                }
+              ],
+              "generic_unknown": false,
+              "negative_conclusion_asserted": false,
+              "current_owner_or_procedure_selected": false,
+              "contact_or_action_supplied": false
+            }
+          }
+        },
+        "after_disconnected_decoy_projection": {
+          "scope": "operations",
+          "mainline": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "evidence-backed",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              },
+              {
+                "version_id": "SOP-OPS-9-V3",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-MATERIALS-LEAD"
+                },
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V3",
+                  "title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:04:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V3",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V3"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": {
+              "edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "epistemic_type": "graph-derived relationship",
+              "source_quote": false,
+              "authoritative_rule": false
+            },
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V3"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          },
+          "hypothetical_branch": {
+            "scenario": {
+              "label": "Hypothetical observation-time branch",
+              "assumed_observed_at": "2026-10-14T16:06:00Z",
+              "actual_source_observed_at": "2026-10-14T16:04:00Z",
+              "source_fact_modified": false,
+              "scenario_not_source_truth": true
+            },
+            "projection": {
+              "known_at": "2026-10-14T16:05:00Z",
+              "claim_context_state": "incomplete/unknown",
+              "claims": [
+                {
+                  "version_id": "SOP-OPS-9-V2",
+                  "claim_edge": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "CLAIMS_ROLE",
+                    "to": "ROLE-FACILITIES-DUTY"
+                  },
+                  "role_id": "ROLE-FACILITIES-DUTY",
+                  "claim_label": "unverified SOP claim",
+                  "source": {
+                    "id": "SRC-SOP-CURRENT-V2",
+                    "title": "Synthetic SOP-OPS-9 Current Text v2",
+                    "observed_at": "2026-10-14T16:00:00Z",
+                    "evidence_link": {
+                      "from": "SOP-OPS-9-V2",
+                      "relationship": "EVIDENCED_BY",
+                      "to": "SRC-SOP-CURRENT-V2"
+                    }
+                  },
+                  "applicability_edge": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "APPLIES_TO",
+                    "to": "CONVEYOR-C4"
+                  },
+                  "discovery_path": "existing SOP-impact graph path"
+                }
+              ],
+              "conflict": null,
+              "decision_record": {
+                "id": "DEC-OPS-9-REVIEW-01",
+                "title": "SOP-OPS-9 claim reconciliation review",
+                "recorded_state": "open-unresolved",
+                "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+                "register_id": "REGISTER-OPS-DECISIONS-01",
+                "register_edge": {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                "source": {
+                  "id": "SRC-DEC-OPS-9-REVIEW-01",
+                  "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                  "observed_at": "2026-10-14T16:05:00Z",
+                  "evidence_link": {
+                    "from": "DEC-OPS-9-REVIEW-01",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-DEC-OPS-9-REVIEW-01"
+                  }
+                },
+                "provenance_path": [
+                  {
+                    "from": "REGISTER-OPS-DECISIONS-01",
+                    "relationship": "TRACKS",
+                    "to": "DEC-OPS-9-REVIEW-01"
+                  },
+                  {
+                    "from": "DEC-OPS-9-REVIEW-01",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-DEC-OPS-9-REVIEW-01"
+                  }
+                ]
+              },
+              "decision_considers_edges": [
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "CONSIDERS",
+                  "to": "SOP-OPS-9-V2"
+                }
+              ],
+              "generic_unknown": false,
+              "negative_conclusion_asserted": false,
+              "current_owner_or_procedure_selected": false,
+              "contact_or_action_supplied": false
+            }
+          }
+        },
+        "decoy_projection_semantically_identical": true,
+        "after_connected_restricted_injection_projection": {
+          "scope": "operations",
+          "mainline": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "evidence-backed",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              },
+              {
+                "version_id": "SOP-OPS-9-V3",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-MATERIALS-LEAD"
+                },
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V3",
+                  "title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:04:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V3",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V3"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": {
+              "edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "epistemic_type": "graph-derived relationship",
+              "source_quote": false,
+              "authoritative_rule": false
+            },
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V3"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          },
+          "hypothetical_branch": {
+            "scenario": {
+              "label": "Hypothetical observation-time branch",
+              "assumed_observed_at": "2026-10-14T16:06:00Z",
+              "actual_source_observed_at": "2026-10-14T16:04:00Z",
+              "source_fact_modified": false,
+              "scenario_not_source_truth": true
+            },
+            "projection": {
+              "known_at": "2026-10-14T16:05:00Z",
+              "claim_context_state": "incomplete/unknown",
+              "claims": [
+                {
+                  "version_id": "SOP-OPS-9-V2",
+                  "claim_edge": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "CLAIMS_ROLE",
+                    "to": "ROLE-FACILITIES-DUTY"
+                  },
+                  "role_id": "ROLE-FACILITIES-DUTY",
+                  "claim_label": "unverified SOP claim",
+                  "source": {
+                    "id": "SRC-SOP-CURRENT-V2",
+                    "title": "Synthetic SOP-OPS-9 Current Text v2",
+                    "observed_at": "2026-10-14T16:00:00Z",
+                    "evidence_link": {
+                      "from": "SOP-OPS-9-V2",
+                      "relationship": "EVIDENCED_BY",
+                      "to": "SRC-SOP-CURRENT-V2"
+                    }
+                  },
+                  "applicability_edge": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "APPLIES_TO",
+                    "to": "CONVEYOR-C4"
+                  },
+                  "discovery_path": "existing SOP-impact graph path"
+                }
+              ],
+              "conflict": null,
+              "decision_record": {
+                "id": "DEC-OPS-9-REVIEW-01",
+                "title": "SOP-OPS-9 claim reconciliation review",
+                "recorded_state": "open-unresolved",
+                "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+                "register_id": "REGISTER-OPS-DECISIONS-01",
+                "register_edge": {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                "source": {
+                  "id": "SRC-DEC-OPS-9-REVIEW-01",
+                  "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                  "observed_at": "2026-10-14T16:05:00Z",
+                  "evidence_link": {
+                    "from": "DEC-OPS-9-REVIEW-01",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-DEC-OPS-9-REVIEW-01"
+                  }
+                },
+                "provenance_path": [
+                  {
+                    "from": "REGISTER-OPS-DECISIONS-01",
+                    "relationship": "TRACKS",
+                    "to": "DEC-OPS-9-REVIEW-01"
+                  },
+                  {
+                    "from": "DEC-OPS-9-REVIEW-01",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-DEC-OPS-9-REVIEW-01"
+                  }
+                ]
+              },
+              "decision_considers_edges": [
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "CONSIDERS",
+                  "to": "SOP-OPS-9-V2"
+                }
+              ],
+              "generic_unknown": false,
+              "negative_conclusion_asserted": false,
+              "current_owner_or_procedure_selected": false,
+              "contact_or_action_supplied": false
+            }
+          }
+        },
+        "full_operations_projection_invariant": true,
+        "browser_text_and_accessibility_tree_invariant": true,
+        "restricted_literals_disclosed": [],
+        "hidden_count_or_existence_disclosed": false
+      }
+    },
+    {
+      "id": "repeat-reconnect-read-only-desktop-mobile-cleanup",
+      "planner_refs": [
+        "planner-packet#outcome-8"
+      ],
+      "source_oracle_refs": [
+        "contracts/decision-knowledge-timeline/expected-results.json#cases/reseed-reconnect-read-only-browser-cleanup",
+        "tests/decision-provenance-expected-results.json#cases/idempotent-reseed-restores-baseline",
+        "tests/decision-provenance-expected-results.json#cases/fresh-client-read-only-owned-cleanup",
+        "tests/sop-impact-expected-results.json#cases/sop-impact-reseed-reconnect"
+      ],
+      "expected": {
+        "seed_runs": 2,
+        "duplicate_node_delta_after_second_seed": 0,
+        "duplicate_relationship_delta_after_second_seed": 0,
+        "fresh_falkordb_client_required": true,
+        "reconnected_mainline_at_16_05": {
+          "known_at": "2026-10-14T16:05:00Z",
+          "claim_context_state": "evidence-backed",
+          "claims": [
+            {
+              "version_id": "SOP-OPS-9-V2",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-FACILITIES-DUTY"
+              },
+              "role_id": "ROLE-FACILITIES-DUTY",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V2",
+                "title": "Synthetic SOP-OPS-9 Current Text v2",
+                "observed_at": "2026-10-14T16:00:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V2"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            },
+            {
+              "version_id": "SOP-OPS-9-V3",
+              "claim_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "CLAIMS_ROLE",
+                "to": "ROLE-MATERIALS-LEAD"
+              },
+              "role_id": "ROLE-MATERIALS-LEAD",
+              "claim_label": "unverified SOP claim",
+              "source": {
+                "id": "SRC-SOP-CURRENT-V3",
+                "title": "Synthetic SOP-OPS-9 Current Text v3",
+                "observed_at": "2026-10-14T16:04:00Z",
+                "evidence_link": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-SOP-CURRENT-V3"
+                }
+              },
+              "applicability_edge": {
+                "from": "SOP-OPS-9-V3",
+                "relationship": "APPLIES_TO",
+                "to": "CONVEYOR-C4"
+              },
+              "discovery_path": "existing SOP-impact graph path"
+            }
+          ],
+          "conflict": {
+            "edge": {
+              "from": "SOP-OPS-9-V2",
+              "relationship": "SOP_CONFLICT",
+              "to": "SOP-OPS-9-V3",
+              "status": "unresolved"
+            },
+            "epistemic_type": "graph-derived relationship",
+            "source_quote": false,
+            "authoritative_rule": false
+          },
+          "decision_record": {
+            "id": "DEC-OPS-9-REVIEW-01",
+            "title": "SOP-OPS-9 claim reconciliation review",
+            "recorded_state": "open-unresolved",
+            "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+            "register_id": "REGISTER-OPS-DECISIONS-01",
+            "register_edge": {
+              "from": "REGISTER-OPS-DECISIONS-01",
+              "relationship": "TRACKS",
+              "to": "DEC-OPS-9-REVIEW-01"
+            },
+            "source": {
+              "id": "SRC-DEC-OPS-9-REVIEW-01",
+              "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+              "observed_at": "2026-10-14T16:05:00Z",
+              "evidence_link": {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            },
+            "provenance_path": [
+              {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "EVIDENCED_BY",
+                "to": "SRC-DEC-OPS-9-REVIEW-01"
+              }
+            ]
+          },
+          "decision_considers_edges": [
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V2"
+            },
+            {
+              "from": "DEC-OPS-9-REVIEW-01",
+              "relationship": "CONSIDERS",
+              "to": "SOP-OPS-9-V3"
+            }
+          ],
+          "generic_unknown": false,
+          "negative_conclusion_asserted": false,
+          "current_owner_or_procedure_selected": false,
+          "contact_or_action_supplied": false
+        },
+        "reconnected_branch_at_16_05": {
+          "scenario": {
+            "label": "Hypothetical observation-time branch",
+            "assumed_observed_at": "2026-10-14T16:06:00Z",
+            "actual_source_observed_at": "2026-10-14T16:04:00Z",
+            "source_fact_modified": false,
+            "scenario_not_source_truth": true
+          },
+          "projection": {
+            "known_at": "2026-10-14T16:05:00Z",
+            "claim_context_state": "incomplete/unknown",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": null,
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          }
+        },
+        "reconnected_branch_at_16_06": {
+          "scenario": {
+            "label": "Hypothetical observation-time branch",
+            "assumed_observed_at": "2026-10-14T16:06:00Z",
+            "actual_source_observed_at": "2026-10-14T16:04:00Z",
+            "source_fact_modified": false,
+            "scenario_not_source_truth": true
+          },
+          "projection": {
+            "known_at": "2026-10-14T16:06:00Z",
+            "claim_context_state": "evidence-backed",
+            "claims": [
+              {
+                "version_id": "SOP-OPS-9-V2",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-FACILITIES-DUTY"
+                },
+                "role_id": "ROLE-FACILITIES-DUTY",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V2",
+                  "title": "Synthetic SOP-OPS-9 Current Text v2",
+                  "observed_at": "2026-10-14T16:00:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V2",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V2"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V2",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              },
+              {
+                "version_id": "SOP-OPS-9-V3",
+                "claim_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "CLAIMS_ROLE",
+                  "to": "ROLE-MATERIALS-LEAD"
+                },
+                "role_id": "ROLE-MATERIALS-LEAD",
+                "claim_label": "unverified SOP claim",
+                "source": {
+                  "id": "SRC-SOP-CURRENT-V3",
+                  "title": "Synthetic SOP-OPS-9 Current Text v3",
+                  "observed_at": "2026-10-14T16:06:00Z",
+                  "evidence_link": {
+                    "from": "SOP-OPS-9-V3",
+                    "relationship": "EVIDENCED_BY",
+                    "to": "SRC-SOP-CURRENT-V3"
+                  }
+                },
+                "applicability_edge": {
+                  "from": "SOP-OPS-9-V3",
+                  "relationship": "APPLIES_TO",
+                  "to": "CONVEYOR-C4"
+                },
+                "discovery_path": "existing SOP-impact graph path"
+              }
+            ],
+            "conflict": {
+              "edge": {
+                "from": "SOP-OPS-9-V2",
+                "relationship": "SOP_CONFLICT",
+                "to": "SOP-OPS-9-V3",
+                "status": "unresolved"
+              },
+              "epistemic_type": "graph-derived relationship",
+              "source_quote": false,
+              "authoritative_rule": false
+            },
+            "decision_record": {
+              "id": "DEC-OPS-9-REVIEW-01",
+              "title": "SOP-OPS-9 claim reconciliation review",
+              "recorded_state": "open-unresolved",
+              "recorded_statement": "No version is selected as authoritative in this synthetic record.",
+              "register_id": "REGISTER-OPS-DECISIONS-01",
+              "register_edge": {
+                "from": "REGISTER-OPS-DECISIONS-01",
+                "relationship": "TRACKS",
+                "to": "DEC-OPS-9-REVIEW-01"
+              },
+              "source": {
+                "id": "SRC-DEC-OPS-9-REVIEW-01",
+                "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation",
+                "observed_at": "2026-10-14T16:05:00Z",
+                "evidence_link": {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              },
+              "provenance_path": [
+                {
+                  "from": "REGISTER-OPS-DECISIONS-01",
+                  "relationship": "TRACKS",
+                  "to": "DEC-OPS-9-REVIEW-01"
+                },
+                {
+                  "from": "DEC-OPS-9-REVIEW-01",
+                  "relationship": "EVIDENCED_BY",
+                  "to": "SRC-DEC-OPS-9-REVIEW-01"
+                }
+              ]
+            },
+            "decision_considers_edges": [
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V2"
+              },
+              {
+                "from": "DEC-OPS-9-REVIEW-01",
+                "relationship": "CONSIDERS",
+                "to": "SOP-OPS-9-V3"
+              }
+            ],
+            "generic_unknown": false,
+            "negative_conclusion_asserted": false,
+            "current_owner_or_procedure_selected": false,
+            "contact_or_action_supplied": false
+          }
+        },
+        "query_and_browser_write_counts": {
+          "graph_nodes": 0,
+          "graph_relationships": 0,
+          "local_actions": 0,
+          "files": 0,
+          "external_writes": 0
+        },
+        "desktop_mobile_api_semantically_equal": true,
+        "keyboard_selection_api_semantically_equal": true,
+        "cleanup_only_owned_graph_state_and_processes": true
+      }
+    }
+  ]
+}
