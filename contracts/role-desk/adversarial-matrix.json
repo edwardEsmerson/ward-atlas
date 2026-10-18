@@ -1,0 +1,13 @@
+{
+  "candidate_output_is_oracle": false,
+  "groups": [
+    {"id": "cold", "assertions": ["unknown", "no-identities", "same-unavailable", "no-workload-claim", "cold-browser"]},
+    {"id": "conveyor", "assertions": ["exact-roles", "sterile-path", "materials-path", "exact-cards", "separate-occurrences", "no-sop-owner", "reverse-query"]},
+    {"id": "restoration", "assertions": ["roles-retained", "active-removed", "event-evidenced", "no-safe-resolution", "not-common-shift"]},
+    {"id": "dock", "assertions": ["duty-only", "swing-only", "crossed-unknown", "exact-paths", "exact-cards", "independent-axes", "early-no-r2"]},
+    {"id": "mutation", "assertions": ["owner-edge", "source-edge", "event-edge", "event-source-time", "dock-owner-edge", "dock-source-time", "reseed-restores"]},
+    {"id": "denied-decoy", "assertions": ["injection-connected", "decoy-invariant", "full-response-invariant", "desktop-dom-aria", "mobile-dom-aria", "generic-role-boundary", "denied-witness"]},
+    {"id": "input", "assertions": ["all-invalid", "duplicate-role", "malformed-time", "zero-reads", "unavailable-graph", "no-details"]},
+    {"id": "repeat-browser-cleanup", "assertions": ["repeat-seed", "reconnect", "graph-hash", "state-hash", "keyboard", "desktop-mobile", "race-errors-escape", "root-link", "owned-cleanup"]}
+  ]
+}

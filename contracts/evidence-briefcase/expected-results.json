@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "candidate_output_is_oracle": false,
+  "purpose": "Historical evidence only. Expected values come from these byte-pinned accepted oracles, never from candidate output.",
+  "sources": {
+    "tests/expected-results.json": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+    "contracts/decision-knowledge-timeline/expected-results.json": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076",
+    "contracts/decision-source-branch/expected-results.json": "e209aeab5af266abd6940619727295ea50c0ad2707f47c2d4df37d24cb37da23"
+  },
+  "capture_clock": "2026-10-18T10:00:00Z",
+  "contexts": ["outage-snapshot", "sop-mainline", "sop-hypothetical"],
+  "cases": [
+    {"id":"outage-1830", "context":"outage-snapshot", "as_of":"2026-10-14T18:30:00Z", "paths_ref":"tests/expected-results.json#expected_evidence_by_path", "path_count":2, "nodes_per_path":5, "roster_occurrences":["2026-10-14T18:04:00Z","2026-10-14T18:05:00Z"]},
+    {"id":"outage-1930", "context":"outage-snapshot", "as_of":"2026-10-14T19:30:00Z", "paths":[], "state":"restored", "safe_asserted":false, "resolution_asserted":false},
+    {"id":"mainline-1604", "context":"sop-mainline", "known_at":"2026-10-14T16:04:00Z", "oracle":"timeline", "case":"v3-and-graph-derived-conflict"},
+    {"id":"mainline-1605", "context":"sop-mainline", "known_at":"2026-10-14T16:05:00Z", "oracle":"timeline", "case":"record-source-boundary"},
+    {"id":"hypothetical-1605", "context":"sop-hypothetical", "known_at":"2026-10-14T16:05:00Z", "oracle":"branch", "case":"branch-at-16-05-suppression"},
+    {"id":"hypothetical-1606", "context":"sop-hypothetical", "known_at":"2026-10-14T16:06:00Z", "oracle":"branch", "case":"branch-at-16-06-restoration"}
+  ],
+  "unknown": {"identities":[], "sources":[], "mainline_fallback":false, "safety_or_resolution_conclusion":false},
+  "archive": {"files":["evidence.json","report.html","manifest.json"], "max_entry_bytes":1048576, "max_total_bytes":3145728, "max_archive_bytes":4194304, "hash":"sha256", "integrity_meaning":"Accidental-change detection only; not a signature, authenticity guarantee or proof of correctness."},
+  "invariants": {"read_only":true,"synthetic":true,"not_current_truth":true,"selected_version":null,"safe_asserted":false,"resolution_asserted":false,"action_proposed":false,"action_confirmed":false,"watch_created":false,"acknowledgment_created":false,"hospital_communication":false,"external_writes":false},
+  "invalid_queries": [
+    "context=unknown&known_at=2026-10-14T16:05:00Z",
+    "context=sop-mainline&context=sop-mainline&known_at=2026-10-14T16:05:00Z",
+    "context=sop-mainline&known_at=bad",
+    "context=sop-mainline&known_at=2026-10-14T16:05:00",
+    "context=sop-mainline&known_at=2026-10-14T16:05:00Z&known_at=2026-10-14T16:05:00Z",
+    "context=sop-mainline&known_at=2026-10-14T16:05:00Z&scope=restricted",
+    "context=sop-mainline&known_at=2026-10-14T16:05:00Z&scope=operations&scope=operations",
+    "context=outage-snapshot&known_at=2026-10-14T16:05:00Z",
+    "context=sop-mainline&as_of=2026-10-14T18:30:00Z&known_at=2026-10-14T16:05:00Z",
+    "context=sop-mainline&known_at=2026-10-14T16:05:00%2B00:60",
+    "context=sop-mainline&known_at=2026-10-14T16:05:00Z&path=../../secret",
+    "context=sop-mainline&known_at=", "context", "", "scope=operations"
+  ],
+  "mutations": {"v3_source":"timeline#separate-evidence-edge-removals/v3_source_evidence_edge_removal", "record_source":"timeline#separate-evidence-edge-removals/decision_record_source_edge_removal", "owner_edge_removed_path_index":1, "branch_edges":["HAS_HYPOTHETICAL_OBSERVATION","FOR_SOURCE"]},
+  "injection_tripwires":["SECRET-BRIEFCASE","Restricted briefcase canary","private instruction canary","DECOY-BRIEFCASE","Disconnected briefcase canary"]
+}

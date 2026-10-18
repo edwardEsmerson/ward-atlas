@@ -31,6 +31,7 @@ from verify_falkordb_live import (
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
 from wardatlas_resilience import experiment as resilience_experiment, validate_request as validate_resilience_request
+from wardatlas_briefcase import mount_briefcase
 from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
 from wardatlas_knowledge_timeline import (
     build_queries as build_knowledge_timeline_queries,
@@ -47,6 +48,7 @@ from wardatlas_source_branch import (
 from wardatlas_knowledge_diff import knowledge_diff, parse_parameters as parse_knowledge_diff_parameters
 from wardatlas_replay import mount_replay
 from wardatlas_sop_compare import mount_sop_compare
+from wardatlas_role_desk import mount_role_desk, read_responsibilities as role_desk_read
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -318,8 +320,10 @@ APP_HTML = r'''<!doctype html>
       <div class="top-actions"><a class="button" href="/knowledge-diff" aria-label="Explain answer differences">Knowledge diff</a><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
+      <p><a href="/roles" style="color:#86e1be">Role desk · source-witnessed responsibilities →</a></p>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
       <p><a href="/sop-compare" style="color:#86e1be">SOP claim comparison · archived references and unresolved claims →</a></p>
+      <p><a href="/briefcase" style="color:#86e1be">Historical evidence briefcase · inspect and download offline →</a></p>
       <p><a href="/time-machine" style="color:#86e1be">Evidence time machine · play live relationship arrival →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
@@ -1170,6 +1174,9 @@ class WardAtlasService:
             stale,
         )
 
+    def role_responsibilities(self, selection: dict) -> dict:
+        return role_desk_read(self, selection)
+
     def evidence_resilience(self, mode: str = "baseline") -> dict:
         # Input validation precedes opening a connection. GRAPH.RO_QUERY adds
         # a database-enforced read-only boundary around both pane traversals.
@@ -1785,6 +1792,10 @@ class Handler(BaseHTTPRequestHandler):
         service = self.server.service
         try:
             if mount_sop_compare(self, service, parsed):
+                return
+            if mount_briefcase(self, service, parsed):
+                return
+            if mount_role_desk(self, service, parsed):
                 return
             if mount_replay(self, service, parsed):
                 return
