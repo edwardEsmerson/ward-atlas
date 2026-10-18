@@ -75,7 +75,7 @@
     },
     {
       "id": "validation",
-      "source_refs": ["decision-knowledge-timeline#normalization-and-rejection", "decision-source-branch#repeat-reconnect-read-only-desktop-mobile-cleanup"],
+      "source_refs": ["decision-knowledge-timeline#timestamp-normalization-and-rejection", "decision-source-branch#repeat-reconnect-read-only-desktop-mobile-cleanup"],
       "expected": {"utc_offset_equivalent": true, "invalid_time_status": 400, "naive_time_status": 400, "missing_parameter_status": 400, "duplicate_time_status": 400, "invalid_mode_status": 400, "duplicate_mode_status": 400, "denied_scope_status": 403, "state_unchanged": true}
     }
   ]
