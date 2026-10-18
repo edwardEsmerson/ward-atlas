@@ -2,6 +2,8 @@
 
 WardAtlas connects hospital incidents, SOPs and shift ownership in FalkorDB so operations teams can trace an outage to the departments and roles affected — a **Company Brain** built for hospital operations.
 
+**Live demo: <https://ayaansh-hoeserver.tail730cfd.ts.net:10000/>**, running on real FalkorDB 6.0.2 with synthetic data. Every visitor shares this one instance. *Reset synthetic scenario* restores it, and it also reseeds itself every 12 hours. To run your own copy, see [Quickstart](#quickstart).
+
 ![Control-room impact map and source trail: one outage reaches two departments and their operating roles](docs/media/control-room.png)
 
 ## What you can do
