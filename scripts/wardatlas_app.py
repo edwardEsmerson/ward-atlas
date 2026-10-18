@@ -20,6 +20,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+from wardatlas_questions import HTML_PATH as QUESTIONS_HTML_PATH, post_questions
+
 from verify_falkordb_live import (
     RespConnection,
     module_list_maps,
@@ -58,6 +60,7 @@ from wardatlas_evidence_watch import (
     public_refresh as public_watch_refresh,
     witness_from_dock,
 )
+from wardatlas_clock_atlas import mount_clock_atlas
 from wardatlas_shift_board import (
     BRANCH_AT,
     BRANCH_EVENT_QUERY,
@@ -309,9 +312,10 @@ APP_HTML = r'''<!doctype html>
   <div class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><span>WARDATLAS<small>HOSPITAL OPERATIONS BRAIN</small></span></div>
-      <div class="top-actions"><a class="button" href="/knowledge-diff" aria-label="Explain answer differences">Knowledge diff</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
+      <div class="top-actions"><a class="button" href="/knowledge-diff" aria-label="Explain answer differences">Knowledge diff</a><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
+      <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
         <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
         <aside class="incident-card"><div id="incident-status" class="status">No graph-backed incident</div><strong id="incident-title">No incident in graph</strong><p id="incident-summary">Empty/unknown is not evidence of safety or no operational risk.</p></aside>
@@ -1759,6 +1763,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_clock_atlas(self, service, parsed):
+                return
             if parsed.path == "/":
                 self._send(200, APP_HTML)
             elif parsed.path == "/knowledge-diff":
@@ -1769,6 +1775,8 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     parameters = parse_knowledge_diff_parameters(parse_qs(parsed.query, keep_blank_values=True))
                     self._send(200, knowledge_diff(service, *parameters))
+            elif parsed.path == "/ask":
+                self._send(200, QUESTIONS_HTML_PATH.read_text(encoding="utf-8"))
             elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
@@ -1861,6 +1869,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urlsplit(self.path)
         service = self.server.service
+        if parsed.path == "/api/questions":
+            post_questions(self, service)
+            return
         if parsed.path == "/api/shift-board/branch/reset":
             try:
                 self._json_body()
