@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import copy
+import errno
 import json
 import socket
 import unittest
 import uuid
+from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 from pathlib import Path
 import sys
+from typing import Iterator
 from unittest.mock import Mock
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +24,25 @@ from wardatlas_app import WardAtlasService
 
 ORACLE = json.loads((ROOT / "tests/handover-drift-expected-results.json").read_text())
 CANONICAL = ORACLE["canonical_snapshot"]
+
+
+@contextmanager
+def temporary_local_directory(prefix: str) -> Iterator[str]:
+    local_root = ROOT / ".local"
+    local_root_existed = local_root.exists()
+    local_root.mkdir(exist_ok=True)
+    try:
+        with TemporaryDirectory(prefix=prefix, dir=local_root) as directory:
+            yield directory
+    finally:
+        if not local_root_existed:
+            try:
+                local_root.rmdir()
+            except FileNotFoundError:
+                pass
+            except OSError as error:
+                if error.errno not in (errno.ENOTEMPTY, errno.EEXIST):
+                    raise
 
 
 def impact_from_snapshot(snapshot: dict, *, as_of: str, state: str, event: dict | None) -> dict:
@@ -179,8 +201,7 @@ class HandoverDriftProjectionTests(unittest.TestCase):
         self.assertFalse(result["observed"]["sop_witness_unchanged"])
 
     def test_service_normalizes_times_and_only_reads_the_saved_action(self):
-        (ROOT / ".local").mkdir(exist_ok=True)
-        with TemporaryDirectory(prefix="handover-drift-unit-", dir=ROOT / ".local") as directory:
+        with temporary_local_directory("handover-drift-unit-") as directory:
             with socket.socket() as sock:
                 sock.bind(("127.0.0.1", 0))
                 ephemeral_port = sock.getsockname()[1]
@@ -206,8 +227,7 @@ class HandoverDriftProjectionTests(unittest.TestCase):
             self.assertEqual(action_file.read_bytes(), before)
 
     def test_service_rejects_bad_time_before_action_or_graph_access(self):
-        (ROOT / ".local").mkdir(exist_ok=True)
-        with TemporaryDirectory(prefix="handover-drift-unit-", dir=ROOT / ".local") as directory:
+        with temporary_local_directory("handover-drift-unit-") as directory:
             with socket.socket() as sock:
                 sock.bind(("127.0.0.1", 0))
                 ephemeral_port = sock.getsockname()[1]
