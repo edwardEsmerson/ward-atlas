@@ -6,6 +6,12 @@
 - Commands: `python3 -m unittest tests.test_resilience`; `python3 scripts/verify_resilience.py --all --require-live-falkordb --desktop-mobile --fail-on-zero`.
 - Frozen oracle commit: `122c555`. Eight groups / 55 live mapped assertions; unit suite includes deliberate bad-output mutations. Reports: `$WORKSHOP_RUN_DIR/resilience/live.json` and desktop/mobile browser reports/screenshots. Fresh supervisor verification remains separate; no real-hospital, clinical, eligibility, or safety claim.
 
+## Ask recovery — 2026-10-18 fresh-source checkpoint
+
+- Recovery commit `5179013` preserves the already-integrated Ask workflow and oracle `8877158`; source/mount hashes and non-destructive reconciliation are in `docs/questions-recovery.md`. Earlier failed task status is not reset. The only code change tightens verifier source-pointer preflight; no product behavior or oracle bytes changed.
+- Both exact original commands passed in the builder and a separate source-only checkout of `5179013`, initially without `.local/`: **25 focused tests**, actual FalkorDB **60002**, **11 groups / 78 mapped assertions**, and **54 cold + 122 seeded + 122 post-ACL browser assertions** with desktop/mobile/keyboard evidence. Reseed/reconnect, complete ACL/model-request invariance, model-stub adversaries and read-only/owned cleanup passed. All six cleanup checks are true; no background service remains from these checks.
+- Fresh report/screenshots: `/workspace/evidence/auto-2971b551a77ba5cd9560a4d0/b13d4b688e6d41cfa2a93327ffd60488/fresh/questions/`; command logs are `fresh-live.log` and `fresh-unit.log` in the parent run directory. Re-run the two **Ask WardAtlas** commands in README. Supervisor integration remains separate. No live model inference, publication, real-hospital validation or participant eligibility is certified; next step is integration and the existing private demo path, not another rebuild.
+
 ## Knowledge diff — 2026-10-18 builder checkpoint
 
 - `/knowledge-diff` (control-room **Knowledge diff** link) and read-only `/api/knowledge-diff` independently select left/right cutoff and allowlisted mainline/hypothetical mode. Five typed, citation-linked witness deltas distinguish unchanged, projected-only and incomparable facts; unknown is never mass removal. Actual V3 observation remains 16:04Z and its separate assumption is 16:06Z; V2 and the independently sourced open-unresolved record are preserved. No action is required, compared or written; no transaction-isolation or completeness claim.

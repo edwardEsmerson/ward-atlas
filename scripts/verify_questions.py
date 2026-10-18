@@ -42,6 +42,45 @@ PINS = {
 }
 
 
+def verify_source_pointers(expected, matrix, sources):
+    """Check both frozen reference lists before querying candidate behavior.
+
+    Expected groups carry some references absent from the matrix (for example
+    the individual V2/V3 claims). Checking only the matrix misses those links.
+    False/zero are meaningful oracle values, not an empty mapping.
+    """
+    checked = set()
+    for case, group in zip(expected["groups"], matrix["groups"], strict=True):
+        if case["id"] != group["id"] or set(case["expected"]) != set(group["assertions"]):
+            raise VerificationFailure("matrix mapping drift")
+        value = expected
+        try:
+            for part in group["expected_pointer"].removeprefix("/").split("/"):
+                value = value[int(part)] if isinstance(value, list) else value[part]
+        except (KeyError, IndexError, ValueError, TypeError) as exc:
+            raise VerificationFailure("invalid expected pointer") from exc
+        if value is not case["expected"]:
+            raise VerificationFailure("expected pointer maps to a different group")
+        for references in (case.get("source_pointers"), group.get("source_pointers")):
+            if not isinstance(references, list) or not references:
+                raise VerificationFailure("missing source pointers")
+            for reference in references:
+                try:
+                    key, pointer = reference.split("#", 1)
+                    if not pointer.startswith("/"):
+                        raise ValueError("not an absolute JSON pointer")
+                    value = sources[key]
+                    for part in pointer[1:].split("/"):
+                        part = part.replace("~1", "/").replace("~0", "~")
+                        value = value[int(part)] if isinstance(value, list) else value[part]
+                except (KeyError, IndexError, ValueError, TypeError, AttributeError) as exc:
+                    raise VerificationFailure("invalid source pointer") from exc
+                if value is None or value == "" or value == [] or value == {}:
+                    raise VerificationFailure("empty source pointer")
+                checked.add(reference)
+    return sorted(checked)
+
+
 def packet():
     for path, digest in PINS.items():
         if hashlib.sha256((ROOT / path).read_bytes()).hexdigest() != digest:
@@ -50,16 +89,8 @@ def packet():
     matrix = json.loads((ROOT / "contracts/questions/adversarial-matrix.json").read_text())
     if len(matrix["groups"]) < 8 or sum(len(g["assertions"]) for g in matrix["groups"]) < 40:
         raise VerificationFailure("zero/insufficient mapped coverage")
-    for case, group in zip(expected["groups"], matrix["groups"], strict=True):
-        if case["id"] != group["id"] or set(case["expected"]) != set(group["assertions"]):
-            raise VerificationFailure("matrix mapping drift")
-        for reference in group["source_pointers"]:
-            key, pointer = reference.split("#", 1)
-            value = json.loads((ROOT / expected["sources"][key]["path"]).read_text())
-            for part in pointer[1:].split("/"):
-                value = value[int(part)] if isinstance(value, list) else value[part]
-            if value is None:
-                raise VerificationFailure("empty source pointer")
+    sources = {key: json.loads((ROOT / source["path"]).read_text()) for key, source in expected["sources"].items()}
+    verify_source_pointers(expected, matrix, sources)
     return expected, matrix
 
 
