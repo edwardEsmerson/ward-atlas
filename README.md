@@ -79,6 +79,22 @@ python3 scripts/verify_decision_knowledge_timeline_live.py --require-live-falkor
 
 The frozen candidate-independent oracle maps 12 groups to 120 assertions. The live run covers cold/empty and all source boundaries, V3 timestamp shift (including a desktop/mobile browser replay at 16:05), both evidence-edge removals, decoy/restricted invariance, offset/rejection behavior, reseed, fresh-client reads, read-only API/browser output, and owned cleanup. Builder evidence: `/workspace/evidence/decision-knowledge-timeline/lane-2/live-d126ea36313045ca97c526dfee0b0879.json` with screenshots and browser reports beside it. This is implementation evidence; an independent clean-source reverify remains a separate gate.
 
+## Hypothetical source-observation branch
+
+The additive read-only `GET /api/decision-source-branch?scope=operations&known_at=2026-10-14T16:05:00Z` returns the unchanged source-time `/api/decision-timeline` projection beside a graph-stored hypothetical projection. The branch is discovered only through `ScenarioBranch -[:HAS_HYPOTHETICAL_OBSERVATION]-> ObservationOverride -[:FOR_SOURCE]-> Evidence`; FalkorDB applies the override's assumed observation time to V3 before projecting its evidence-backed claims. The original Evidence fact stays observed at **16:04Z**. At the shared 16:05Z cutoff V3 and its dependent conflict are absent from the hypothetical pane while V2 and the separately sourced `open-unresolved` record remain; at 16:06Z V3 returns only as a labeled hypothetical. Mainline remains unchanged at both times.
+
+If either branch edge is missing, the hypothetical projection is generic `incomplete/unknown`: it does not reuse mainline claims, disclose branch/source identities, or infer absence or resolution. Queries filter every path node and edge to `operations`; disconnected decoys and connected restricted-source injections leave the complete visible projection unchanged. A native keyboard-selectable cutoff drives both accessible desktop panes and the stacked mobile view from the same API response. The endpoint does not write the graph or action state.
+
+Run the frozen source packet check (including its content-bound reviewer receipt), focused mutation tests, and actual-FalkorDB/API/browser verification from the allocated lane range:
+
+```sh
+python3 scripts/verify_decision_source_branch_contract.py --expected contracts/decision-source-branch/expected-results.json --matrix contracts/decision-source-branch/adversarial-matrix.json --pinned-plan /workspace/worktrees/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0/plans/planner-4889c5b5d5d542cb9a7d33b48d7ca1b0.md --require-eight-groups --check-frozen-oracle-hashes --require-review-receipt
+python3 -m unittest tests.test_decision_source_branch tests.test_decision_source_branch_contract
+python3 scripts/verify_decision_source_branch_live.py --require-live-falkordb --all-eight-groups --assert-api --desktop-mobile --assert-keyboard --assert-mainline-immutable --assert-no-fallback --assert-reconnect --assert-owned-cleanup
+```
+
+The live check selects FalkorDB/app ports at `WORKSHOP_PORT_BASE+90/+91`, uses an empty run-unique graph, exercises all eight groups and 74 pinned assertions, then removes only its graph, database/app processes, runtime directory, and local state. It captures cold/seeded, missing-edge, ACL-invariance, reconnect, desktop, keyboard, and mobile evidence. The pinned planner path is workshop evidence and must be supplied for clean-source contract validation; the submitted JSON and manifest carry the frozen expectations and exact source hashes. This remains synthetic operations replay, not source truth or hospital validation.
+
 Check the candidate-independent nine-case packet, unit tests, actual FalkorDB/API behavior, and desktop/mobile browser from this worker's allocated ports:
 
 ```sh
