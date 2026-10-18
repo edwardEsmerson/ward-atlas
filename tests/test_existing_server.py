@@ -57,12 +57,12 @@ class ExistingServerTests(unittest.TestCase):
 
     def test_legacy_constructor(self):
         from wardatlas_app import WardAtlasService
-        service = WardAtlasService(18732, "wardatlas_unit_legacy", self.state)
+        service = WardAtlasService(18732, "wardatlas_ui_unit_legacy_1234", self.state)
         self.assertEqual(service.db_host, "127.0.0.1")
 
     def test_explicit_constructor_host(self):
         from wardatlas_app import WardAtlasService
-        service = WardAtlasService(18732, "wardatlas_unit_host", self.state, db_host="localhost")
+        service = WardAtlasService(18732, "wardatlas_ui_unit_host_1234", self.state, db_host="localhost")
         with patch("wardatlas_app.RespConnection") as connect:
             service._connection()
         connect.assert_called_once_with("localhost", 18732, timeout=3.0)
@@ -71,12 +71,12 @@ class ExistingServerTests(unittest.TestCase):
         from wardatlas_app import WardAtlasService
         for host in ("", "http://localhost", "bad host", "a\nb"):
             with self.subTest(host=host), self.assertRaises(ValueError):
-                WardAtlasService(18732, "wardatlas_unit_host", self.state, db_host=host)
+                WardAtlasService(18732, "wardatlas_ui_unit_host_1234", self.state, db_host=host)
 
     def test_state_escape_rejected(self):
         from wardatlas_app import WardAtlasService
         with self.assertRaises(ValueError):
-            WardAtlasService(18732, "wardatlas_unit_path", Path("/tmp/outside-wardatlas"))
+            WardAtlasService(18732, "wardatlas_ui_unit_path_1234", Path("/tmp/outside-wardatlas"))
 
     def test_no_graph_cleanup_without_ownership(self):
         item = self.attach.Attachment("localhost", 18732)

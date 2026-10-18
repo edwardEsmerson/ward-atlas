@@ -1,5 +1,33 @@
 # WardAtlas
 
+**Hospital operations lose continuity when an outage, an ownership roster and contradictory SOPs live in separate places.** WardAtlas connects them into an evidence-linked control room for the **Company Brain** track: see who is affected, why that role is accountable, and what remains unknown—without turning an unverified SOP claim into a procedure.
+
+## Start with your FalkorDB server
+
+Requires **Python 3.10+ and an existing FalkorDB 6.x+ server**, reachable without authentication. No Python packages, model API or Docker are required by the app. From this repository:
+
+```sh
+python3 scripts/wardatlas_attach.py --db-host 127.0.0.1 --db-port 6379
+```
+
+Open the printed `WARDATLAS_READY http://127.0.0.1:…` URL. The app uses a free ephemeral loopback port; optionally pass an explicit `--app-port`. It seeds a **new, run-unique synthetic graph and local action state**, never an existing graph. **Ctrl-C** closes the app and removes only that run's graph/state; the supplied database and other graphs remain running and untouched. Saved demo actions are intentionally temporary. The launcher never starts, stops, resets, upgrades or configures your database. Do not supply a production hospital server or credentials.
+
+If you need a server, judges can run their own official image in a separate terminal (not run by WardAtlas):
+
+```sh
+docker run --rm -p 127.0.0.1:6379:6379 falkordb/falkordb:6.0.2
+```
+
+See the [judge guide](docs/judge-guide.md) for the demo route, existing-server checks and the documented project-local Linux alternative. The older independent check commands below remain available unchanged.
+
+### Why a graph, not a chat wrapper?
+
+`Incident → Equipment → Service → Department → current Role` is an explicit multi-hop ownership/impact path. `EVIDENCED_BY → Evidence` carries source IDs and observation times; SOP version/applicability/conflict edges keep competing claims separate. Effective-time and knowledge-time views expose why an answer changed, and scenario overlays label assumptions rather than rewriting source truth. Python's loopback HTTP app queries actual FalkorDB over RESP and projects deterministic, source-linked results into the responsive UI; human confirmation is required before local action storage. See the [actual Cypher, schema and architecture walkthrough](docs/falkordb-query-walkthrough.md).
+
+**Limits & AI disclosure:** all people, departments, incidents and sources are fictional. No patient data, diagnosis, treatment, autonomous clinical triage, real-hospital validation or compliance certification. AI agents generated substantial code, fixtures, tests and documentation; the core graph workflow is deterministic. Optional model-assisted layout on Ask WardAtlas is described below and is **not claimed live-model verified**. Participant technical understanding and meaningful human contribution have **not been verified**; official rules warn that AI-only entries may be rejected. Automated checks do not establish submission eligibility. Publishing/submission and recording approval are separate from this local setup.
+
+## Product workflow
+
 WardAtlas is a local synthetic hospital-operations control room for the Company Brain track. It uses actual FalkorDB queries to trace a fictional equipment outage through a service to impacted departments and explicitly current operating roles, preserve source provenance, reveal a stale SOP reference and unresolved conflict, and exclude inaccessible evidence. Its integrated shift board keeps the INC-207 dock roster revision separate from INC-204 conveyor event replay: effective-dated ownership, explicit-edge review candidates, observed restoration, and a forked hypothetical drill are inspectable at pinned times. The responsive UI separates source facts, graph inference and missing evidence. A handover preview carries an inspectable, timestamped snapshot of the exact impact paths and explicit source-backed SOP witness from the existing read-only graph query; missing edges stay incomplete/unknown. The confirmed local action stores that same snapshot only after an explicit confirmation click. It does not send messages, make calls, create tickets, or perform external writes. Fixtures are invented and non-clinical; WardAtlas is not a validated hospital system or medical device.
 
 For the short operator-focused private demo path, see the [demo runbook](docs/demo-runbook.md).
