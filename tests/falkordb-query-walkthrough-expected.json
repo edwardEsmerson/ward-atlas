@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "source_commit": "b540f032a50d14384602e638abc1ff59f50160cf",
+  "policy": "Pinned before checker/tests; query bytes come from accepted source, outcomes only from unchanged frozen oracles, never candidate runtime output.",
+  "fence_cutoff": "2026-10-14T16:05:00Z",
+  "source_sha256": {
+    "scripts/wardatlas_shift_board.py": "893460656966003bdd16161966f966be1369a1b54f527956f544d5e47092aaa4",
+    "scripts/wardatlas_knowledge_timeline.py": "4542af5916d16a5c1a2cfb5fc387b1ebab4b60b4a9b51ea44445aed8353bc583",
+    "scripts/wardatlas_source_branch.py": "6a5718bda62dd3ad9f1e9f63bebd9e70a0e65f7c6faa4c47fb9671116c1758f3",
+    "scripts/wardatlas_fixtures.py": "02a869139a956d0675d6238e23358e5c122b61f7af27d91df9c26ce55c793b43",
+    "scripts/wardatlas_decisions.py": "0cf8a5be6bcbfa27cac6ef3742c5ac9d2a048cff7bd06c2b02786b33c42c69be"
+  },
+  "queries": [
+    {
+      "id": "conveyor-path",
+      "file": "scripts/wardatlas_shift_board.py",
+      "symbol": "CONVEYOR_PATH_QUERY",
+      "symbol_sha256": "2ba9e25e6794e573a3aa8490e807f8d5515abaad30a665c781d9585f387d7e9c",
+      "generated_sha256": {"constant": "2e5096e13a278c64e3ceb22a472bec1d1ab06ae81502850fe953ba17836114cf"}
+    },
+    {
+      "id": "timeline-claim",
+      "file": "scripts/wardatlas_knowledge_timeline.py",
+      "symbol": "_claim_query",
+      "symbol_sha256": "4f4f023c7d949fab6d460dc11ac4817fb700d03e3749606136771082f68872ac",
+      "generated_sha256": {
+        "2026-10-14T16:04:00Z": "81815d6aeb49979f2b6b886f4c927ffec592b7cb575de07613c4d9d3f94aa5dd",
+        "2026-10-14T16:05:00Z": "6bec2409db81e7d7daf8afc0d6104fd345e02feb070111397b5b4a828f5b86e8",
+        "2026-10-14T16:06:00Z": "4a99a0c9879c7850928e4ede709025c1f7996ca7f1842915c84f5888aace9a13"
+      }
+    },
+    {
+      "id": "timeline-record",
+      "file": "scripts/wardatlas_knowledge_timeline.py",
+      "symbol": "_record_query",
+      "symbol_sha256": "3467e7631127259fdafa645f4e71fbb7e3a22cc3f6dc07f65fe0b9a239b2892c",
+      "generated_sha256": {
+        "2026-10-14T16:04:00Z": "0715cdf1ca0c54e549770024fd6ab459dd0fb506d9c47c914bb6b163df14d6af",
+        "2026-10-14T16:05:00Z": "e437185a7463762161ad55c02ef184edcfa644363b60efed7fedf7803650f1ac",
+        "2026-10-14T16:06:00Z": "18b27628310f5dc8f1c95014bb850f0cf32072d75b630e4a30ed4d85a11069dc"
+      }
+    },
+    {
+      "id": "branch-path",
+      "file": "scripts/wardatlas_source_branch.py",
+      "symbol": "BRANCH_PATH_QUERY",
+      "symbol_sha256": "232f861fb51a650f9e5d407acab258e04353139d590dfc362aea456e0fe40e1e",
+      "generated_sha256": {"constant": "8869af7fcfa42074db2d0ee64098ff51622d41043a7a7aef46eaaccd6a7fff64"}
+    },
+    {
+      "id": "branch-v3-claim",
+      "file": "scripts/wardatlas_source_branch.py",
+      "symbol": "branch_v3_claim_query",
+      "symbol_sha256": "7d4394a25e388bc2b6595162b3d440a4131d9212edbfca8146cc25744fc1bcba",
+      "generated_sha256": {
+        "2026-10-14T16:04:00Z": "9d02c94f7583e1249778bee0c2f2fc40dd64d7a43cbc023cd9d1c4fb3d44d9ea",
+        "2026-10-14T16:05:00Z": "ff577a59cca64e34a0ffbd005ed5592ca1e3575c43943dd6a543115786f6e4b0",
+        "2026-10-14T16:06:00Z": "58b6320a99223d438f58eea1a5ed41d9650c6b86e2f3bfd7fc4bb002d2a40be5"
+      }
+    }
+  ],
+  "oracle_sha256": {
+    "tests/expected-results.json": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+    "tests/shift-board-expected-results.json": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428",
+    "contracts/decision-knowledge-timeline/expected-results.json": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076",
+    "contracts/decision-knowledge-timeline/adversarial-matrix.json": "75a88572303e8fe98e14eadddf7aeab1cb0caead48a8552cfa6551284eaa1de4",
+    "contracts/decision-source-branch/expected-results.json": "e209aeab5af266abd6940619727295ea50c0ad2707f47c2d4df37d24cb37da23",
+    "contracts/decision-source-branch/adversarial-matrix.json": "4a07df2def7244b3008e912a5c617fbc75d080999071f3b48a556f27b65698c5",
+    "contracts/decision-source-branch/independent-review.json": "36e3c8bdc29019da67f06af605f188cb1c0c6662c81e5ea3efbad666242b0d55"
+  },
+  "accepted_reports": {
+    "fresh-source verification report (actual FalkorDB 6.0.2; branch 8/74, timeline 12/120, integrated 79 assertions, 238 unit tests)": "5eea66d76f13baa419ee8e01b39b3cbe4ef447b2c0881ed31814905e838544e8",
+    "fresh source-review receipt (same source commit)": "7292076f6a88e6218944f57ccf00c835559300fb894ec4ddaba9527e4975668e"
+  },
+  "outcomes": [
+    {"id": "mainline-1604", "group": "mainline-isolation", "key": "mainline_at_16_04", "oracle_value_sha256": "6008cf4804af265eb4fbf3382baa7d0cfc5f2c48f76837d15a4d1ba05b437af9", "doc_row": "| Mainline | 16:04Z | V2 + V3 (actual 16:04Z) | unresolved | unknown; no record/existence claim | none |"},
+    {"id": "mainline-1605", "group": "mainline-isolation", "key": "mainline_at_16_05", "oracle_value_sha256": "f66eef8b9c43b42a8c16c0668f885bc3b240bdf1e58212c32ebe3a14938e82b0", "doc_row": "| Mainline | 16:05Z | V2 + V3 (actual 16:04Z) | unresolved | open-unresolved | V2 + V3 |"},
+    {"id": "mainline-1606", "group": "mainline-isolation", "key": "mainline_at_16_06", "oracle_value_sha256": "4fc72cd9f6a41a415530a06b9b9a6fe214587c0396d03e7db8c06d9c769a1a26", "doc_row": "| Mainline | 16:06Z | V2 + V3 (actual 16:04Z) | unresolved | open-unresolved | V2 + V3 |"},
+    {"id": "branch-1605", "group": "branch-at-16-05-suppression", "key": "projection", "oracle_value_sha256": "7bb0327b386efbd3247d6f9429a9479792c89ecc8af6b0e6b5c22f4997b7e933", "doc_row": "| Hypothetical | 16:05Z | V2 only; incomplete/unknown | unknown; not resolved | open-unresolved | V2 only |"},
+    {"id": "branch-1606", "group": "branch-at-16-06-restoration", "key": "projection", "oracle_value_sha256": "ad84b0a50ab2b5450c1cbf735d5420a18205bf4852eea4280d79682362341e92", "doc_row": "| Hypothetical | 16:06Z | V2 + V3 (assumed 16:06Z) | unresolved, hypothetical | open-unresolved | V2 + V3 |"},
+    {"id": "missing-root-edge", "group": "missing-edge-no-fallback-and-reseed", "key": "missing_branch_to_override_edge_result", "oracle_value_sha256": "8926269fbfa97de925850997e540083e495178907cbca98afa073fe5d3b4b60a", "doc_row": "| Missing HAS_HYPOTHETICAL_OBSERVATION | 16:05Z | generic incomplete/unknown; no claims | unknown | unknown; no record | none; no mainline fallback |"},
+    {"id": "missing-source-edge", "group": "missing-edge-no-fallback-and-reseed", "key": "missing_override_to_source_edge_result", "oracle_value_sha256": "8926269fbfa97de925850997e540083e495178907cbca98afa073fe5d3b4b60a", "doc_row": "| Missing FOR_SOURCE | 16:05Z | generic incomplete/unknown; no claims | unknown | unknown; no record | none; no mainline fallback |"}
+  ],
+  "required_statements": [
+    "These are literal returned query strings, not illustrative Cypher; the three function examples use known_at = 2026-10-14T16:05:00Z.",
+    "The conveyor query selects explicitly current OWNED_BY edges, joins owns.source_id = rsrc.id, and returns incident, equipment, service and roster provenance; it does not itself apply a knowledge-time cutoff or select an outage event.",
+    "The service layer selects the separately evidenced observed event and exposes active impact paths only while it is unavailable; the 18:30Z outage and 19:30Z restoration are not the 16:04/16:05/16:06Z SOP knowledge clock.",
+    "Claims are discovered only through the incident/equipment/service, APPLIES_TO, CLAIMS_ROLE and EVIDENCED_BY path; a DecisionRecord or CONSIDERS edge never discovers a claim.",
+    "The register-rooted query requires TRACKS and the record's own EVIDENCED_BY source with source.observed_at <= known_at before disclosing record facts or existence.",
+    "SOP rows are unverified SOP claim records, not roster-derived current owners, selected procedures, verified contacts or authoritative SOP winners.",
+    "SOP_CONFLICT is a graph-derived unresolved relationship, not a source quotation or authoritative rule; it requires both independently evidenced claims. CONSIDERS is projected only for independently known claims after the record's own boundary.",
+    "Both branch edges are mandatory: ScenarioBranch -> HAS_HYPOTHETICAL_OBSERVATION -> ObservationOverride -> FOR_SOURCE -> Evidence; branch_source.id = source.id connects the override to the ordinary V3 evidence path.",
+    "The branch query tests override.assumed_observed_at <= known_at inside FalkorDB, not source.observed_at; only the hypothetical projection uses assumed 16:06Z. V3's stored actual observation remains 16:04Z and mainline is immutable at all three cutoffs.",
+    "If either required branch edge is missing, the hypothetical result is generic incomplete/unknown: no claims, record, conflict, counts, source/branch identities or mainline fallback; mainline stays intact.",
+    "Every traversed node, relationship and evidence source is filtered with access = 'operations' before projection. Connected restricted-source injections and disconnected decoys leave the entire visible operations projection unchanged, including titles, facts, counts and existence hints.",
+    "Unknown is not absence, resolution, safety or currentness. A missing path is insufficient evidence, not a negative operational conclusion.",
+    "Explicit ISO-8601 offsets normalize to UTC; malformed or timezone-naive cutoffs reject. An omitted known_at yields generic unknown, never a local-clock fallback.",
+    "This Company Brain demo uses fictional synthetic hospital-operations data only: no patients, identifiable real staff or live hospital integration. It is non-clinical, not a validated hospital system or medical device, and makes no compliance or clinical-outcome claim.",
+    "At the pinned source this is deterministic FalkorDB retrieval and template projection; no AI model is called at runtime. AI assistants helped author code, tests and documentation; this is not a model-backed clinical agent.",
+    "These queries and replay endpoints are read-only. Any handover action requires explicit human confirmation and saves only a local synthetic snapshot; no messages, calls, external tickets or external writes occur.",
+    "This appendix performs no publication or submission and makes no public deployment or video-availability claim; publication and submission require owner authorization.",
+    "Eligibility risk remains: official rules require participant technical understanding and meaningful contribution and warn that AI-only entries may be rejected. Autonomous work does not certify these requirements on the owner's behalf; winning is not guaranteed.",
+    "The accepted report digests identify prior verification, not a new graph/browser run or publicly accessible media. This appendix's checker is static and cannot re-prove database behavior."
+  ]
+}
