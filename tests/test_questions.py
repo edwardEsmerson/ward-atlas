@@ -332,5 +332,39 @@ class QuestionsTests(unittest.TestCase):
             self.assertFalse(thread.is_alive())
 
 
+class QuestionsVerifierPreflightTests(unittest.TestCase):
+    def test_all_expected_and_matrix_pointers_resolve_without_candidate(self):
+        from verify_questions import packet, verify_source_pointers
+        expected, matrix = packet()
+        sources = {"outage": OLD, "timeline": TIMELINE}
+        checked = verify_source_pointers(expected, matrix, sources)
+        self.assertIn("timeline#/baseline/v2_claim", checked)
+        self.assertIn("timeline#/baseline/v3_claim", checked)
+        self.assertEqual(set(checked), {
+            ref for groups in (expected["groups"], matrix["groups"])
+            for group in groups for ref in group["source_pointers"]
+        })
+
+    def test_unmapped_or_invalid_source_pointers_fail_before_live_checks(self):
+        from verify_questions import packet, verify_source_pointers, VerificationFailure
+        expected, matrix = packet()
+        for location in ("expected-only", "matrix-only", "missing", "empty-target", "wrong-group"):
+            with self.subTest(location=location):
+                candidate, mapping = copy.deepcopy(expected), copy.deepcopy(matrix)
+                sources = {"outage": copy.deepcopy(OLD), "timeline": copy.deepcopy(TIMELINE)}
+                if location == "expected-only":
+                    candidate["groups"][2]["source_pointers"].append("timeline#/baseline/not-a-claim")
+                elif location == "matrix-only":
+                    mapping["groups"][2]["source_pointers"].append("outage#/not-a-scenario")
+                elif location == "missing":
+                    candidate["groups"][0]["source_pointers"] = []
+                elif location == "empty-target":
+                    sources["timeline"]["baseline"]["v2_claim"] = {}
+                else:
+                    mapping["groups"][0]["expected_pointer"] = "/groups/1/expected"
+                with self.assertRaises(VerificationFailure):
+                    verify_source_pointers(candidate, mapping, sources)
+
+
 if __name__ == "__main__":
     unittest.main()
