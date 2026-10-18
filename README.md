@@ -4,7 +4,7 @@ WardAtlas connects hospital incidents, SOPs and shift ownership in FalkorDB so o
 
 **Live demo: <https://ayaansh-hoeserver.tail730cfd.ts.net:10000/>**, running on real FalkorDB 6.0.2 with synthetic data. Every visitor shares this one instance. *Reset synthetic scenario* restores it, and it also reseeds itself every 12 hours. To run your own copy, see [Quickstart](#quickstart).
 
-![Control-room impact map and source trail: one outage reaches two departments and their operating roles](docs/media/control-room.png)
+![Shift board: the live impact map traces one outage to two departments and their operating roles, beside the unresolved SOP conflict](docs/media/control-room.png)
 
 ## What you can do
 
