@@ -31,6 +31,7 @@ from verify_falkordb_live import (
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
 from wardatlas_resilience import experiment as resilience_experiment, validate_request as validate_resilience_request
+from wardatlas_briefcase import mount_briefcase
 from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
 from wardatlas_knowledge_timeline import (
     build_queries as build_knowledge_timeline_queries,
@@ -317,6 +318,7 @@ APP_HTML = r'''<!doctype html>
     </header>
     <main>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
+      <p><a href="/briefcase" style="color:#86e1be">Historical evidence briefcase · inspect and download offline →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
         <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
@@ -1777,6 +1779,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_briefcase(self, service, parsed):
+                return
             if mount_clock_atlas(self, service, parsed):
                 return
             if parsed.path == "/":

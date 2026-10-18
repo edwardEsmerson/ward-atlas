@@ -226,3 +226,16 @@ python3 scripts/verify_evidence_watch_live.py --require-live-falkordb --all-nine
 ```
 
 The live verifier selects DB/app ports at offsets +40/+41 inside the current `WORKSHOP_PORT_BASE`/`WORKSHOP_PORT_SPAN`, uses a unique lane-named graph and state directory, and deletes only its owned graph, process, runtime directory and watch state. It checks all 86 frozen assertions, edge/source sensitivity, denied-source API and accessible desktop/mobile DOM invariance, explicit browser confirmation, reconnect/reseed and cleanup. This is synthetic operations evidence, not real roster validation or a hospital system.
+
+## Download historical evidence, not an action
+
+Open **Historical evidence briefcase** (`/briefcase`) from Shift control. Choose one outage impact snapshot, SOP source-time mainline, or hypothetical source-time context and its explicitly labeled UTC time. Inspect the read-only preview, then click **Download displayed evidence ZIP**. The local ZIP contains exactly that displayed capture: `evidence.json`, standalone offline `report.html`, and `manifest.json`. Changing selection does not download anything; late responses cannot replace a newer selection. There is no upload, importer, attachment reader, saved export or operational action.
+
+The report separates source facts, graph inference, unknowns, typed relationship witnesses and citation occurrences. The same roster source ID retains its separate 18:04Z/18:05Z observations on the two paths. Hypothetical V3 actual observation (16:04Z) and assumed projection time (16:06Z) remain distinct. Outage impact and SOP knowledge are not combined into a causal briefing. Synthetic historical evidence is **not current truth**; no SOP winner, resolution or safety is inferred. Manifest SHA256 values hash exact file bytes for accidental-change detection only, **not signatures, authenticity or proof of correctness**.
+
+```sh
+python3 -m unittest tests.test_evidence_briefcase
+python3 scripts/verify_evidence_briefcase.py --all --require-live-falkordb --desktop-mobile --assert-downloaded-bytes --assert-offline --fail-on-zero
+```
+
+The product-only check automatically bootstraps the digest-pinned local FalkorDB module described above, selects free allocated-lane/ephemeral ports, and owns a run-unique graph/state/process set. It verifies the three unchanged source-oracle hashes and pre-behavior `contracts/evidence-briefcase/` mappings, exercises cold/reseed/new-client reconnect and witness removals, checks complete restricted-injection package invariance with a frozen capture clock, and proves unchanged graph/action/watch state. Chromium downloads the actual ZIP, verifies its bytes against the displayed package, then opens that same extracted HTML offline on desktop/mobile with networking blocked. Its strict non-extracting verification reader rejects duplicate/traversal/oversize ZIPs and bad hashes; it is not a product importer. Rerunnable reports, ZIPs and screenshots are under `$WORKSHOP_RUN_DIR/briefcase` (default `.local/briefcase-evidence/briefcase`). Builder evidence does not replace independent verification or certify participant eligibility.
