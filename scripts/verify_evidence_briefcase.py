@@ -182,12 +182,16 @@ class Verify(SourceBranchLive):
         adapted = {"groups": [{"group_id": g["id"], "pinned_assertions": [{"id": i} for i in g["assertions"]]} for g in matrix["groups"]]}
         super().__init__(args, dict(expected, groups=[]), adapted)
         self.coverage = {g["id"]: set() for g in matrix["groups"]}
+        self.regressions = []
         self.db.graph = "wardatlas_test_briefcase_" + self.run_id
         self.state_dir = ROOT / ".local/briefcase-runs" / self.run_id
         self.cases = {c["id"]: c for c in expected["cases"]}
     def checks(self, group, **checks):
         for key, value in checks.items():
             self.check(group, key.replace("_", "-"), value)
+    def regression(self, name, passed):
+        self.regressions.append({"id":name,"passed":bool(passed)})
+        assert passed, name
     def api(self, case):
         case = self.cases[case] if isinstance(case, str) else case
         status, value = self.get("/api/evidence-briefcase?" + urlencode(selection(case)))
@@ -242,6 +246,33 @@ class Verify(SourceBranchLive):
             else:
                 s = next(s for s in e["source_occurrences"] if s["source_id"] == "SRC-SOP-CURRENT-V3")
                 self.checks(key, v3_restored=len(p["claims"]) == 2 and p["conflict"] is not None, actual_clock=s["observed_at"] == "2026-10-14T16:04:00Z", assumed_clock=s["projected_observed_at"] == "2026-10-14T16:06:00Z", mainline_unchanged=self.api("mainline-1605") == baseline["mainline-1605"], not_source_truth=e["witnesses"][0]["scenario"]["scenario_not_source_truth"] is True)
+        # Independent verifier's counterexample: actual source later than the
+        # selected hypothetical cutoff. All expected timestamps below are
+        # literal mutation inputs, not copied from the candidate response.
+        self.service.action_file.write_bytes(b'[{"id":"owned-clock-regression-canary"}]\n')
+        self.service.watch_file.write_bytes(b'{"owned-clock-regression-canary":true}\n')
+        clock_state={p.name:p.read_bytes() for p in self.state_dir.iterdir()}
+        self.db.graph_query("owned-actual-clock-mutation", "MATCH (s:Evidence {id:'SRC-SOP-CURRENT-V3'}) SET s.observed_at='2026-10-14T16:07:00Z'")
+        clock_graph=self.graph_snapshot("clock-before-read")
+        late=self.api("hypothetical-1606");e=late["evidence"]
+        citation=next(s for s in e["source_occurrences"] if s["source_id"]=="SRC-SOP-CURRENT-V3")
+        fact=next(f["claim"] for f in e["source_facts"] if f["type"]=="unverified-sop-claim" and f["claim"]["source"]["id"]=="SRC-SOP-CURRENT-V3")
+        self.regression("actual-late-citation-clock",citation["observed_at"]=="2026-10-14T16:07:00Z")
+        self.regression("assumed-clock-separate",citation.get("projected_observed_at")=="2026-10-14T16:06:00Z")
+        self.regression("actual-late-source-fact-clock",fact["source"]["observed_at"]=="2026-10-14T16:07:00Z")
+        self.regression("scenario-actual-agrees",e["witnesses"][0]["scenario"]["actual_source_observed_at"]==citation["observed_at"])
+        self.regression("no-mainline-future-claim",[c["version_id"] for c in self.get('/api/decision-timeline?known_at=2026-10-14T16:06:00Z')[1]["claims"]]==["SOP-OPS-9-V2"])
+        self.regression("unrelated-source-clock-retained",next(s for s in e["source_occurrences"] if s["source_id"]=="SRC-SOP-CURRENT-V2")["observed_at"]=="2026-10-14T16:00:00Z")
+        clock_browser=self.browser("source-clock-mutation","source-clock-mutation")
+        self.regression("late-clock-downloaded-offline-desktop-mobile",clock_browser["offline_desktop"]>=6 and clock_browser["offline_mobile"]>=6 and clock_browser["offline_network_requests"]==[])
+        fresh_clock=WardAtlasService(self.args.db_port,self.db.graph,self.state_dir)
+        self.regression("late-clock-new-client-whole-package",product.package_evidence(product.capture_evidence(fresh_clock,selection(self.cases["hypothetical-1606"])))==late)
+        self.regression("late-clock-graph-read-only",self.graph_snapshot("clock-after-read")==clock_graph)
+        self.regression("late-clock-action-watch-read-only",clock_state=={p.name:p.read_bytes() for p in self.state_dir.iterdir()} and not self.service.pending and not self.service.pending_watches)
+        (self.args.evidence_dir/"source-clock-mutation.zip").write_bytes(base64.b64decode(late["zip_base64"]))
+        (self.args.evidence_dir/"source-clock-mutation-evidence.json").write_bytes(product.json_bytes(e))
+        self.reset()
+        self.regression("late-clock-reseed-restores-whole-package",self.api("hypothetical-1606")==baseline["hypothetical-1606"])
         self.delete("SOP-OPS-9-V3", "EVIDENCED_BY", "SRC-SOP-CURRENT-V3")
         mutated = self.api("mainline-1605")["evidence"]["witnesses"][0]["projection"]
         self.check("mutation-sensitivity", "v3-source-dependent", mutated == source_case("timeline", "separate-evidence-edge-removals")["v3_source_evidence_edge_removal"]["projection"])
@@ -311,7 +342,7 @@ def main():
                 v.check("repeat-reconnect-read-only","owned-cleanup",all(v.cleanup.values()))
                 assert all(v.coverage[g["id"]] == set(g["assertions"]) for g in matrix["groups"]), "missing mapped assertions"
             except Exception as exc: error=str(exc)
-        report={"status":"FAIL" if error else "PASS","error":error,"mapped_assertion_count":len(v.assertions),"assertions":v.assertions,"coverage":{k:sorted(s) for k,s in v.coverage.items()},"cleanup":v.cleanup,"database":v.db.database,"query_count":v.db.query_count,"oracle_hashes":PINNED}
+        report={"status":"FAIL" if error else "PASS","error":error,"mapped_assertion_count":len(v.assertions),"assertions":v.assertions,"regressions":v.regressions,"coverage":{k:sorted(s) for k,s in v.coverage.items()},"cleanup":v.cleanup,"database":v.db.database,"query_count":v.db.query_count,"oracle_hashes":PINNED}
         (args.evidence_dir/"live.json").write_text(json.dumps(report,indent=2))
         print(json.dumps({"status":report["status"],"assertions":len(v.assertions),"report":str(args.evidence_dir/"live.json")}))
     return bool(error)

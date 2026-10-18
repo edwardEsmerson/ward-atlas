@@ -18,6 +18,7 @@ from urllib.parse import parse_qs
 import zipfile
 
 from wardatlas_shift_board import normalize_timestamp
+from wardatlas_source_branch import SOURCE_ID as BRANCH_SOURCE_ID
 
 CONTEXTS = ("outage-snapshot", "sop-mainline", "sop-hypothetical")
 FILES = ("evidence.json", "report.html", "manifest.json")
@@ -126,6 +127,13 @@ def capture_evidence(service, selection, *, captured_at=None):
                     matching = next((c for c in mainline["claims"] if c["version_id"] == claim["version_id"] and c["source"]["id"] == source["id"]), None)
                     if matching:
                         actual = matching["source"]["observed_at"]
+                # Mainline claims are cutoff-filtered: absence there does not
+                # turn an assumed observation into a source fact. The accepted
+                # branch witness carries the actual clock even past cutoff.
+                # Its one-source scope must never rewrite V2 or another source
+                # merely because they happen to share the assumed timestamp.
+                if scenario and source["id"] == BRANCH_SOURCE_ID:
+                    actual = scenario["actual_source_observed_at"]
                 fact = deepcopy(claim)
                 if actual and actual != source["observed_at"]:
                     fact["source"]["observed_at"] = actual

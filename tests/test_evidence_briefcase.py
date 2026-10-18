@@ -82,6 +82,33 @@ class BriefcaseTests(unittest.TestCase):
         self.assertEqual(s['observed_at'],'2026-10-14T16:04:00Z')
         self.assertEqual(s['projected_observed_at'],'2026-10-14T16:06:00Z')
         self.assertEqual(e['source_facts'][1]['claim']['source']['observed_at'],'2026-10-14T16:04:00Z')
+    def test_actual_clock_after_cutoff_comes_from_branch_witness(self):
+        class LaterActual(LiteralService):
+            def decision_source_branch(self, stamp):
+                value=super().decision_source_branch(stamp)
+                value['mainline']=source_case('timeline','separate-evidence-edge-removals')['v3_source_evidence_edge_removal']['projection']
+                value['hypothetical_branch']['scenario']['actual_source_observed_at']='2026-10-14T16:07:00Z'
+                return value
+        b=bundle('hypothetical-1606',LaterActual('hypothetical-1606'));e=b['evidence']
+        v3=next(s for s in e['source_occurrences'] if s['source_id']=='SRC-SOP-CURRENT-V3')
+        self.assertEqual(v3['observed_at'],'2026-10-14T16:07:00Z')
+        self.assertEqual(v3['projected_observed_at'],'2026-10-14T16:06:00Z')
+        fact=next(f['claim'] for f in e['source_facts'] if f['type']=='unverified-sop-claim' and f['claim']['source']['id']=='SRC-SOP-CURRENT-V3')
+        self.assertEqual(fact['source']['observed_at'],'2026-10-14T16:07:00Z')
+        files=read_archive_bytes(base64.b64decode(b['zip_base64']))
+        self.assertIn(b'2026-10-14T16:07:00Z',files['report.html'])
+    def test_branch_clock_never_applies_to_another_source_at_assumed_time(self):
+        class SameTime(LiteralService):
+            def decision_source_branch(self,stamp):
+                value=super().decision_source_branch(stamp)
+                value['mainline']['claims']=[]
+                value['hypothetical_branch']['scenario']['actual_source_observed_at']='2026-10-14T16:07:00Z'
+                value['hypothetical_branch']['projection']['claims'][0]['source']['observed_at']='2026-10-14T16:06:00Z'
+                return value
+        e=bundle('hypothetical-1606',SameTime('hypothetical-1606'))['evidence']
+        v2=next(s for s in e['source_occurrences'] if s['source_id']=='SRC-SOP-CURRENT-V2')
+        self.assertEqual(v2['observed_at'],'2026-10-14T16:06:00Z')
+        self.assertNotIn('projected_observed_at',v2)
     def test_hypothetical_1605_no_future_id_or_record_fallback(self):
         e=bundle('hypothetical-1605')['evidence']
         self.assertNotIn('SOP-OPS-9-V3',json.dumps(e))

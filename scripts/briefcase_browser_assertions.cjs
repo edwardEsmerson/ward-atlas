@@ -30,6 +30,13 @@ function readZip(file) {
     const files=readZip(zip);
     check(view+' exact report bytes '+serial,files['report.html'].equals(Buffer.from(bundle.report_html,'utf8')));
     const evidence=JSON.parse(files['evidence.json']);
+    const lateClock=mode==='source-clock-mutation'&&evidence.selection.context==='sop-hypothetical'&&evidence.selection.known_at==='2026-10-14T16:06:00Z';
+    if(lateClock){
+      const citation=evidence.source_occurrences.find(s=>s.source_id==='SRC-SOP-CURRENT-V3');
+      const fact=evidence.source_facts.find(f=>f.type==='unverified-sop-claim'&&f.claim.source.id==='SRC-SOP-CURRENT-V3');
+      check(view+' actual late source clock in downloaded JSON',citation?.observed_at==='2026-10-14T16:07:00Z'&&citation?.projected_observed_at==='2026-10-14T16:06:00Z'&&fact?.claim.source.observed_at==='2026-10-14T16:07:00Z');
+      check(view+' unrelated V2 source clock unchanged',evidence.source_occurrences.find(s=>s.source_id==='SRC-SOP-CURRENT-V2')?.observed_at==='2026-10-14T16:00:00Z');
+    }
     check(view+' downloaded selection equals displayed '+serial,JSON.stringify(evidence.selection)===JSON.stringify(bundle.evidence.selection));
     check(view+' exact evidence JSON semantic '+serial,JSON.stringify(evidence)===JSON.stringify(bundle.evidence));
     const manifest=JSON.parse(files['manifest.json']);
@@ -41,6 +48,12 @@ function readZip(file) {
     offline.on('request',r=>{if(/^https?:/.test(r.url()))report.offline_network_requests.push(r.url());});
     await offline.goto('file://'+path.resolve(html));
     const text=await offline.locator('main').innerText();
+    if(lateClock){
+      const citations=await offline.locator('section').filter({has:offline.getByRole('heading',{name:'Citation occurrences · ID / title / observation UTC',exact:true})}).innerText();
+      const facts=await offline.locator('section').filter({has:offline.getByRole('heading',{name:'Source facts · unverified claims remain claims',exact:true})}).innerText();
+      check(view+' actual and assumed clocks in downloaded offline citation section',citations.includes('2026-10-14T16:07:00Z')&&citations.includes('2026-10-14T16:06:00Z'));
+      check(view+' actual clock in downloaded offline source facts',facts.includes('2026-10-14T16:07:00Z'));
+    }
     check(view+' offline warning '+serial,text.includes('not current truth')&&text.includes('not a signature'));
     check(view+' offline selection and capture '+serial,Object.values(evidence.selection).every(v=>text.includes(v))&&text.includes(evidence.captured_at));
     check(view+' offline every citation occurrence '+serial,evidence.source_occurrences.every(s=>text.includes(s.source_id)&&text.includes(s.title)&&text.includes(s.observed_at)&&(!s.projected_observed_at||text.includes(s.projected_observed_at))));
