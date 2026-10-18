@@ -2,6 +2,19 @@
 
 **Hospital operations lose continuity when an outage, an ownership roster and contradictory SOPs live in separate places.** WardAtlas connects them into an evidence-linked control room for the **Company Brain** track: see who is affected, why that role is accountable, and what remains unknown—without turning an unverified SOP claim into a procedure.
 
+## Play the evidence time machine
+
+Open **Evidence time machine** from the control room (`/time-machine`). Play, pause, step or scrub four mainline knowledge frames and explicitly switch to two hypothetical frames. This is a live typed relationship graph, not a cached animation: every selected frame reuses the accepted FalkorDB timeline/branch services. An early frame reveals no future source or decision-record identity. Inspect any node/link with keyboard arrows or the evidence detail list. Solid unverified-claim edges and dashed graph-derived links have textual labels; mobile stacks the graph and details, with reduced-motion support.
+
+`GET /api/replay-frame?frame=3&mode=mainline&scope=operations` returns only that frame. Mainline indices **0–3** select **15:59:59, 16:00, 16:04, 16:05 UTC on 2026-10-14**; hypothetical indices **4–5** select **16:05, 16:06 UTC**. Frame and mode are required exactly once; optional scope is operations-only. The hypothetical V3 observation remains actually **16:04**, with a separately labeled **16:06 assumption**, never a source correction or resolved conflict. Missing branch support is generic unknown without fallback. Offline graph access is unavailable, never canned facts. Playback reset changes no scenario, action or watch data.
+
+```sh
+python3 scripts/verify_evidence_replay.py --all --require-live-falkordb --desktop-mobile --assert-keyboard --assert-reduced-motion --fail-on-zero
+python3 -m unittest tests.test_evidence_replay
+```
+
+These checks passed in the builder and a fresh source-only clone: **12 groups / 85 mapped live assertions**, **18 focused tests**, real FalkorDB, cold/reseed/reconnect, owned mutations, ACL/decoy invariance, keyboard/reduced-motion desktop/mobile, abort-ignoring response races and cleanup. The live check bootstraps the existing digest-pinned module locally, selects free lane/ephemeral ports (or accepts `--db-port` / `--app-port`), and overwrites only its own reports/screenshots under `$WORKSHOP_RUN_DIR/evidence-replay/`. No new queries, fixtures, writes or model route. Supervisor integration acceptance remains separate from builder evidence.
+
 ## Start with your FalkorDB server
 
 Requires **Python 3.10+ and an existing FalkorDB 6.x+ server**, reachable without authentication. No Python packages, model API or Docker are required by the app. From this repository:

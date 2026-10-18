@@ -1,0 +1,40 @@
+{
+  "schema_version":1,"candidate_output_is_oracle":false,
+  "purpose":"Six live read-only frames; unknown support never proves absence, resolution, ownership or safety.",
+  "pinned_sources":[
+    {"path":"contracts/decision-knowledge-timeline/expected-results.json","sha256":"8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"},
+    {"path":"contracts/decision-source-branch/expected-results.json","sha256":"e209aeab5af266abd6940619727295ea50c0ad2707f47c2d4df37d24cb37da23"}
+  ],
+  "sources":[
+    {"id":"SRC-SOP-CURRENT-V2","title":"Synthetic SOP-OPS-9 Current Text v2","observed_at":"2026-10-14T16:00:00Z"},
+    {"id":"SRC-SOP-CURRENT-V3","title":"Synthetic SOP-OPS-9 Current Text v3","observed_at":"2026-10-14T16:04:00Z"},
+    {"id":"SRC-DEC-OPS-9-REVIEW-01","title":"Synthetic Decision Register: SOP-OPS-9 Reconciliation","observed_at":"2026-10-14T16:05:00Z"}
+  ],
+  "record":{"id":"DEC-OPS-9-REVIEW-01","title":"SOP-OPS-9 claim reconciliation review","recorded_state":"open-unresolved","recorded_statement":"No version is selected as authoritative in this synthetic record."},
+  "allowed_relationships":["APPLIES_TO","CLAIMS_ROLE","EVIDENCED_BY","SOP_CONFLICT","TRACKS","CONSIDERS"],
+  "edge_definitions":{
+    "apply2":"SOP-OPS-9-V2|APPLIES_TO|CONVEYOR-C4",
+    "claim2":"SOP-OPS-9-V2|CLAIMS_ROLE|ROLE-FACILITIES-DUTY",
+    "evidence2":"SOP-OPS-9-V2|EVIDENCED_BY|SRC-SOP-CURRENT-V2",
+    "apply3":"SOP-OPS-9-V3|APPLIES_TO|CONVEYOR-C4",
+    "claim3":"SOP-OPS-9-V3|CLAIMS_ROLE|ROLE-MATERIALS-LEAD",
+    "evidence3":"SOP-OPS-9-V3|EVIDENCED_BY|SRC-SOP-CURRENT-V3",
+    "conflict":"SOP-OPS-9-V2|SOP_CONFLICT|SOP-OPS-9-V3",
+    "tracks":"REGISTER-OPS-DECISIONS-01|TRACKS|DEC-OPS-9-REVIEW-01",
+    "record-evidence":"DEC-OPS-9-REVIEW-01|EVIDENCED_BY|SRC-DEC-OPS-9-REVIEW-01",
+    "considers2":"DEC-OPS-9-REVIEW-01|CONSIDERS|SOP-OPS-9-V2",
+    "considers3":"DEC-OPS-9-REVIEW-01|CONSIDERS|SOP-OPS-9-V3"
+  },
+  "frames":[
+    {"frame":0,"mode":"mainline","known_at":"2026-10-14T15:59:59Z","source_ref":"decision-knowledge-timeline#before-first-observation","unknown":true,"claims":[],"sources":[],"record":false,"conflict":false,"considers":[],"edges":[]},
+    {"frame":1,"mode":"mainline","known_at":"2026-10-14T16:00:00Z","source_ref":"decision-knowledge-timeline#v2-observation-boundary","unknown":false,"claims":["SOP-OPS-9-V2"],"sources":["SRC-SOP-CURRENT-V2"],"record":false,"conflict":false,"considers":[],"edges":["apply2","claim2","evidence2"]},
+    {"frame":2,"mode":"mainline","known_at":"2026-10-14T16:04:00Z","source_ref":"decision-knowledge-timeline#v3-and-graph-derived-conflict","unknown":false,"claims":["SOP-OPS-9-V2","SOP-OPS-9-V3"],"sources":["SRC-SOP-CURRENT-V2","SRC-SOP-CURRENT-V3"],"record":false,"conflict":true,"considers":[],"edges":["apply2","claim2","evidence2","apply3","claim3","evidence3","conflict"]},
+    {"frame":3,"mode":"mainline","known_at":"2026-10-14T16:05:00Z","source_ref":"decision-knowledge-timeline#record-source-boundary","unknown":false,"claims":["SOP-OPS-9-V2","SOP-OPS-9-V3"],"sources":["SRC-SOP-CURRENT-V2","SRC-SOP-CURRENT-V3","SRC-DEC-OPS-9-REVIEW-01"],"record":true,"conflict":true,"considers":["SOP-OPS-9-V2","SOP-OPS-9-V3"],"edges":["apply2","claim2","evidence2","apply3","claim3","evidence3","conflict","tracks","record-evidence","considers2","considers3"]},
+    {"frame":4,"mode":"hypothetical","known_at":"2026-10-14T16:05:00Z","source_ref":"decision-source-branch#branch-at-16-05-suppression","unknown":false,"claims":["SOP-OPS-9-V2"],"sources":["SRC-SOP-CURRENT-V2","SRC-DEC-OPS-9-REVIEW-01"],"record":true,"conflict":false,"considers":["SOP-OPS-9-V2"],"edges":["apply2","claim2","evidence2","tracks","record-evidence","considers2"]},
+    {"frame":5,"mode":"hypothetical","known_at":"2026-10-14T16:06:00Z","source_ref":"decision-source-branch#branch-at-16-06-restoration","unknown":false,"claims":["SOP-OPS-9-V2","SOP-OPS-9-V3"],"sources":["SRC-SOP-CURRENT-V2","SRC-SOP-CURRENT-V3","SRC-DEC-OPS-9-REVIEW-01"],"record":true,"conflict":true,"considers":["SOP-OPS-9-V2","SOP-OPS-9-V3"],"actual_observed_at":"2026-10-14T16:04:00Z","assumed_observed_at":"2026-10-14T16:06:00Z","edges":["apply2","claim2","evidence2","apply3","claim3","evidence3","conflict","tracks","record-evidence","considers2","considers3"]}
+  ],
+  "mutations":{"missing_branch_edges":["HAS_HYPOTHETICAL_OBSERVATION","FOR_SOURCE"],"unknown_fallback":false,"v3_evidence_removed_matches_frame":4,"reseed_restores":true},
+  "policy":{"live_only":true,"read_only":true,"preload_future_evidence":false,"reset_changes_data":false,"source_fact_modified":false,"negative_conclusion_asserted":false},
+  "invalid_queries":["","frame=0","mode=mainline","frame=6&mode=mainline","frame=-1&mode=mainline","frame=00&mode=mainline","frame=0&frame=1&mode=mainline","frame=0&mode=mainline&mode=mainline","frame=0&mode=other","frame=0&mode=hypothetical","frame=4&mode=mainline","frame=0&mode=mainline&scope=restricted","frame=0&mode=mainline&scope=operations&scope=operations","frame=0&mode=mainline&node=anything","frame=0&mode=mainline&scope="],
+  "tripwires":["RESTRICTED","DECOY","canary 77","north annex diversion"]
+}

@@ -1,5 +1,11 @@
 # WardAtlas morning status — 2026-10-17
 
+## 2026-10-18 Evidence time machine — builder + source-only checkpoint
+
+- `/time-machine`, linked from the control room, and `GET /api/replay-frame` replay six live typed relationship frames directly from the accepted timeline/branch services. Play/pause/step/scrub, explicit mode switching, keyboard graph traversal/evidence list, non-color labels, reduced motion and stacked mobile work without new graph queries, fixtures, action/watch writes or model access.
+- Oracle/matrix committed before behavior in `fe37799`; implementation `3b6aad1`. Both exact README replay commands pass after merging current main and in a fresh source-only clone: **18 focused tests; 12 live groups / 85 mapped assertions; FalkorDB 60002; all five owned-cleanup checks true**. Reports/screenshots are `$WORKSHOP_RUN_DIR/evidence-replay/`; fresh-clone evidence is `$WORKSHOP_RUN_DIR/source-only/evidence-replay/` for this build run. Canonical supervisor verification remains separate.
+- The first live run failed a new verifier predicate: a denied V3 source also removes the complete branch witness. The corrected predicate requires mainline V2/record retention but hypothetical generic unknown, matching the unchanged original oracle; all original outcomes remain pinned. No replay source fact or scenario is modified. No clinical, deployment, independent acceptance or participant-eligibility claim. Next step: integrate and use the time-machine sequence in the existing private demo.
+
 ## 2026-10-18 Evidence resilience — builder increment
 
 - `/resilience` and `GET /api/evidence-resilience` add three bounded read-only modes, parameterized `GRAPH.RO_QUERY` traversals, side-by-side witnesses/source cards, generic unknown for unsupported omissions, and a GET-only reset. No new fixture or state schema.

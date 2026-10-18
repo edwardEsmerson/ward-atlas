@@ -1,0 +1,17 @@
+{
+  "schema_version":1,"candidate_output_is_oracle":false,"expected_path":"contracts/evidence-replay/expected-results.json",
+  "groups":[
+    {"id":"frame-0","assertions":["exact-edges","exact-nodes","exact-sources","record-gated","epistemic-types","no-hindsight"]},
+    {"id":"frame-1","assertions":["exact-edges","exact-nodes","exact-sources","record-gated","epistemic-types","no-hindsight"]},
+    {"id":"frame-2","assertions":["exact-edges","exact-nodes","exact-sources","record-gated","epistemic-types","no-hindsight"]},
+    {"id":"frame-3","assertions":["exact-edges","exact-nodes","exact-sources","record-gated","epistemic-types","no-hindsight"]},
+    {"id":"frame-4","assertions":["exact-edges","exact-nodes","exact-sources","record-gated","epistemic-types","no-hindsight"]},
+    {"id":"frame-5","assertions":["exact-edges","exact-nodes","exact-sources","record-gated","epistemic-types","no-hindsight","actual-time","assumed-time","v2-unchanged"]},
+    {"id":"cold","assertions":["all-unknown","identity-free","no-counts","browser-empty","not-canned"]},
+    {"id":"mutations","assertions":["branch-edge-unknown","source-edge-unknown","no-fallback","v3-evidence-suppressed","v2-record-retained","mainline-isolated","reseed-restores","browser-unknown"]},
+    {"id":"privacy","assertions":["decoy-api","restricted-api","desktop-invariant","mobile-invariant","accessibility-invariant","no-tripwires","denied-source-suppressed"]},
+    {"id":"validation","assertions":["all-rejected","duplicate-frame","duplicate-mode","duplicate-scope","zero-queries","no-state-writes"]},
+    {"id":"lifecycle","assertions":["repeat-seed","reconnect","graph-readonly","actions-readonly","watches-readonly","reset-selector-only","owned-cleanup","root-link"]},
+    {"id":"browser","assertions":["six-live-frames","desktop","mobile","keyboard-nodes","keyboard-edges","evidence-list","reduced-motion","stale-response","rapid-controls","unload-cancels","no-future-dom","unavailable"]}
+  ]
+}
