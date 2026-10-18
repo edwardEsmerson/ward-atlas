@@ -36,6 +36,11 @@ each already matches. Their individual exact-text SHA-256 values are:
 - GET block: `eb1ce2d1d15c77a7f6fd8b709cc0870d2966e7a26240ab086f8e5eac02521994`
 - POST block: `e27ff7f0577d929729b089a64db9688ca3675af64c59493546b4d3fff25e3287`
 
+These are admission-time hashes. This recovery subsequently adds two focused
+verifier tests and checks **both** expected-group and matrix source pointers
+before live behavior, including the individually referenced V2/V3 claims.
+Neither the preserved draft nor any frozen oracle is modified.
+
 ## Acceptance, not inherited claims
 
 Run the two original commands unchanged from fresh tracked source:
@@ -52,3 +57,10 @@ verifier process is not an independent human oracle: independence comes from the
 frozen accepted source expectations and adversarial checks. Supervisor integration
 is a further acceptance step. No live inference, credentials, publication or
 human eligibility certification is required or claimed here.
+
+Recovery verification of `5179013`: both commands passed in the builder and in a
+source-only checkout with no preinstalled `.local/`. The latter bootstrapped the
+pinned module, reported actual FalkorDB `60002`, passed all 11 / 78 mappings,
+25 unit tests, desktop/mobile/keyboard and model-stub checks, and confirmed all
+owned-resource cleanup. Evidence is recorded in the morning-status checkpoint;
+this does not promote the failed original task or claim supervisor acceptance.
