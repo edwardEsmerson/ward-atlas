@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "candidate_output_is_oracle": false,
+  "groups": [
+    {"id": "exact-owner", "assertions": ["baseline-paths", "baseline-sources", "baseline-knowledge", "omitted-paths", "omission-edge", "dependent-unknown", "unchanged-knowledge"]},
+    {"id": "exact-v3", "assertions": ["baseline-two-claims", "baseline-conflict", "omitted-projection", "record-retained", "only-v2-considered", "no-winner-resolution", "support-cards"]},
+    {"id": "reset-invariance", "assertions": ["reset-baseline", "mainline-api", "stored-facts", "graph-unchanged", "state-unchanged"]},
+    {"id": "empty-unknown", "assertions": ["baseline-unknown", "owner-unknown", "v3-unknown", "no-identities", "no-existence-hints"]},
+    {"id": "mutation-sensitivity", "assertions": ["owner-edge-real", "owner-unsupported", "service-source-required", "v3-edge-real", "v3-unsupported", "timestamp-sensitive", "reseed-restores"]},
+    {"id": "decoy-denied", "assertions": ["decoy-excluded", "injection-connected", "full-api-invariant", "desktop-dom-invariant", "mobile-dom-invariant", "no-tripwires", "denied-witness-generic"]},
+    {"id": "reject-before-query", "assertions": ["invalid-mode", "duplicate-mode", "invalid-scope", "duplicate-scope", "arbitrary-input", "zero-queries", "state-unchanged"]},
+    {"id": "repeat-browser-cleanup", "assertions": ["repeat-exact", "reseed-node-delta", "reseed-edge-delta", "reconnect", "read-only", "keyboard", "desktop", "mobile", "root-link", "owned-cleanup"]}
+  ],
+  "minimum_groups": 8,
+  "minimum_assertions": 40,
+  "focused_mutations": ["baseline-as-hypothesis", "hardcoded-unchanged-paths", "unknown-as-safe", "unsupported-omission", "changed-timestamp", "zero-mappings", "missing-evidence", "denied-witness", "arbitrary-input", "duplicate-mode"]
+}

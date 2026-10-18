@@ -30,6 +30,7 @@ from verify_falkordb_live import (
     text,
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
+from wardatlas_resilience import experiment as resilience_experiment, validate_request as validate_resilience_request
 from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
 from wardatlas_knowledge_timeline import (
     build_queries as build_knowledge_timeline_queries,
@@ -86,7 +87,7 @@ from wardatlas_shift_board import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-GRAPH_NAME_RE = re.compile(r"^wardatlas_(?:test|ui)_[A-Za-z0-9_-]{12,80}$")
+GRAPH_NAME_RE = re.compile(r"^wardatlas_(?:test|ui|attach)_[A-Za-z0-9_-]{12,80}$")
 APP_HTML = r'''<!doctype html>
 <html lang="en">
 <head>
@@ -315,6 +316,7 @@ APP_HTML = r'''<!doctype html>
       <div class="top-actions"><a class="button" href="/knowledge-diff" aria-label="Explain answer differences">Knowledge diff</a><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
+      <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
         <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
@@ -979,15 +981,18 @@ def utc_now() -> str:
 
 
 class WardAtlasService:
-    def __init__(self, db_port: int, graph_name: str, state_dir: Path):
+    def __init__(self, db_port: int, graph_name: str, state_dir: Path, db_host: str = "127.0.0.1"):
         if not (1024 <= db_port <= 65535):
             raise ValueError("database port must be an explicitly selected high port")
         if not GRAPH_NAME_RE.fullmatch(graph_name):
             raise ValueError("graph name must use the wardatlas_ prefix and safe characters")
+        if not db_host or any(c.isspace() for c in db_host) or "/" in db_host or "://" in db_host:
+            raise ValueError("database host must be an explicit hostname or IP, not a URL")
         resolved_state = state_dir.resolve()
         if not resolved_state.is_relative_to(ROOT):
             raise ValueError("local action state must remain inside the project workspace")
         self.db_port = db_port
+        self.db_host = db_host
         self.graph_name = graph_name
         self.state_dir = resolved_state
         self.action_file = self.state_dir / "confirmed-actions.json"
@@ -1000,7 +1005,7 @@ class WardAtlasService:
         self.scenario_seeded_by_this_process = False
 
     def _connection(self) -> RespConnection:
-        return RespConnection("127.0.0.1", self.db_port, timeout=3.0)
+        return RespConnection(self.db_host, self.db_port, timeout=3.0)
 
     def _rows(self, connection: RespConnection, cypher: str) -> list[dict]:
         return result_rows(query_result(connection.command("GRAPH.QUERY", self.graph_name, cypher)))
@@ -1011,8 +1016,8 @@ class WardAtlasService:
             try:
                 modules = module_list_maps(connection.command("MODULE", "LIST"))
                 module = next((row for row in modules if str(row.get("name", "")).lower() in {"graph", "falkordb"}), None)
-                if not module or int(module.get("ver", 0)) != 60002:
-                    raise RuntimeError("FalkorDB 6.0.2 graph module is not available")
+                if not module or int(module.get("ver", 0)) < 60000:
+                    raise RuntimeError("FalkorDB 6.x or newer graph module is not available")
                 rows = self._rows(connection, "RETURN 1 AS ready")
                 if len(rows) != 1 or int(rows[0].get("ready", 0)) != 1:
                     raise RuntimeError("FalkorDB graph query health check failed")
@@ -1160,6 +1165,18 @@ class WardAtlasService:
             witness,
             stale,
         )
+
+    def evidence_resilience(self, mode: str = "baseline") -> dict:
+        # Input validation precedes opening a connection. GRAPH.RO_QUERY adds
+        # a database-enforced read-only boundary around both pane traversals.
+        validate_resilience_request("mode=" + mode)
+        with self.graph_lock:
+            connection = self._connection()
+            try:
+                return resilience_experiment(mode, lambda query: result_rows(query_result(
+                    connection.command("GRAPH.RO_QUERY", self.graph_name, query))))
+            finally:
+                connection.close()
 
     def decision_docket(self) -> dict:
         """Read the operations docket through its register and source edges."""
@@ -1767,6 +1784,15 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if parsed.path == "/":
                 self._send(200, APP_HTML)
+            elif parsed.path == "/resilience":
+                self._send(200, (ROOT / "scripts/ui/resilience.html").read_text(encoding="utf-8"))
+            elif parsed.path == "/api/evidence-resilience":
+                try:
+                    mode = validate_resilience_request(parsed.query)
+                except ValueError:
+                    self._error(400, "Invalid evidence experiment request.")
+                    return
+                self._send(200, service.evidence_resilience(mode))
             elif parsed.path == "/knowledge-diff":
                 self._send(200, (ROOT / "scripts/ui/knowledge_diff.html").read_text(encoding="utf-8"))
             elif parsed.path == "/api/knowledge-diff":
@@ -1951,12 +1977,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--app-port", type=int, required=True)
     parser.add_argument("--db-port", type=int, required=True)
+    parser.add_argument("--db-host", default="127.0.0.1")
     parser.add_argument("--graph-name", required=True)
     parser.add_argument("--state-dir", type=Path, default=ROOT / ".local/wardatlas-state")
     args = parser.parse_args()
     if not (1024 <= args.app_port <= 65535):
         parser.error("app port must be an explicitly selected high port")
-    service = WardAtlasService(args.db_port, args.graph_name, args.state_dir)
+    service = WardAtlasService(args.db_port, args.graph_name, args.state_dir, db_host=args.db_host)
     try:
         server = WardAtlasHTTPServer(("127.0.0.1", args.app_port), Handler, service)
     except OSError as exc:

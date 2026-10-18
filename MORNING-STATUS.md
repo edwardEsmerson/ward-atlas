@@ -1,5 +1,11 @@
 # WardAtlas morning status — 2026-10-17
 
+## 2026-10-18 Evidence resilience — builder increment
+
+- `/resilience` and `GET /api/evidence-resilience` add three bounded read-only modes, parameterized `GRAPH.RO_QUERY` traversals, side-by-side witnesses/source cards, generic unknown for unsupported omissions, and a GET-only reset. No new fixture or state schema.
+- Commands: `python3 -m unittest tests.test_resilience`; `python3 scripts/verify_resilience.py --all --require-live-falkordb --desktop-mobile --fail-on-zero`.
+- Frozen oracle commit: `122c555`. Eight groups / 55 live mapped assertions; unit suite includes deliberate bad-output mutations. Reports: `$WORKSHOP_RUN_DIR/resilience/live.json` and desktop/mobile browser reports/screenshots. Fresh supervisor verification remains separate; no real-hospital, clinical, eligibility, or safety claim.
+
 ## Ask recovery — 2026-10-18 fresh-source checkpoint
 
 - Recovery commit `5179013` preserves the already-integrated Ask workflow and oracle `8877158`; source/mount hashes and non-destructive reconciliation are in `docs/questions-recovery.md`. Earlier failed task status is not reset. The only code change tightens verifier source-pointer preflight; no product behavior or oracle bytes changed.

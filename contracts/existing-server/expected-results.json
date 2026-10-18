@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "oracle": "Literal lifecycle expectations authored before attachment behavior. Original tests/expected-results.json remains the independent synthetic graph oracle; no mutable delivery evidence is a check input.",
+  "groups": [
+    {"id":"actual-supplied-server","expected":{"module_minimum":60000,"database":"FalkorDB","seeded_paths":2,"server_survives":true}},
+    {"id":"explicit-host-port","expected":{"hosts":["127.0.0.1","localhost"],"explicit_db_port_preserved":true,"legacy_constructor_host":"127.0.0.1","legacy_cli_preserved":true}},
+    {"id":"app-port-collision","expected":{"exit_code":2,"database_connections":0,"occupant_connections":0,"sentinel_unchanged":true}},
+    {"id":"unique-owned-resources","expected":{"graph_prefix":"wardatlas_attach_","unique_graph":true,"unique_state":true,"sentinel_unchanged":true}},
+    {"id":"sigint-cleanup","expected":{"exit_code":0,"owned_graph_removed":true,"owned_state_removed":true,"app_listener_closed":true,"server_survives":true,"sentinel_unchanged":true}},
+    {"id":"startup-failure","expected":{"exit_code":2,"no_ready":true,"owned_graph_removed":true,"owned_state_removed":true,"server_survives":true,"sentinel_unchanged":true}},
+    {"id":"repeat-run","expected":{"runs":2,"distinct_graphs":true,"distinct_states":true,"api_paths_equal":true,"server_survives":true}},
+    {"id":"desktop-mobile-home","expected":{"viewports":[[1440,1000],[390,844]],"title":"WardAtlas","incident":"INC-204","no_horizontal_overflow":true,"no_page_errors":true,"api_browser_parity":true}}
+  ]
+}

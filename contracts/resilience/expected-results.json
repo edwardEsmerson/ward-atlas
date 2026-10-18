@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "purpose": "Candidate-independent single supporting-edge omission; frozen before query behavior. Exact nested source projections are referenced by literal case IDs and verified hashes, not learned from candidate output.",
+  "sources": {
+    "tests/expected-results.json": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+    "contracts/decision-knowledge-timeline/expected-results.json": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"
+  },
+  "as_of": "2026-10-14T18:30:00Z",
+  "known_at": "2026-10-14T16:05:00Z",
+  "modes": ["baseline", "omit-central-sterile-owner", "omit-v3-evidence"],
+  "baseline": {
+    "ownership_state": "evidence-backed",
+    "paths": [
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+    ],
+    "path_evidence_source_pointer": "tests/expected-results.json#/expected_evidence_by_path",
+    "knowledge_source_case": "record-source-boundary"
+  },
+  "omit-central-sterile-owner": {
+    "omission": {"from": "DEPT-CENTRAL-STERILE", "relationship": "OWNED_BY", "to": "ROLE-STERILE-OPS-COORD"},
+    "ownership_state": "incomplete/unknown",
+    "paths": [["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]],
+    "knowledge_source_case": "record-source-boundary",
+    "dependent_evidence_state": "unknown",
+    "role_disappearance_asserted": false
+  },
+  "omit-v3-evidence": {
+    "omission": {"from": "SOP-OPS-9-V3", "relationship": "EVIDENCED_BY", "to": "SRC-SOP-CURRENT-V3"},
+    "ownership_state": "evidence-backed",
+    "paths": [
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+    ],
+    "knowledge_source_case": "separate-evidence-edge-removals",
+    "knowledge_source_key": "v3_source_evidence_edge_removal",
+    "version_ids": ["SOP-OPS-9-V2"],
+    "conflict": null,
+    "recorded_state": "open-unresolved",
+    "considered_versions": ["SOP-OPS-9-V2"],
+    "selected_version": null,
+    "resolution_asserted": false
+  },
+  "unsupported": {
+    "mode": null,
+    "omission": null,
+    "dependent_evidence_state": "unknown",
+    "ownership_state": "unknown",
+    "paths": [],
+    "knowledge_source_case": "cold-empty-unknown",
+    "identity_or_existence_hint": false
+  },
+  "mutations": {
+    "owner_edge_removed_paths": [["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]],
+    "service_evidence_removed_paths": [],
+    "v3_evidence_removed_versions": ["SOP-OPS-9-V2"],
+    "v3_observed_at_changed_to": "2026-10-14T16:06:00Z",
+    "changed_timestamp_case": "v3-observation-time-shift",
+    "changed_timestamp_key": "at_16_05"
+  },
+  "invalid_queries": ["mode=invalid", "mode=", "mode=baseline&mode=baseline", "scope=restricted", "scope=operations&scope=operations", "scope=", "node_id=INC-204", "cypher=MATCH", "known_at=2026-10-14T16:06:00Z", "as_of=2026-10-14T19:30:00Z", "source_id=SRC-SOP-CURRENT-V3"],
+  "invariants": {"mainline_unchanged": true, "source_facts_unchanged": true, "graph_writes": 0, "state_writes": 0, "external_writes": 0, "selected_version": null, "resolution_asserted": false, "safe_asserted": false, "role_disappearance_asserted": false},
+  "reseed": {"node_delta": 0, "relationship_delta": 0},
+  "restricted_tripwires": ["SECRET-RESILIENCE", "Restricted resilience canary", "hidden supporting instruction"],
+  "disconnected_tripwires": ["DECOY-RESILIENCE", "Disconnected resilience canary"]
+}
