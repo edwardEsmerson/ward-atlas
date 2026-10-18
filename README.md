@@ -4,6 +4,8 @@ WardAtlas is a local synthetic hospital-operations control room for the Company 
 
 For the short operator-focused private demo path, see the [demo runbook](docs/demo-runbook.md).
 
+For exact source-bound Cypher and graph/evidence/time semantics, see the [FalkorDB query walkthrough](docs/falkordb-query-walkthrough.md).
+
 ## Clean setup and verification
 
 Requirements: Python 3.10+, an existing `redis-server` executable, Node.js and the workshop's local Playwright browser for browser acceptance, and outbound access to the public Docker Hub OCI registry on the first run from a source-only checkout. No Docker daemon/socket, Python package install, account, credentials, `sudo`, or host service change is used. The database binary and provenance receipt are installed under ignored `.local/` only.
