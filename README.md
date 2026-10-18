@@ -1,5 +1,14 @@
 # WardAtlas
 
+**Evidence resilience:** `/resilience`, linked from Shift control, compares live witnesses with one hypothetical missing supporting edge. Only baseline, ownership-support omission, and V3 source-evidence omission are available, at October 14, 18:30Z impact time and 16:05Z source time. Each pane has relationship diagrams and exact source cards. Reset re-reads baseline without changing graph, handover, or watch state. Unknown support never means a vanished role, resolved conflict, selected SOP, or safety. This is a read-only experiment, not an outage cascade or risk score.
+
+```sh
+python3 -m unittest tests.test_resilience
+python3 scripts/verify_resilience.py --all --require-live-falkordb --desktop-mobile --fail-on-zero
+```
+
+This check bootstraps the existing digest-pinned local FalkorDB module, selects two free allocated-lane ports (ephemeral outside the workshop), and cleans its unique graph/process/state. Reports and screenshots overwrite only their own outputs under `$WORKSHOP_RUN_DIR/resilience` (default `.local/resilience-evidence/resilience`). Eight frozen groups map 55 assertions; original oracle hashes are verified first. Builder evidence does not replace fresh independent/integration verification.
+
 WardAtlas is a local synthetic hospital-operations control room for the Company Brain track. It uses actual FalkorDB queries to trace a fictional equipment outage through a service to impacted departments and explicitly current operating roles, preserve source provenance, reveal a stale SOP reference and unresolved conflict, and exclude inaccessible evidence. Its integrated shift board keeps the INC-207 dock roster revision separate from INC-204 conveyor event replay: effective-dated ownership, explicit-edge review candidates, observed restoration, and a forked hypothetical drill are inspectable at pinned times. The responsive UI separates source facts, graph inference and missing evidence. A handover preview carries an inspectable, timestamped snapshot of the exact impact paths and explicit source-backed SOP witness from the existing read-only graph query; missing edges stay incomplete/unknown. The confirmed local action stores that same snapshot only after an explicit confirmation click. It does not send messages, make calls, create tickets, or perform external writes. Fixtures are invented and non-clinical; WardAtlas is not a validated hospital system or medical device.
 
 For the short operator-focused private demo path, see the [demo runbook](docs/demo-runbook.md).

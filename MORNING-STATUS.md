@@ -1,5 +1,11 @@
 # WardAtlas morning status — 2026-10-17
 
+## 2026-10-18 Evidence resilience — builder increment
+
+- `/resilience` and `GET /api/evidence-resilience` add three bounded read-only modes, parameterized `GRAPH.RO_QUERY` traversals, side-by-side witnesses/source cards, generic unknown for unsupported omissions, and a GET-only reset. No new fixture or state schema.
+- Commands: `python3 -m unittest tests.test_resilience`; `python3 scripts/verify_resilience.py --all --require-live-falkordb --desktop-mobile --fail-on-zero`.
+- Frozen oracle commit: `122c555`. Eight groups / 55 live mapped assertions; unit suite includes deliberate bad-output mutations. Reports: `$WORKSHOP_RUN_DIR/resilience/live.json` and desktop/mobile browser reports/screenshots. Fresh supervisor verification remains separate; no real-hospital, clinical, eligibility, or safety claim.
+
 ## 2026-10-18 Ask increment — builder evidence
 
 - Added `/ask` and `POST /api/questions`: three bounded operational intents over the existing live FalkorDB impact/source-time services, exact path provenance, separate facts/derivations/unknowns, and optional canonical-ID-only model layout. No new graph facts, actions, watches, external writes, or live model calls.
