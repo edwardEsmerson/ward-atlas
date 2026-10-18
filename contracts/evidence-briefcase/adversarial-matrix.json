@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "candidate_output_is_oracle": false,
+  "groups": [
+    {"id":"cold-unknown","assertions":["all-contexts-unknown","no-identities","no-sources","no-fallback","no-safety-resolution","offline-unknown"]},
+    {"id":"outage-1830","assertions":["exact-paths","five-nodes","every-source-occurrence","distinct-roster-times","typed-witness","selected-axis"]},
+    {"id":"outage-1930","assertions":["no-active-paths","observed-restoration","no-safety","no-resolution","separate-context"]},
+    {"id":"mainline-1604","assertions":["whole-projection","two-claims","graph-conflict","no-record","exact-citations"]},
+    {"id":"mainline-1605","assertions":["whole-projection","independent-record","record-source-time","considers-links","no-winner"]},
+    {"id":"hypothetical-1605","assertions":["whole-projection","v2-retained","record-retained","no-v3-dependent-output","assumption-labeled"]},
+    {"id":"hypothetical-1606","assertions":["whole-projection","v3-restored","actual-clock","assumed-clock","mainline-unchanged","not-source-truth"]},
+    {"id":"mutation-sensitivity","assertions":["v3-source-dependent","record-source-dependent","ownership-dependent","service-source-required","branch-edge-one-unknown","branch-edge-two-unknown","unrelated-context-unchanged"]},
+    {"id":"permission-invariance","assertions":["connected-injection-real","whole-json-invariant","html-invariant","occurrences-invariant","manifest-invariant","no-tripwires"]},
+    {"id":"reject-before-query","assertions":["all-invalid-400","generic-error","no-service-calls","normalized-offset","no-arbitrary-input","state-unchanged"]},
+    {"id":"archive-browser","assertions":["fixed-members","exact-hashes","downloaded-bytes","offline-desktop","offline-mobile","network-blocked","stale-selection","keyboard-responsive"]},
+    {"id":"repeat-reconnect-read-only","assertions":["repeat-whole-snapshot","idempotent-reseed","new-client-reconnect","graph-unchanged","action-watch-bytes-unchanged","root-link","owned-cleanup"]}
+  ],
+  "focused_adversaries": ["malicious-title-escaping","same-id-distinct-observations","wrong-hash","tamper","duplicate-zip-entry","zip-traversal","zip-oversize","no-actions","stale-selection-download","invalid-context","duplicate-axis","cold-unknown","missing-branch","manifest-not-authentication"]
+}
