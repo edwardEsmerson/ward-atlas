@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d26">
+  <link rel="icon" href="data:,">
+  <title>Knowledge diff · WardAtlas</title>
+  <style>
+    :root { color-scheme:dark; --bg:#0d1720; --panel:#14232d; --line:#30434e; --ink:#edf3f1; --muted:#b0c0c7; --mint:#a4e8cb; --amber:#f4cf91; --blue:#b4d5fb; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:radial-gradient(ellipse at 75% 0,#233e484d,transparent 50%),var(--bg); color:var(--ink); font-size:14px; line-height:1.55; }
+    a { color:inherit; text-decoration-thickness:1px; text-underline-offset:4px; }
+    :focus-visible { outline:3px solid var(--mint); outline-offset:4px; }
+    .skip { position:absolute; left:20px; top:-100px; padding:12px; background:var(--panel); z-index:5; }
+    .skip:focus { top:12px; }
+    .workspace { max-width:1500px; margin:auto; padding:0 clamp(16px,4vw,56px) 48px; }
+    .topbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:24px 0; border-bottom:1px solid var(--line); }
+    .brand { display:flex; align-items:center; gap:12px; font-size:14px; font-weight:750; letter-spacing:.08em; }
+    .mark { display:grid; place-items:center; height:35px; width:35px; border:1px solid #789f91; border-radius:10px; background:#203a33; color:var(--mint); font-size:20px; }
+    .brand small { display:block; font-size:10px; color:var(--muted); letter-spacing:.13em; font-weight:500; }
+    .top-meta { display:flex; align-items:center; flex-wrap:wrap; gap:10px 18px; font-size:12px; color:var(--muted); }
+    .pill { display:inline-flex; align-items:center; border:1px solid #416355; background:#1a302a; color:var(--mint); padding:5px 10px; border-radius:20px; font-size:11px; font-weight:650; }
+    .hero { display:flex; align-items:end; justify-content:space-between; gap:24px; padding:35px 0 28px; }
+    .eyebrow { margin:0 0 10px; color:var(--mint); font-size:10px; letter-spacing:.18em; text-transform:uppercase; font-weight:750; }
+    h1 { margin:0 0 12px; font-size:clamp(32px,4.4vw,54px); font-weight:650; letter-spacing:-.045em; line-height:1.1; }
+    .intro { margin:0; color:var(--muted); max-width:720px; }
+    .jump { flex-shrink:0; border:1px solid #526c71; border-radius:8px; padding:10px 14px; font-size:12px; text-decoration:none; background:#1d303a; }
+    .selection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    fieldset { min-width:0; margin:0; padding:20px; border:1px solid #47665e; border-radius:13px; background:linear-gradient(135deg,#1b302e,#14232d 75%); }
+    fieldset.right { border-color:#4b5f7a; background:linear-gradient(135deg,#222e43,#14232d 75%); }
+    legend { padding:0 8px; color:var(--mint); font-weight:650; font-size:13px; }
+    .right legend { color:var(--blue); }
+    .control-grid { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.3fr); gap:14px; }
+    label { display:grid; gap:7px; color:#c3d1d4; font-size:11px; }
+    select { min-width:0; width:100%; border:1px solid #566b75; border-radius:7px; padding:10px 9px; background:#10212b; color:var(--ink); font:inherit; font-size:12px; cursor:pointer; min-height:43px; }
+    .selection-hint { color:var(--muted); font-size:11px; margin:13px 0 0; }
+    .snapshot { margin-top:16px; padding-top:15px; border-top:1px solid #3a5057; }
+    .snapshot h2 { margin:0 0 7px; font-size:13px; font-weight:650; }
+    .snapshot p { margin:6px 0; font-size:12px; color:var(--muted); }
+    .snapshot .availability { color:var(--mint); }
+    .snapshot .availability.partial,.snapshot .availability.unknown { color:var(--amber); }
+    .scenario { padding:10px 12px; border:1px dashed #65718a; border-radius:7px; margin:12px 0; background:#1b2a3a; }
+    .scenario strong { color:var(--blue); font-size:12px; }
+    .scenario p { font-size:11px; }
+    .summary { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:22px; border:1px solid #3d535d; background:#172832; padding:19px 22px; border-radius:12px; margin:24px 0 12px; }
+    .summary h2 { margin:0 0 5px; font-size:16px; font-weight:650; }
+    #diff-status { margin:0; color:var(--muted); font-size:12px; }
+    .metric { min-width:95px; border-left:1px solid #3d535d; padding-left:22px; }
+    .metric strong { display:block; font-size:29px; font-weight:600; line-height:1.2; color:var(--mint); }
+    .metric span { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+    .boundary { margin:0 0 28px; color:var(--muted); font-size:11px; line-height:1.7; }
+    .boundary strong { color:var(--amber); font-weight:600; }
+    .result-heading { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px; margin:0 0 14px; }
+    .result-heading h2 { margin:0; font-size:19px; letter-spacing:-.02em; }
+    .result-heading p { margin:0; font-size:11px; color:var(--muted); }
+    #knowledge-diff-results { display:grid; gap:14px; }
+    .delta-card { min-width:0; border:1px solid var(--line); border-radius:11px; background:#14232d; overflow:hidden; scroll-margin:18px; }
+    .delta-card[data-status="projected-only-on-left"],.delta-card[data-status="projected-only-on-right"],.delta-card[data-status="changed"] { border-color:#62604c; }
+    .delta-head { display:flex; align-items:start; justify-content:space-between; flex-wrap:wrap; gap:10px 16px; padding:15px 18px; background:#1a2b36; border-bottom:1px solid var(--line); }
+    .delta-head h3 { margin:5px 0 0; font-size:12px; font-weight:500; color:#c8d6da; overflow-wrap:anywhere; }
+    .kind { color:var(--blue); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; }
+    .status-badge { border:1px solid #4c5c66; color:#c2cfd2; padding:4px 8px; border-radius:5px; font-size:10px; }
+    [data-status="projected-only-on-left"] .status-badge,[data-status="projected-only-on-right"] .status-badge,[data-status="changed"] .status-badge { color:var(--amber); border-color:#7a6849; background:#322d23; }
+    [data-status="incomparable"] .status-badge { color:var(--amber); }
+    .witness-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .witness { min-width:0; padding:16px 18px; }
+    .witness + .witness { border-left:1px solid var(--line); }
+    .witness h4 { margin:0 0 11px; font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--mint); }
+    .witness[data-side="right"] h4 { color:var(--blue); }
+    dl { margin:0; min-width:0; }
+    .field { display:grid; grid-template-columns:minmax(80px,.36fr) minmax(0,1fr); gap:8px; padding:5px 0; font-size:11px; border-top:1px solid #30434e66; }
+    .field:first-child { border-top:0; }
+    dt { color:var(--muted); }
+    dd { margin:0; min-width:0; overflow-wrap:anywhere; }
+    dd dl { border-left:1px solid #40525d; padding-left:10px; }
+    dd .field { grid-template-columns:1fr; gap:2px; }
+    .edge { display:block; color:#d4dfdf; font-size:11px; overflow-wrap:anywhere; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .citation { display:block; border-left:2px solid #77b99f; background:#102029; padding:8px 10px; margin:6px 0; font-style:normal; font-size:11px; overflow-wrap:anywhere; }
+    .citation strong { display:block; color:#aee9d0; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:10px; }
+    .citation .source-title { display:block; color:#e1eae6; margin:3px 0; }
+    .citation .source-time { display:block; color:#b8c9cc; font-size:10px; }
+    .citation .assumed { color:var(--blue); }
+    time { overflow-wrap:anywhere; }
+    .value-list { list-style:none; padding:0; margin:0; display:grid; gap:7px; }
+    .unknown-message { color:var(--amber); font-size:12px; margin:0; }
+    .empty-state { border:1px dashed #59646b; border-radius:10px; padding:30px; background:#17242c; }
+    .empty-state h3 { margin:0 0 8px; font-size:16px; color:var(--amber); }
+    .empty-state p { margin:0; color:var(--muted); font-size:12px; }
+    footer { margin-top:28px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:10px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; }
+    @media (max-width:760px) { .hero { display:block; padding:26px 0; } .jump { display:inline-block; margin-top:18px; } .selection-grid,.witness-grid { grid-template-columns:minmax(0,1fr); } .witness + .witness { border-left:0; border-top:1px solid var(--line); } .summary { gap:15px; padding:17px; grid-template-columns:1fr 1fr; } .summary > div:first-child { grid-column:1/-1; } .metric { padding-left:12px; } .control-grid { grid-template-columns:minmax(0,1fr); gap:11px; } fieldset { padding:16px; } .field { grid-template-columns:minmax(0,1fr); gap:3px; } }
+    @media (prefers-reduced-motion:no-preference) { .delta-card { transition:border-color .15s; } .delta-card:focus { border-color:var(--mint); } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#diff-results-heading">Skip to comparison results</a>
+  <main id="knowledge-diff" class="workspace">
+    <header class="topbar">
+      <div class="brand"><span class="mark" aria-hidden="true">W</span><div>WARDATLAS<small>OPERATIONS INTELLIGENCE</small></div></div>
+      <div class="top-meta"><a href="/">← Control room</a><span>Knowledge workspace</span><span>Scope · operations</span><span class="pill">Read-only</span></div>
+    </header>
+    <section class="hero" aria-labelledby="workspace-title">
+      <div><p class="eyebrow">Evidence / Compare snapshots</p><h1 id="workspace-title">What changed in the witness?</h1><p class="intro">Two selections. One inspectable comparison. Explore what the public graph projects at each knowledge cutoff, keeping recorded facts and hypothetical assumptions separate.</p></div>
+      <a class="jump" href="#diff-results-heading">Jump to differences ↓</a>
+    </section>
+    <section aria-label="Two independently selected snapshots" class="selection-grid">
+      <fieldset><legend>01 / Left snapshot</legend>
+        <div class="control-grid">
+          <label for="left-mode">Left snapshot mode<select id="left-mode"><option value="mainline" selected>Mainline</option><option value="hypothetical">Hypothetical</option></select></label>
+          <label for="left-known-at">Left snapshot knowledge cutoff<select id="left-known-at">
+            <option value="2026-10-14T15:59:59Z">2026-10-14 · 15:59:59 UTC</option><option value="2026-10-14T16:00:00Z">2026-10-14 · 16:00:00 UTC</option><option value="2026-10-14T16:04:00Z">2026-10-14 · 16:04:00 UTC</option><option value="2026-10-14T16:05:00Z" selected>2026-10-14 · 16:05:00 UTC</option><option value="2026-10-14T16:06:00Z">2026-10-14 · 16:06:00 UTC</option>
+          </select></label>
+        </div><p class="selection-hint">Independent selection · changing this side leaves the other side unchanged.</p>
+        <section id="left-snapshot" class="snapshot" aria-label="Left snapshot public projection"></section>
+      </fieldset>
+      <fieldset class="right"><legend>02 / Right snapshot</legend>
+        <div class="control-grid">
+          <label for="right-mode">Right snapshot mode<select id="right-mode"><option value="mainline">Mainline</option><option value="hypothetical" selected>Hypothetical</option></select></label>
+          <label for="right-known-at">Right snapshot knowledge cutoff<select id="right-known-at">
+            <option value="2026-10-14T15:59:59Z">2026-10-14 · 15:59:59 UTC</option><option value="2026-10-14T16:00:00Z">2026-10-14 · 16:00:00 UTC</option><option value="2026-10-14T16:04:00Z">2026-10-14 · 16:04:00 UTC</option><option value="2026-10-14T16:05:00Z" selected>2026-10-14 · 16:05:00 UTC</option><option value="2026-10-14T16:06:00Z">2026-10-14 · 16:06:00 UTC</option>
+          </select></label>
+        </div><p class="selection-hint">Independent selection · changing this side leaves the other side unchanged.</p>
+        <section id="right-snapshot" class="snapshot" aria-label="Right snapshot public projection"></section>
+      </fieldset>
+    </section>
+    <section class="summary" aria-labelledby="comparison-heading">
+      <div><h2 id="comparison-heading">Public witness comparison</h2><p id="diff-status" role="status" aria-live="polite" aria-atomic="true">Loading selected snapshots…</p></div>
+      <div class="metric"><strong id="delta-count">—</strong><span>Witness differences</span></div>
+      <div class="metric"><strong id="unchanged-count">—</strong><span>Unchanged witnesses</span></div>
+    </section>
+    <p class="boundary"><strong>Projection, not source truth.</strong> Bounded public witnesses, not a complete history or transaction-isolated snapshot. One-sided projection is not evidence of deletion, absence, resolution, or safety. An unknown side is incomparable; no mainline fallback is used. No owner, procedure, or authoritative winner is selected.</p>
+    <div class="result-heading"><h2 id="diff-results-heading" tabindex="-1">Semantic delta ledger</h2><p>Focus a card · ↑ / ↓ to navigate · Home / End to jump</p></div>
+    <section id="knowledge-diff-results" aria-label="Typed semantic delta witnesses" aria-busy="true"></section>
+    <footer><span>Synthetic operations evidence · No graph edits or external actions</span><span>Claims · Sources · Relationships · Decision records</span></footer>
+  </main>
+  <script>
+    'use strict';
+    (() => {
+      const root = document.getElementById('knowledge-diff');
+      const results = document.getElementById('knowledge-diff-results');
+      const status = document.getElementById('diff-status');
+      const controls = ['left-mode', 'left-known-at', 'right-mode', 'right-known-at'];
+      const kinds = {
+        claim: ['Claim', 'Unverified SOP claim; source observation time is compared separately.'],
+        source_observation: ['Source observation', 'Actual source facts and hypothetical observation assumptions remain distinct.'],
+        conflict_relationship: ['Conflict relationship', 'Graph-derived relationship, not a source quotation or authoritative rule.'],
+        decision_record: ['Decision record', 'Separately sourced recorded state, not a decision inferred by this comparison.'],
+        considered_link: ['Considered link', 'A considered relationship is not an endorsement or selection.'],
+      };
+      const statuses = { unchanged: 'Unchanged', 'projected-only-on-left': 'Projected only on left', 'projected-only-on-right': 'Projected only on right', changed: 'Changed', incomparable: 'Incomparable' };
+      const names = { id: 'ID', version_id: 'Version ID', role_id: 'Role ID', observed_at: 'Actual source observation', assumed_observed_at: 'Hypothetical observation', observation_mode: 'Observation mode', source_quote: 'Source quotation', authoritative_rule: 'Authoritative rule' };
+      let generation = 0;
+      function node(tag, text, className) {
+        const element = document.createElement(tag);
+        if (text !== undefined && text !== null) element.textContent = String(text);
+        if (className) element.className = className;
+        return element;
+      }
+      function label(key) { return names[key] || key.replaceAll('_', ' ').replace(/^./, char => char.toUpperCase()); }
+      function time(value) { const el = node('time', value); el.dateTime = value; return el; }
+      function citation(source) {
+        const el = node('cite', null, 'citation');
+        el.dataset.citationId = source.id;
+        el.dataset.observedAt = source.observed_at;
+        el.append(node('strong', source.id), node('span', source.title, 'source-title'));
+        const actual = node('span', 'Actual source observation · ', 'source-time');
+        actual.append(time(source.observed_at)); el.append(actual);
+        if (source.assumed_observed_at) {
+          const assumed = node('span', 'Hypothetical observation · ', 'source-time assumed');
+          assumed.append(time(source.assumed_observed_at)); el.append(assumed);
+        }
+        for (const key of Object.keys(source).sort()) {
+          if (['id', 'title', 'observed_at', 'assumed_observed_at'].includes(key)) continue;
+          const line = node('div', null, 'source-time');
+          line.append(node('span', label(key) + ' · '), value(source[key])); el.append(line);
+        }
+        return el;
+      }
+      function value(data) {
+        if (data === null || data === undefined) return node('span', 'Not supplied');
+        if (typeof data !== 'object') return typeof data === 'string' && /^\d{4}-\d\d-\d\dT/.test(data) ? time(data) : node('span', data);
+        if (Array.isArray(data)) {
+          const list = node('ul', null, 'value-list');
+          if (!data.length) list.append(node('li', 'Not supplied'));
+          for (const item of data) { const li = node('li'); li.append(value(item)); list.append(li); }
+          return list;
+        }
+        if (data.id && data.title && data.observed_at) return citation(data);
+        if (data.from && data.relationship && data.to) {
+          const box = node('div');
+          box.append(node('code', data.from + ' → ' + data.relationship + ' → ' + data.to, 'edge'));
+          const extra = Object.fromEntries(Object.entries(data).filter(([key]) => !['from', 'relationship', 'to'].includes(key)));
+          if (Object.keys(extra).length) box.append(fields(extra));
+          return box;
+        }
+        return fields(data);
+      }
+      function fields(data) {
+        const dl = node('dl');
+        for (const key of Object.keys(data).sort()) {
+          const row = node('div', null, 'field');
+          const dd = node('dd'); dd.append(value(data[key]));
+          row.append(node('dt', label(key)), dd); dl.append(row);
+        }
+        return dl;
+      }
+      function collectSources(projection) {
+        const sources = new Map();
+        for (const claim of projection.claims || []) if (claim.source) sources.set(claim.source.id, claim.source);
+        if (projection.decision_record?.source) sources.set(projection.decision_record.source.id, projection.decision_record.source);
+        return [...sources.values()].sort((a, b) => a.id.localeCompare(b.id, 'en'));
+      }
+      function snapshot(side, data) {
+        const box = document.getElementById(side + '-snapshot'); box.replaceChildren();
+        const availability = data.availability;
+        const unknown = availability === 'comparison-unavailable';
+        box.append(node('h2', unknown ? 'Unknown / incomplete' : availability === 'partial' ? 'Partial public projection' : 'Available public projection', 'availability ' + (unknown ? 'unknown' : availability)));
+        const cutoff = node('p', 'Known at · '); cutoff.append(time(data.known_at)); box.append(cutoff);
+        if (unknown) {
+          box.append(node('p', 'Public evidence is unknown / incomplete for this selection. No comparison or fallback is available.'));
+          return;
+        }
+        box.append(node('p', 'Claim context · ' + data.projection.claim_context_state));
+        if (data.projection.decision_record) box.append(node('p', 'Recorded state · ' + data.projection.decision_record.recorded_state));
+        if (data.scenario) {
+          const scenario = node('div', null, 'scenario');
+          scenario.append(node('strong', data.scenario.label || 'Hypothetical observation-time branch'));
+          scenario.append(node('p', 'Hypothetical observation · ' + data.scenario.assumed_observed_at));
+          scenario.append(node('p', 'Actual source observation · ' + data.scenario.actual_source_observed_at));
+          scenario.append(node('p', 'Scenario, not source truth. The stored source fact is unchanged.'));
+          box.append(scenario);
+        }
+        for (const source of collectSources(data.projection)) box.append(citation(source));
+      }
+      function card(item, index, response) {
+        const article = node('article', null, 'delta-card');
+        article.id = 'delta-' + (index + 1); article.tabIndex = 0;
+        article.dataset.key = item.key; article.dataset.kind = item.kind; article.dataset.status = item.status;
+        const head = node('header', null, 'delta-head');
+        const description = node('div');
+        description.append(node('span', kinds[item.kind]?.[0] || label(item.kind), 'kind'));
+        const heading = node('h3', item.key); heading.id = article.id + '-heading';
+        description.append(heading); article.setAttribute('aria-labelledby', heading.id);
+        head.append(description, node('span', statuses[item.status] || item.status, 'status-badge')); article.append(head);
+        const grid = node('div', null, 'witness-grid');
+        for (const side of ['left', 'right']) {
+          const pane = node('section', null, 'witness'); pane.dataset.side = side;
+          pane.setAttribute('aria-label', side === 'left' ? 'Left witness' : 'Right witness');
+          pane.append(node('h4', side === 'left' ? 'Left witness' : 'Right witness'));
+          if (item[side]) pane.append(value(item[side]));
+          else pane.append(node('p', response[side].availability === 'comparison-unavailable' || item.status === 'incomparable' ? 'Unknown / incomplete. No comparison or fallback is available.' : 'Not projected at this selection. This is not evidence of absence.', 'unknown-message'));
+          grid.append(pane);
+        }
+        article.append(grid);
+        article.append(node('p', kinds[item.kind]?.[1] || 'Public graph witness.', 'boundary'));
+        article.lastChild.style.margin = '0'; article.lastChild.style.padding = '10px 18px';
+        return article;
+      }
+      function query() {
+        return new URLSearchParams({ scope: 'operations', left_known_at: document.getElementById('left-known-at').value, right_known_at: document.getElementById('right-known-at').value, left_mode: document.getElementById('left-mode').value, right_mode: document.getElementById('right-mode').value });
+      }
+      function empty(title, message) {
+        const box = node('div', null, 'empty-state'); box.append(node('h3', title), node('p', message)); results.append(box);
+      }
+      async function load() {
+        const request = ++generation;
+        const params = query();
+        root.dataset.state = 'loading'; delete root.dataset.selection;
+        results.setAttribute('aria-busy', 'true'); results.replaceChildren();
+        status.textContent = 'Loading selected snapshots…';
+        document.getElementById('delta-count').textContent = '—';
+        document.getElementById('unchanged-count').textContent = '—';
+        for (const side of ['left', 'right']) document.getElementById(side + '-snapshot').replaceChildren(node('p', 'Loading selected public projection…'));
+        try {
+          const response = await fetch('/api/knowledge-diff?' + params, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+          const data = await response.json();
+          // Check after every asynchronous boundary. A late success or failure
+          // must never change the selected snapshots, status, or result ledger.
+          if (request !== generation) return;
+          if (!response.ok) throw new Error('Comparison request rejected');
+          if (!data.left || !data.right || !data.delta || !Array.isArray(data.delta.items)) throw new Error('Invalid comparison');
+          for (const side of ['left', 'right']) {
+            if (data[side].known_at !== params.get(side + '_known_at') || data[side].mode !== params.get(side + '_mode')) throw new Error('Selection mismatch');
+          }
+          snapshot('left', data.left); snapshot('right', data.right);
+          const unknown = data.delta.state === 'comparison-unavailable';
+          document.getElementById('delta-count').textContent = unknown || data.delta.substantive_delta_count === null ? 'Unknown' : data.delta.substantive_delta_count;
+          document.getElementById('unchanged-count').textContent = unknown ? '—' : data.delta.unchanged_count;
+          status.textContent = unknown ? 'Comparison unavailable · Unknown / incomplete public evidence. No negative conclusion is supported.' : data.delta.state === 'partial-witness-comparison' ? 'Partial witness comparison · One or both public projections are incomplete. No completeness claim.' : 'Witness comparison · Public projections only. No completeness claim.';
+          const items = [...data.delta.items].sort((a, b) => Number(a.status === 'unchanged') - Number(b.status === 'unchanged') || a.kind.localeCompare(b.kind, 'en') || a.key.localeCompare(b.key, 'en'));
+          items.forEach((item, index) => results.append(card(item, index, data)));
+          if (!items.length) empty(unknown ? 'Unknown / incomplete' : 'No comparable witness differences', unknown ? 'A public comparison cannot be established for these selections. This is not evidence that a claim, source, relationship, or decision does not exist.' : 'Only the bounded public witness projection is compared. This does not establish completeness.');
+          root.dataset.state = data.delta.state;
+        } catch (_) {
+          if (request !== generation) return;
+          results.replaceChildren();
+          for (const side of ['left', 'right']) document.getElementById(side + '-snapshot').replaceChildren(node('h2', 'Unknown / incomplete'), node('p', 'The selected public projection could not be loaded. No fallback was used.'));
+          empty('Comparison unavailable', 'The selected public comparison could not be loaded. No current-time or mainline substitution was attempted.');
+          status.textContent = 'Comparison unavailable · Unknown / incomplete. No fallback was used.';
+          root.dataset.state = 'error';
+        }
+        if (request === generation) { root.dataset.selection = params.toString(); results.setAttribute('aria-busy', 'false'); }
+      }
+      for (const id of controls) document.getElementById(id).addEventListener('change', load);
+      results.addEventListener('keydown', event => {
+        if (event.altKey || event.ctrlKey || event.metaKey || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+        const cards = [...results.querySelectorAll('.delta-card')];
+        const index = cards.indexOf(document.activeElement); if (index < 0) return;
+        event.preventDefault();
+        const target = event.key === 'Home' ? 0 : event.key === 'End' ? cards.length - 1 : Math.max(0, Math.min(cards.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1)));
+        cards[target].focus();
+      });
+      load();
+    })();
+  </script>
+</body>
+</html>
