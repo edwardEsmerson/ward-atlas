@@ -46,6 +46,7 @@ from wardatlas_source_branch import (
 )
 from wardatlas_knowledge_diff import knowledge_diff, parse_parameters as parse_knowledge_diff_parameters
 from wardatlas_replay import mount_replay
+from wardatlas_role_desk import mount_role_desk, read_responsibilities as role_desk_read
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -317,6 +318,7 @@ APP_HTML = r'''<!doctype html>
       <div class="top-actions"><a class="button" href="/knowledge-diff" aria-label="Explain answer differences">Knowledge diff</a><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
+      <p><a href="/roles" style="color:#86e1be">Role desk · source-witnessed responsibilities →</a></p>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
       <p><a href="/time-machine" style="color:#86e1be">Evidence time machine · play live relationship arrival →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
@@ -1168,6 +1170,9 @@ class WardAtlasService:
             stale,
         )
 
+    def role_responsibilities(self, selection: dict) -> dict:
+        return role_desk_read(self, selection)
+
     def evidence_resilience(self, mode: str = "baseline") -> dict:
         # Input validation precedes opening a connection. GRAPH.RO_QUERY adds
         # a database-enforced read-only boundary around both pane traversals.
@@ -1782,6 +1787,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_role_desk(self, service, parsed):
+                return
             if mount_replay(self, service, parsed):
                 return
             if mount_clock_atlas(self, service, parsed):
