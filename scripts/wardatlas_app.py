@@ -31,6 +31,7 @@ from verify_falkordb_live import (
 )
 from wardatlas_fixtures import IMPACT_QUERY, SOP_CONFLICT_QUERY, seed_queries
 from wardatlas_resilience import experiment as resilience_experiment, validate_request as validate_resilience_request
+from wardatlas_briefcase import mount_briefcase
 from wardatlas_decisions import RECORDS_QUERY, decision_seed_queries, project_docket
 from wardatlas_knowledge_timeline import (
     build_queries as build_knowledge_timeline_queries,
@@ -320,6 +321,7 @@ APP_HTML = r'''<!doctype html>
     <main>
       <p><a href="/roles" style="color:#86e1be">Role desk · source-witnessed responsibilities →</a></p>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
+      <p><a href="/briefcase" style="color:#86e1be">Historical evidence briefcase · inspect and download offline →</a></p>
       <p><a href="/time-machine" style="color:#86e1be">Evidence time machine · play live relationship arrival →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
@@ -1787,6 +1789,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_briefcase(self, service, parsed):
+                return
             if mount_role_desk(self, service, parsed):
                 return
             if mount_replay(self, service, parsed):

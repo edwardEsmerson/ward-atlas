@@ -40,6 +40,8 @@ This matrix distinguishes implemented product behavior from behavior exercised b
 - The workflow report records the owned bind addresses, exact FalkorDB runtime module, per-assertion results, local-only side-effect policy, and cleanup status. A green build alone is not treated as product success.
 - Source-change CLI contract: `docs/source-change-cli.md`; independent oracle: `tests/source-change-expected-results.json` plus `tests/source-change-adversarial-matrix.json`; live evidence is written beneath `/workspace/evidence/wardatlas/source-change-build/$WORKSHOP_LANE/`. The source-change behavior is **CLI-only**, not current UI integration.
 
+- **Historical evidence briefcase — implemented / builder verified:** `/briefcase` and `/api/evidence-briefcase` compose only accepted impact/timeline/source-branch services, with explicit normalized UTC axes and a separate capture clock. One read-only preview yields a user-triggered ZIP of exact displayed evidence, offline passive HTML and accidental-change manifest hashes. Twelve frozen live groups / 72 mappings plus 23 focused tests cover cold/reseed/reconnect, edge sensitivity, permission invariance, real downloaded bytes, offline desktop/mobile and stale-selection safety. No export persistence, upload/import, handover/action/watch/acknowledgment/communication or runtime model; fresh independent acceptance remains separate.
+
 ## Deferred and risk
 
 - No broad ingestion, event replay, real roster, hosted account, real staff schedule, clinical workflow, authentication, or external model/API is included.
