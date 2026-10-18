@@ -45,6 +45,7 @@ from wardatlas_source_branch import (
     source_branch_seed_queries,
 )
 from wardatlas_knowledge_diff import knowledge_diff, parse_parameters as parse_knowledge_diff_parameters
+from wardatlas_replay import mount_replay
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -317,6 +318,7 @@ APP_HTML = r'''<!doctype html>
     </header>
     <main>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
+      <p><a href="/time-machine" style="color:#86e1be">Evidence time machine · play live relationship arrival →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
         <div><div class="eyebrow">Shift control · synthetic exercise</div><h1 id="main-title">A board with no defaults.</h1><p id="hero-description">The local graph has not established an incident or accountable path. Reset the synthetic scenario to load its pinned cases.</p></div>
@@ -1777,6 +1779,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_replay(self, service, parsed):
+                return
             if mount_clock_atlas(self, service, parsed):
                 return
             if parsed.path == "/":
