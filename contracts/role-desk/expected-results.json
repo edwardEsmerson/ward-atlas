@@ -1,0 +1,39 @@
+{
+  "oracle_policy": "Literal pre-behavior outcomes, never candidate-derived. Only unchanged product-local source oracles.",
+  "sources": {
+    "tests/expected-results.json": "c77e00e47c4f1e26d565c3d9583653838d5cc88695c4e6aa19ac583205d92b87",
+    "tests/shift-board-expected-results.json": "5d53a8f93245ee8391ec7cffb6d45b58355536d30d649db19cd53ca6b1ce2428",
+    "tests/dock-bitemporal-expected-results.json": "243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"
+  },
+  "provenance": {
+    "conveyor_paths_and_occurrences": "tests/expected-results.json#/expected_evidence_by_path",
+    "restoration": "tests/shift-board-expected-results.json#/cases/3/expected",
+    "dock_duty": "tests/dock-bitemporal-expected-results.json#/cases/3/expected",
+    "dock_swing": "tests/dock-bitemporal-expected-results.json#/cases/4/expected",
+    "dock_crossed_unknown": "tests/dock-bitemporal-expected-results.json#/cases/5/expected",
+    "cold": "tests/dock-bitemporal-expected-results.json#/cases/0/expected",
+    "missing_edge": "tests/dock-bitemporal-expected-results.json#/cases/6/expected"
+  },
+  "conveyor": {
+    "as_of": "2026-10-14T18:30:00Z", "restored_at": "2026-10-14T19:30:00Z",
+    "paths": [
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-CENTRAL-STERILE", "ROLE-STERILE-OPS-COORD"],
+      ["INC-204", "CONVEYOR-C4", "SVC-MATERIAL-TRANSFER", "DEPT-MATERIALS-LOGISTICS", "ROLE-MATERIALS-DUTY"]
+    ],
+    "source_ids": ["SRC-INC-204", "SRC-ASSET-C4", "SRC-SERVICE-CATALOG", "SRC-OPS-ROSTER"],
+    "source_titles": ["Synthetic Incident Register INC-204", "Synthetic Asset State Ledger", "Synthetic Service Dependency Register", "Synthetic Operations Role Roster"],
+    "source_observed_at": ["2026-10-14T18:00:00Z", "2026-10-14T18:02:00Z", "2026-10-14T18:03:00Z"],
+    "roster_occurrences": ["2026-10-14T18:04:00Z", "2026-10-14T18:05:00Z"],
+    "never_owners": ["ROLE-FACILITIES-DUTY", "ROLE-MATERIALS-LEAD"]
+  },
+  "dock": {
+    "prefix": ["INC-207", "EQ-DOCK-CART-2", "SVC-INBOUND-TRANSFER", "DEPT-RECEIVING-DOCK"],
+    "cases": [
+      {"effective_at": "2026-10-14T20:29:00Z", "known_at": "2026-10-14T20:19:00Z", "role_id": "ROLE-DOCK-DUTY", "source_id": "SRC-DOCK-ROSTER-R1", "title": "Synthetic Dock Operations Roster Revision 1", "observed_at": "2026-10-14T19:00:00Z"},
+      {"effective_at": "2026-10-14T20:30:00Z", "known_at": "2026-10-14T20:19:00Z", "role_id": "ROLE-DOCK-SWING", "source_id": "SRC-DOCK-ROSTER-R2", "title": "Synthetic Dock Operations Roster Revision 2", "observed_at": "2026-10-14T20:18:00Z"},
+      {"effective_at": "2026-10-14T20:30:00Z", "known_at": "2026-10-14T20:17:59Z", "role_id": null, "state": "unknown"}
+    ]
+  },
+  "unavailable": {"scope": "operations", "state": "unknown", "message": "Role responsibility evidence is unavailable.", "roles": [], "selected_role": null, "responsibilities": [], "ownership_witnesses": [], "event": null, "clocks": null, "safe_asserted": false, "resolution_asserted": false, "workload_complete": false},
+  "invalid_queries": ["context=conveyor&context=conveyor", "context=conveyor&role=ROLE-X&role=ROLE-X", "context=conveyor&scope=restricted", "context=conveyor&scope=operations&scope=operations", "context=conveyor&as_of=garbage", "context=conveyor&known_at=2026-10-14T20:19:00Z", "context=dock&effective_at=2026-10-14T20:30:00Z", "context=other", "context=conveyor&role=", "context=conveyor&role=%27DELETE", "context=conveyor&extra=x", "context", "context=conveyor&as_of=2026-10-14T18:30:00", "context=conveyor&as_of=2026-10-14T18:30:00Z&as_of=2026-10-14T18:30:00Z"]
+}
