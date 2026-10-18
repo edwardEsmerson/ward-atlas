@@ -1,0 +1,15 @@
+{
+  "candidate_output_is_oracle": false,
+  "oracle": "contracts/sop-compare/expected-results.json",
+  "groups": [
+    {"id":"cold","assertions":["empty-versions","empty-equipment","unknown-pair","no-identities","cold-browser"]},
+    {"id":"boundaries","assertions":["before-options","before-no-future","archive-independent","at-v2-options","at-v2-unknown","pre-v3-invariant","at-v3-options","at-v3-unresolved"]},
+    {"id":"pairs","assertions":["all-pairs","exact-archive-source","exact-current-sources","archive-no-role","archive-c3-edge","archive-c4-unknown","v2-role-edge","v3-role-edge","typed-differences","no-winner-lineage"]},
+    {"id":"mutations","assertions":["property-retained","property-not-applicability","no-archive-role-fallback","v3-source-removal","no-default-winner","conflict-removal-unknown","claim-edge-required","source-cutoff-sensitive","reseed-restores"]},
+    {"id":"visibility","assertions":["decoy-invariant","denied-connected","full-api-invariant","desktop-dom-aria-options","mobile-dom-aria-options","hidden-selection-generic","edge-acl","node-acl","source-acl","equipment-independent"]},
+    {"id":"validation","assertions":["invalid-inputs","zero-reads","offset-normalized","duplicate-selection","unknown-equipment","bounded-parameterized"]},
+    {"id":"browser","assertions":["keyboard-pairs","desktop","mobile","race-guard","escaped-values","no-overflow","root-link"]},
+    {"id":"lifecycle","assertions":["repeat-seed","reconnect","graph-read-only","state-read-only","owned-cleanup"]}
+  ],
+  "focused_cases": ["frozen hashes and exact pointers", "all three unordered pairs", "archived C3 edge versus C4 unknown", "archive has no claim edge", "before first current source", "V2 exact source boundary", "V3 exact source boundary", "V1 property after applicability removal", "V3 evidence removal", "conflict removal not agreement", "hidden and disconnected decoy full-view invariance", "node edge and source ACL", "duplicate malformed and offset input", "cold reseed reconnect cleanup", "read-only graph and state", "keyboard desktop mobile", "stale response race", "escaped source values"]
+}

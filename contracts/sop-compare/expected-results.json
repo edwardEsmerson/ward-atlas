@@ -1,0 +1,36 @@
+{
+  "candidate_output_is_oracle": false,
+  "sources": {
+    "tests/sop-impact-expected-results.json": "f94e65850384e36e7200b321d14628f074fee37fb159adbcd73bef00c6e1acca",
+    "contracts/decision-knowledge-timeline/expected-results.json": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"
+  },
+  "source_pointers": {
+    "archive": "tests/sop-impact-expected-results.json#/cases/3/expected",
+    "c4_claims": "tests/sop-impact-expected-results.json#/cases/2/expected",
+    "v2": "contracts/decision-knowledge-timeline/expected-results.json#/baseline/v2_claim",
+    "v3": "contracts/decision-knowledge-timeline/expected-results.json#/baseline/v3_claim",
+    "conflict": "contracts/decision-knowledge-timeline/expected-results.json#/baseline/conflict",
+    "before": "contracts/decision-knowledge-timeline/expected-results.json#/cases/1/expected/projection",
+    "at_v2": "contracts/decision-knowledge-timeline/expected-results.json#/cases/2/expected/projection",
+    "at_v3": "contracts/decision-knowledge-timeline/expected-results.json#/cases/4/expected/projection"
+  },
+  "task_fixed_edge": {"from":"SOP-OPS-9-V1","relationship":"APPLIES_TO","to":"CONVEYOR-C3"},
+  "task_fixed_archive_claims": [],
+  "boundaries": [
+    {"known_at":"2026-10-14T15:59:59Z","versions":["SOP-OPS-9-V1"],"equipment":["CONVEYOR-C3"],"conflict":"unknown"},
+    {"known_at":"2026-10-14T16:00:00Z","versions":["SOP-OPS-9-V1","SOP-OPS-9-V2"],"equipment":["CONVEYOR-C3","CONVEYOR-C4"],"conflict":"unknown"},
+    {"known_at":"2026-10-14T16:03:59Z","versions":["SOP-OPS-9-V1","SOP-OPS-9-V2"],"equipment":["CONVEYOR-C3","CONVEYOR-C4"],"conflict":"unknown"},
+    {"known_at":"2026-10-14T16:04:00Z","versions":["SOP-OPS-9-V1","SOP-OPS-9-V2","SOP-OPS-9-V3"],"equipment":["CONVEYOR-C3","CONVEYOR-C4"],"conflict":"unresolved"}
+  ],
+  "pairs": [["SOP-OPS-9-V1","SOP-OPS-9-V2"],["SOP-OPS-9-V1","SOP-OPS-9-V3"],["SOP-OPS-9-V2","SOP-OPS-9-V3"]],
+  "invalid_queries": ["", "known_at=bad", "known_at=2026-10-14", "known_at=2026-10-14T16:04:00", "known_at=2026-10-14T16:04:00%2B00:60", "known_at=X&known_at=X", "known_at=2026-10-14T16:04:00Z&left=X", "known_at=2026-10-14T16:04:00Z&left=SOP-OPS-9-V1&left=SOP-OPS-9-V1", "known_at=2026-10-14T16:04:00Z&equipment=OTHER", "known_at=2026-10-14T16:04:00Z&scope=restricted", "known_at=2026-10-14T16:04:00Z&scope=operations&scope=operations", "known_at=2026-10-14T16:04:00Z&other=value", "known_at=2026-10-14T16:04:00Z&right="],
+  "semantics": {
+    "property_not_edge": "referenced_equipment_id is a sourced property, never an applicability witness",
+    "archive": "C3 applies explicitly; no evidenced CLAIMS_ROLE; not proved applicable to C4/INC-204",
+    "missing_evidence": "Suppress dependent version/claim/conflict/options; never choose the remaining claim",
+    "missing_conflict": "Unknown relation, not agreement",
+    "lineage": "No inferred lineage or SUPERSEDES from version numbering",
+    "selection": "Hidden requested selection is generic unavailable and never echoed; source-known options remain independent of selected pair",
+    "read_only": "No graph, action, watch, source or scenario writes; GET only"
+  }
+}
