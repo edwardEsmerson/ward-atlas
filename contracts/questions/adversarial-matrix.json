@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "mapping_policy": "Each expected field in every frozen group is an independently mapped live assertion. source_pointers resolve into the SHA-pinned accepted oracles, not candidate behavior.",
+  "groups": [
+    {"id":"impact","expected_pointer":"/groups/0/expected","assertions":["paths","source_ids","source_titles","observed_at","path_kind","status","time","roster_observation_variants"],"source_pointers":["outage#/expected_paths","outage#/expected_evidence_by_path"]},
+    {"id":"restoration","expected_pointer":"/groups/1/expected","assertions":["paths","status","time","safety_conclusion","event_value","explicit_no_safety_conclusion"],"source_pointers":["outage#/scenarios/3/expected","timeline#/scope/unknown_semantics"]},
+    {"id":"disagreement","expected_pointer":"/groups/2/expected","assertions":["versions","roles","claim_label","source_ids","source_titles","observed_at","conflict","sop_selection"],"source_pointers":["outage#/scenarios/4/expected","timeline#/baseline/conflict"]},
+    {"id":"before","expected_pointer":"/groups/3/expected","assertions":["time","status","source_facts","graph_paths","citations","source_record_existence_hints"],"source_pointers":["timeline#/cases/1/expected"]},
+    {"id":"claims-known","expected_pointer":"/groups/4/expected","assertions":["time","versions","conflict_kind","record","record_existence_hint","source_quote"],"source_pointers":["timeline#/cases/4/expected/projection"]},
+    {"id":"record-known","expected_pointer":"/groups/5/expected","assertions":["time","record_id","record_title","record_state","source","source_fact_kind","sop_selection"],"source_pointers":["timeline#/baseline/decision_record","timeline#/cases/6/expected/projection"]},
+    {"id":"cold-offline","expected_pointer":"/groups/6/expected","assertions":["cold_status","offline_status","source_facts","graph_paths","citations","negative_conclusion"],"source_pointers":["outage#/scenarios/0/expected","timeline#/cases/0/expected"]},
+    {"id":"acl-decoy","expected_pointer":"/groups/7/expected","assertions":["entire_answer_invariant","citations_invariant","sanitized_model_input_invariant","browser_text_invariant","browser_accessibility_invariant","restricted_disclosure"],"source_pointers":["outage#/scenarios/5/expected","timeline#/scope/acl_semantics"]},
+    {"id":"validation","expected_pointer":"/groups/8/expected","assertions":["invalid_time_status","duplicate_time_status","denied_scope_status","unsupported_status","ambiguous_status","unknown_identifier_status","queries_before_validation"],"source_pointers":["timeline#/scope/unknown_semantics"]},
+    {"id":"model-boundary","expected_pointer":"/groups/9/expected","assertions":["valid_method","fallback_method","failure_semantic_equality","false_fact_valid_citation_rejected","prompt_injection_rejected","tool_request_rejected","extra_fields_rejected","unknown_fact_rejected"],"source_pointers":["timeline#/scope/citation_semantics"]},
+    {"id":"repeat-read-only","expected_pointer":"/groups/10/expected","assertions":["reseed_semantic_equality","reconnect_entire_answer_equality","second_seed_node_delta","second_seed_edge_delta","graph_state_unchanged","action_watch_state_unchanged","desktop_mobile_api_parity","keyboard_submission","output_escaped","owned_cleanup"],"source_pointers":["outage#/scenarios/6/expected","outage#/scenarios/7/expected","timeline#/scope/external_writes"]}
+  ]
+}
