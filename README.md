@@ -4,6 +4,8 @@ WardAtlas is a local synthetic hospital-operations control room for the Company 
 
 For the short operator-focused private demo path, see the [demo runbook](docs/demo-runbook.md).
 
+For exact source-bound Cypher and graph/evidence/time semantics, see the [FalkorDB query walkthrough](docs/falkordb-query-walkthrough.md).
+
 ## Ask WardAtlas
 
 Open **Ask WardAtlas** from the control room, or visit `/ask` on the same local app. Select the requested synthetic INC-204 operations context, ask one supported question, and supply one explicit time:
