@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "candidate_output_is_oracle": false,
+  "expected_path": "contracts/knowledge-diff/expected-results.json",
+  "groups": [
+    {"group_id": "identical", "assertions": ["equal.zero", "equal.nine-unchanged", "equal.projections", "equal.types", "equal.no-completeness"]},
+    {"group_id": "mainline-boundary", "assertions": ["boundary.four-only-right", "boundary.five-unchanged", "boundary.claims-conflict-preserved", "boundary.record-own-source", "boundary.considers", "boundary.no-negative-conclusion"]},
+    {"group_id": "modes-at-1605", "assertions": ["modes.four-only-left", "modes.five-unchanged", "modes.v2-record-preserved", "modes.no-v3-right", "modes.partial-not-unavailable", "modes.reversal"]},
+    {"group_id": "branch-boundary", "assertions": ["branch.four-only-right", "branch.five-unchanged", "branch.record-preserved", "branch.v3-conflict-link", "branch.partial-labeled"]},
+    {"group_id": "actual-assumed", "assertions": ["time.one-observation-change", "time.actual-1604", "time.assumed-1606", "time.v2-unmodified", "time.citations-exact", "time.stored-fact-unchanged"]},
+    {"group_id": "missing-edges", "assertions": ["missing.branch-edge-unavailable", "missing.source-edge-unavailable", "missing.no-fallback", "missing.no-mass-removal", "missing.reversal", "missing.reseed-restores", "missing.browser-unknown"]},
+    {"group_id": "cold", "assertions": ["cold.unavailable", "cold.no-delta", "cold.no-identities", "cold.browser-unknown", "cold.no-absence-claim"]},
+    {"group_id": "privacy", "assertions": ["acl.decoy-response", "acl.restricted-response", "acl.desktop-dom", "acl.mobile-dom", "acl.accessibility", "acl.no-tripwire"]},
+    {"group_id": "repeat-readonly", "assertions": ["repeat.idempotent", "repeat.reconnect", "repeat.graph-readonly", "repeat.actions-readonly", "repeat.desktop-mobile", "repeat.keyboard", "repeat.stale-request", "repeat.owned-cleanup"]},
+    {"group_id": "validation", "assertions": ["valid.utc", "valid.invalid-time", "valid.naive-time", "valid.missing", "valid.duplicate-time", "valid.invalid-mode", "valid.duplicate-mode", "valid.scope", "valid.readonly"]}
+  ]
+}

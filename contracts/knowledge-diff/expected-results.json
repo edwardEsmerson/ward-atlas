@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "candidate_output_is_oracle": false,
+  "purpose": "Compare independently selected public graph witnesses, not source truth, deletion, resolution, safety or completeness.",
+  "pinned_sources": [
+    {"path": "contracts/decision-knowledge-timeline/expected-results.json", "sha256": "8a9ca76ecf7b194ddf26b2aa9bf3d04d0d4eab966a4ee65cacdbccdf76f79076"},
+    {"path": "contracts/decision-source-branch/expected-results.json", "sha256": "e209aeab5af266abd6940619727295ea50c0ad2707f47c2d4df37d24cb37da23"}
+  ],
+  "policy": {
+    "required_parameters": ["left_known_at", "right_known_at", "left_mode", "right_mode"],
+    "allowed_modes": ["mainline", "hypothetical"],
+    "kinds": ["claim", "source_observation", "conflict_relationship", "decision_record", "considered_link"],
+    "statuses": ["unchanged", "projected-only-on-left", "projected-only-on-right", "changed", "incomparable"],
+    "completeness_claimed": false,
+    "transaction_isolation_claimed": false,
+    "read_only": true,
+    "max_witnesses_per_side": 64,
+    "unknown_delta_count": null
+  },
+  "citations": [
+    {"id": "SRC-SOP-CURRENT-V2", "title": "Synthetic SOP-OPS-9 Current Text v2", "observed_at": "2026-10-14T16:00:00Z"},
+    {"id": "SRC-SOP-CURRENT-V3", "title": "Synthetic SOP-OPS-9 Current Text v3", "observed_at": "2026-10-14T16:04:00Z"},
+    {"id": "SRC-DEC-OPS-9-REVIEW-01", "title": "Synthetic Decision Register: SOP-OPS-9 Reconciliation", "observed_at": "2026-10-14T16:05:00Z"}
+  ],
+  "groups": [
+    {
+      "id": "identical",
+      "source_refs": ["decision-source-branch#mainline-at-16-05"],
+      "input": {"left_known_at": "2026-10-14T16:05:00Z", "right_known_at": "2026-10-14T16:05:00Z", "left_mode": "mainline", "right_mode": "mainline"},
+      "expected": {"substantive_delta_count": 0, "unchanged_count": 9, "only_left": [], "only_right": [], "state": "witness-comparison", "complete": false}
+    },
+    {
+      "id": "mainline-boundary",
+      "source_refs": ["decision-knowledge-timeline#v3-and-graph-derived-conflict", "decision-knowledge-timeline#record-source-boundary"],
+      "input": {"left_known_at": "2026-10-14T16:04:00Z", "right_known_at": "2026-10-14T16:05:00Z", "left_mode": "mainline", "right_mode": "mainline"},
+      "expected": {"substantive_delta_count": 4, "unchanged_count": 5, "only_left": [], "only_right": ["source_observation:SRC-DEC-OPS-9-REVIEW-01", "decision_record:DEC-OPS-9-REVIEW-01", "considered_link:DEC-OPS-9-REVIEW-01:CONSIDERS:SOP-OPS-9-V2", "considered_link:DEC-OPS-9-REVIEW-01:CONSIDERS:SOP-OPS-9-V3"], "state": "witness-comparison", "record_state": "open-unresolved"}
+    },
+    {
+      "id": "modes-at-1605",
+      "source_refs": ["decision-source-branch#mainline-at-16-05", "decision-source-branch#branch-at-16-05-suppression"],
+      "input": {"left_known_at": "2026-10-14T16:05:00Z", "right_known_at": "2026-10-14T16:05:00Z", "left_mode": "mainline", "right_mode": "hypothetical"},
+      "expected": {"substantive_delta_count": 4, "unchanged_count": 5, "only_left": ["claim:SOP-OPS-9-V3:ROLE-MATERIALS-LEAD", "source_observation:SRC-SOP-CURRENT-V3", "conflict_relationship:SOP-OPS-9-V2:SOP_CONFLICT:SOP-OPS-9-V3", "considered_link:DEC-OPS-9-REVIEW-01:CONSIDERS:SOP-OPS-9-V3"], "only_right": [], "state": "partial-witness-comparison", "record_state": "open-unresolved", "right_availability": "partial"}
+    },
+    {
+      "id": "branch-boundary",
+      "source_refs": ["decision-source-branch#branch-at-16-05-suppression", "decision-source-branch#branch-at-16-06-restoration"],
+      "input": {"left_known_at": "2026-10-14T16:05:00Z", "right_known_at": "2026-10-14T16:06:00Z", "left_mode": "hypothetical", "right_mode": "hypothetical"},
+      "expected": {"substantive_delta_count": 4, "unchanged_count": 5, "only_left": [], "only_right": ["claim:SOP-OPS-9-V3:ROLE-MATERIALS-LEAD", "source_observation:SRC-SOP-CURRENT-V3", "conflict_relationship:SOP-OPS-9-V2:SOP_CONFLICT:SOP-OPS-9-V3", "considered_link:DEC-OPS-9-REVIEW-01:CONSIDERS:SOP-OPS-9-V3"], "state": "partial-witness-comparison", "record_state": "open-unresolved"}
+    },
+    {
+      "id": "actual-assumed",
+      "source_refs": ["decision-source-branch#branch-at-16-06-restoration", "decision-source-branch#mainline-isolation"],
+      "input": {"left_known_at": "2026-10-14T16:06:00Z", "right_known_at": "2026-10-14T16:06:00Z", "left_mode": "mainline", "right_mode": "hypothetical"},
+      "expected": {"substantive_delta_count": 1, "unchanged_count": 8, "changed": ["source_observation:SRC-SOP-CURRENT-V3"], "actual_observed_at": "2026-10-14T16:04:00Z", "assumed_observed_at": "2026-10-14T16:06:00Z", "v2_observed_at": "2026-10-14T16:00:00Z", "v2_assumption_applied": false}
+    },
+    {
+      "id": "missing-edges",
+      "source_refs": ["decision-source-branch#missing-edge-no-fallback-and-reseed"],
+      "expected": {"edge_types": ["HAS_HYPOTHETICAL_OBSERVATION", "FOR_SOURCE"], "missing_side": "comparison-unavailable", "generic_unknown": true, "state": "comparison-unavailable", "substantive_delta_count": null, "only_left": [], "only_right": [], "fallback_used": false, "reseed_restores": true}
+    },
+    {
+      "id": "cold",
+      "source_refs": ["decision-knowledge-timeline#cold-empty-unknown", "decision-source-branch#cold-empty-branch-lookup"],
+      "expected": {"state": "comparison-unavailable", "substantive_delta_count": null, "items": [], "generic_unknown": true, "citations": [], "identities_exposed": false}
+    },
+    {
+      "id": "privacy",
+      "source_refs": ["decision-knowledge-timeline#decoy-and-restricted-invariance", "decision-source-branch#decoy-and-restricted-invariance"],
+      "expected": {"decoy_response_invariant": true, "restricted_response_invariant": true, "desktop_dom_invariant": true, "mobile_dom_invariant": true, "accessibility_invariant": true, "denied_existence_or_counts_exposed": false}
+    },
+    {
+      "id": "repeat-readonly",
+      "source_refs": ["decision-source-branch#repeat-reconnect-read-only-desktop-mobile-cleanup"],
+      "expected": {"reseed_idempotent": true, "reconnect_equal": true, "graph_unchanged": true, "actions_unchanged": true, "desktop_mobile_equal": true, "keyboard_navigation": true, "stale_request_ignored": true, "owned_cleanup": true}
+    },
+    {
+      "id": "validation",
+      "source_refs": ["decision-knowledge-timeline#timestamp-normalization-and-rejection", "decision-source-branch#repeat-reconnect-read-only-desktop-mobile-cleanup"],
+      "expected": {"utc_offset_equivalent": true, "invalid_time_status": 400, "naive_time_status": 400, "missing_parameter_status": 400, "duplicate_time_status": 400, "invalid_mode_status": 400, "duplicate_mode_status": 400, "denied_scope_status": 403, "state_unchanged": true}
+    }
+  ]
+}

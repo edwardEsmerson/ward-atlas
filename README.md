@@ -15,6 +15,19 @@ For the short operator-focused private demo path, see the [demo runbook](docs/de
 
 For exact source-bound Cypher and graph/evidence/time semantics, see the [FalkorDB query walkthrough](docs/falkordb-query-walkthrough.md).
 
+## Explain why two graph answers differ
+
+Open **Knowledge diff** on the control room (`/knowledge-diff`, accessible name “Explain answer differences”). Independently choose each snapshot's knowledge cutoff and `mainline` or `hypothetical` mode. The workspace compares five types of live public graph witnesses: unverified claims, source observations, graph-derived conflict, the separately evidenced decision record, and explicit `CONSIDERS` links. Citations retain exact IDs, titles and observation times. V3's actual observation stays **16:04Z**; its branch assumption is separately labeled **16:06Z**, never applied to V2.
+
+`GET /api/knowledge-diff?left_known_at=2026-10-14T16:04:00Z&right_known_at=2026-10-14T16:05:00Z&left_mode=mainline&right_mode=mainline` explains the record-source boundary without inventing an SOP change. All four parameters are required exactly once; explicit offsets normalize to UTC. A one-sided witness is **projected only on left/right**, not deleted, resolved or safe. Partial knowledge is labeled; a missing branch witness makes that side **comparison-unavailable**, with incomparable items and no mainline fallback. This is a bounded comparison, not a completeness claim. It reuses the accepted timeline/branch services under their reentrant application lock, **not database transaction isolation**. No saved action, graph write, source correction, model or clinical inference is involved.
+
+```sh
+python3 -m unittest tests.test_knowledge_diff
+python3 scripts/verify_knowledge_diff.py --all --require-live-falkordb --desktop-mobile --fail-on-zero
+```
+
+The product-only verifier uses the two in-repository, hash-pinned source oracles and pre-implementation `contracts/knowledge-diff/` artifacts (10 groups / 63 mapped assertions). It bootstraps the existing digest-pinned FalkorDB locally, selects free loopback ports, owns unique graph/state/processes, captures API/desktop/mobile/keyboard evidence, and cleans only its own resources. Reports default to `$WORKSHOP_RUN_DIR`; no external planner checkout is needed. Setup prerequisites are below. Builder evidence is distinct from supervisor acceptance and human submission eligibility.
+
 ## Ask WardAtlas
 
 Open **Ask WardAtlas** from the control room, or visit `/ask` on the same local app. Select the requested synthetic INC-204 operations context, ask one supported question, and supply one explicit time:

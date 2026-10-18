@@ -44,6 +44,7 @@ from wardatlas_source_branch import (
     source_branch_response,
     source_branch_seed_queries,
 )
+from wardatlas_knowledge_diff import knowledge_diff, parse_parameters as parse_knowledge_diff_parameters
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -312,7 +313,7 @@ APP_HTML = r'''<!doctype html>
   <div class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><span>WARDATLAS<small>HOSPITAL OPERATIONS BRAIN</small></span></div>
-      <div class="top-actions"><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
+      <div class="top-actions"><a class="button" href="/knowledge-diff" aria-label="Explain answer differences">Knowledge diff</a><a class="button" href="/ask">Ask WardAtlas</a><span id="db-status" class="pill"><span class="dot"></span>Connecting to local graph…</span><button id="reset" class="button" type="button">Reset synthetic scenario</button></div>
     </header>
     <main>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
@@ -1789,6 +1790,14 @@ class Handler(BaseHTTPRequestHandler):
                     self._error(400, "Invalid evidence experiment request.")
                     return
                 self._send(200, service.evidence_resilience(mode))
+            elif parsed.path == "/knowledge-diff":
+                self._send(200, (ROOT / "scripts/ui/knowledge_diff.html").read_text(encoding="utf-8"))
+            elif parsed.path == "/api/knowledge-diff":
+                if not self._scope_allowed(parsed.query):
+                    self._error(403, "This view is not available.")
+                else:
+                    parameters = parse_knowledge_diff_parameters(parse_qs(parsed.query, keep_blank_values=True))
+                    self._send(200, knowledge_diff(service, *parameters))
             elif parsed.path == "/ask":
                 self._send(200, QUESTIONS_HTML_PATH.read_text(encoding="utf-8"))
             elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
@@ -1867,6 +1876,9 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._error(503, "Local graph or action state is unavailable.")
         except ValueError as exc:
+            if parsed.path == "/api/knowledge-diff":
+                self._error(400, "Specify explicit ISO-8601 snapshot times and mainline/hypothetical modes exactly once.")
+                return
             if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"}:
                 message = str(exc)
                 if parsed.path not in {"/api/handover/compare", "/api/evidence-watch"} and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
