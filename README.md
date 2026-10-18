@@ -2,6 +2,8 @@
 
 WardAtlas connects hospital incidents, SOPs and shift ownership in FalkorDB so operations teams can trace an outage to the departments and roles affected — a **Company Brain** built for hospital operations.
 
+**Track:** Graph Hacks: Context for AI Agents, Track 03 Company Brain.
+
 **Live demo: <https://ayaansh-hoeserver.tail730cfd.ts.net:10000/>**, running on real FalkorDB 6.0.2 with synthetic data. Every visitor shares this one instance. *Reset synthetic scenario* restores it, and it also reseeds itself every 12 hours. To run your own copy, see [Quickstart](#quickstart).
 
 ![Shift board: the live impact map traces one outage to two departments and their operating roles, beside the unresolved SOP conflict](docs/media/control-room.png)
@@ -105,7 +107,13 @@ python3 scripts/wardatlas_attach.py --db-host 127.0.0.1 --db-port 6379
 
 Open the printed loopback URL; **Reset synthetic scenario** restores the demo. Ctrl-C cleans up only this run's graph and local state. [Judge guide](docs/judge-guide.md) · [Regenerate screenshots](docs/readme-media.md).
 
-**AI & limits:** AI coding agents generated substantial code, fixtures, tests and documentation. The core graph workflow is deterministic. All data is synthetic and non-clinical; this is not a validated hospital system or medical device.
+## AI disclosure
+
+WardAtlas was built by AI coding agents working under my direction, inside a build process I set up and ran: a self-hosted agent workshop on my own home server. Every feature started as a written contract and had to pass automated checks against a live FalkorDB before it was accepted. The agents (OpenCode running OpenAI GPT models) wrote most of the code, synthetic data, tests and documentation; that is why most commits are authored by "Agent Workshop". Claude Code helped me operate the workshop, redesign the frontend, record the demo film and deploy the live demo.
+
+My part: I set priorities and decided what to build, cut and ship; reviewed the product and sent back what wasn't good enough, including the final-day frontend redesign; and approved the publishing setup, the final-day pushes and the live deployment, which runs on infrastructure I own. The idea is mine, a Company Brain for hospital operations, and so are the graph model ideas the agents built from: tracing impact from incident to accountable role, a dated source behind every hop, contradictory SOPs kept side by side, and separate clocks for when something took effect and when it was known.
+
+By default no model runs when WardAtlas answers; retrieval is deterministic Cypher over FalkorDB. All data is synthetic and non-clinical; this is not a validated hospital system or medical device.
 
 ---
 
