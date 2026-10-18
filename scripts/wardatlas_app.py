@@ -34,6 +34,13 @@ from wardatlas_knowledge_timeline import (
     considered_query as knowledge_timeline_considered_query,
     project_timeline as project_knowledge_timeline,
 )
+from wardatlas_source_branch import (
+    BRANCH_PATH_QUERY as SOURCE_BRANCH_PATH_QUERY,
+    branch_claim_projection,
+    branch_v3_claim_query,
+    source_branch_response,
+    source_branch_seed_queries,
+)
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -274,6 +281,21 @@ APP_HTML = r'''<!doctype html>
     .knowledge-record { border:1px solid #426363; border-radius:9px; padding:10px; margin-top:10px; color:#cfe0db; font-size:10px; line-height:1.6; overflow-wrap:anywhere; }
     .knowledge-unknown { color:var(--amber); font-size:10px; line-height:1.6; margin-top:9px; }
     @media (max-width:680px) { .knowledge-controls { grid-template-columns:1fr; } .knowledge-presets { grid-column:auto; } .knowledge-claims { grid-template-columns:1fr; } }
+    .source-branch { margin:0 0 18px; border-color:#6b5268; background:linear-gradient(145deg,#30253a,#172630 72%); }
+    .source-branch-controls { display:grid; grid-template-columns:minmax(230px,420px) minmax(0,1fr); gap:12px; align-items:end; margin:13px 0; }
+    .source-branch-controls label { display:grid; gap:6px; color:#d1bfd0; font-size:11px; }
+    .source-branch-controls select { width:100%; min-width:0; color:var(--ink); background:#211d2a; border:1px solid #705978; border-radius:7px; padding:10px; font:inherit; font-size:12px; }
+    .source-branch-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .source-branch-pane { min-width:0; border:1px solid #4a4354; border-radius:11px; padding:13px; background:#111d2788; overflow-wrap:anywhere; }
+    .source-branch-pane h3 { margin:0 0 9px; color:#e7d6e9; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+    .source-branch-scenario { color:#f3d39a; border-left:2px solid var(--amber); padding:7px 9px; margin:8px 0 11px; font-size:10px; line-height:1.65; }
+    .source-branch-claim { border-top:1px solid #3e3d4c; padding:9px 0; color:#f1ddae; font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+    .source-branch-claim small { display:block; color:#b7c2c8; font-size:9px; line-height:1.6; margin-top:4px; }
+    .source-branch-state { color:#c7d9d7; font-size:10px; line-height:1.6; margin:8px 0; }
+    .source-branch-record { border:1px solid #426363; border-radius:8px; padding:9px; margin-top:8px; color:#d0e2de; font-size:10px; line-height:1.6; }
+    .source-branch-conflict { border-left:2px dashed var(--amber); padding:7px 9px; margin-top:8px; color:#f2cf91; font-size:10px; line-height:1.6; }
+    .source-branch-unknown { color:var(--amber); font-size:10px; line-height:1.6; margin-top:8px; }
+    @media (max-width:760px) { .source-branch-grid { grid-template-columns:1fr; } .source-branch-controls { grid-template-columns:1fr; } }
     @media (max-width:760px) { .sop-impact-grid { grid-template-columns:1fr; } }
     #legacy-grid[hidden] { display:none; }
     .footer { color:#758c92; font-size:10px; padding:21px 2px 0; display:flex; justify-content:space-between; gap:12px; }
@@ -320,7 +342,7 @@ APP_HTML = r'''<!doctype html>
       </section>
       <section id="evidence-watch" class="card evidence-watch" aria-labelledby="evidence-watch-title">
         <div class="card-head"><div><div class="eyebrow">Graph-backed continuity watch · local only</div><h2 id="evidence-watch-title">Next-shift dock evidence watch</h2></div><span id="watch-badge" class="tag blue">No saved watch</span></div>
-        <p class="watch-intro">Preview the INC-207 ownership witness, then explicitly confirm one local watch. Refresh compares its saved baseline with new FalkorDB evidence using independent effective-at and known-at times. Unknown means insufficient evidence—not no owner, safe, or resolved.</p>
+        <p class="watch-intro">Preview the receiving-dock ownership witness, then explicitly confirm one local watch. Refresh compares its saved baseline with new FalkorDB evidence using independent effective-at and known-at times. Unknown means insufficient evidence—not no owner, safe, or resolved.</p>
         <div class="watch-controls">
           <label for="watch-effective-at">Effective at · ISO-8601 with explicit offset<input id="watch-effective-at" type="text" value="2026-10-14T20:29:00Z" autocomplete="off" spellcheck="false"></label>
           <label for="watch-known-at">Sources known by · ISO-8601 with explicit offset<input id="watch-known-at" type="text" value="2026-10-14T20:17:59Z" autocomplete="off" spellcheck="false"></label>
@@ -373,6 +395,26 @@ APP_HTML = r'''<!doctype html>
         <div id="knowledge-timeline-unknown" class="knowledge-unknown" hidden></div>
         <div id="knowledge-timeline-notice" class="notice" aria-live="polite"></div>
       </section>
+      <section id="decision-source-branch" class="card source-branch" aria-labelledby="source-branch-title" hidden>
+        <div class="card-head"><div><div class="eyebrow">Graph-stored counterfactual · read only</div><h2 id="source-branch-title">Branch the knowledge clock</h2></div><span id="source-branch-badge" class="tag blue">Loading mainline and scenario…</span></div>
+        <p class="decision-docket-intro">Compare mainline source evidence with an optional graph-stored hypothetical. Missing links remain unknown; this view never substitutes mainline facts for missing branch evidence.</p>
+        <div class="source-branch-controls">
+          <label for="source-branch-cutoff">Shared knowledge cutoff · keyboard-selectable ISO-8601 UTC<select id="source-branch-cutoff" aria-label="Shared mainline and hypothetical knowledge cutoff">
+            <option value="2026-10-14T16:05:00Z" selected>16:05Z · decision record known</option>
+            <option value="2026-10-14T16:06:00Z">16:06Z · hypothetical V3 observation</option>
+          </select></label>
+          <div id="source-branch-guidance" class="subtle">Both panes use the same cutoff. Use the select with a keyboard to replay 16:05Z or 16:06Z; missing branch links stay unknown and never fall back to mainline.</div>
+        </div>
+        <div class="source-branch-grid" aria-label="Side-by-side mainline and hypothetical replay">
+          <article id="source-branch-mainline" class="source-branch-pane" aria-labelledby="source-branch-mainline-title" aria-live="polite">
+            <h3 id="source-branch-mainline-title">Mainline · source facts</h3><div class="source-branch-state"></div><div class="source-branch-claims"></div><div class="source-branch-conflict" hidden></div><div class="source-branch-record" hidden></div><div class="source-branch-unknown" hidden></div>
+          </article>
+          <article id="source-branch-hypothetical" class="source-branch-pane" aria-labelledby="source-branch-hypothetical-title" aria-live="polite">
+            <h3 id="source-branch-hypothetical-title">Hypothetical branch · explicit assumption</h3><div class="source-branch-scenario" hidden></div><div class="source-branch-state"></div><div class="source-branch-claims"></div><div class="source-branch-conflict" hidden></div><div class="source-branch-record" hidden></div><div class="source-branch-unknown" hidden></div>
+          </article>
+        </div>
+        <div id="source-branch-notice" class="notice" aria-live="polite"></div>
+      </section>
       <div id="legacy-grid" class="grid" hidden>
         <div class="stack">
           <section class="card" aria-labelledby="graph-title">
@@ -422,6 +464,7 @@ APP_HTML = r'''<!doctype html>
     const branchAt = '2026-10-14T18:50:00Z';
     let shiftRequestSequence = 0;
     let knowledgeRequestSequence = 0;
+    let sourceBranchRequestSequence = 0;
     function element(tag, cls, text) { const node=document.createElement(tag); if(cls) node.className=cls; if(text!==undefined) node.textContent=text; return node; }
     async function api(path, options={}) { const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}}); const data=await response.json(); if(!response.ok) throw new Error(data.error||`HTTP ${response.status}`); return data; }
     function sourceName(id,title,observed) { const box=element('div','evidence-item'); box.append(element('strong','',title)); box.append(element('span','evidence-id',id)); box.append(element('span','',`Observed ${observed}`)); return box; }
@@ -662,6 +705,64 @@ APP_HTML = r'''<!doctype html>
         return null;
       }
     }
+    function renderBranchPane(root, projection, scenario=null, hypothetical=false) {
+      const state=root.querySelector('.source-branch-state');
+      state.textContent=`Known-at ${projection.known_at||'not selected'} · claim context ${projection.claim_context_state}. Missing evidence is unknown, not an absence, resolution, or selected procedure.`;
+      const scenarioBox=root.querySelector('.source-branch-scenario');
+      if(scenarioBox) {
+        scenarioBox.hidden=!scenario;
+        scenarioBox.textContent=scenario?`${scenario.label}. Assumed observation ${scenario.assumed_observed_at}; the source fact remains observed ${scenario.actual_source_observed_at}. This branch is not source truth.`:'';
+      }
+      const claims=root.querySelector('.source-branch-claims'); claims.replaceChildren();
+      for(const claim of projection.claims) {
+        const row=element('div','source-branch-claim',`${claim.version_id} · ${claim.claim_label} → ${claim.role_id}`);
+        const sourceTime=hypothetical?`Hypothetical observation ${claim.source.observed_at} · actual source observation ${scenario?.actual_source_observed_at||'not independently available'}`:`Source observed ${claim.source.observed_at}`;
+        row.append(element('small','',`${claim.source.id} · ${claim.source.title} · ${sourceTime}`));
+        row.append(element('small','',`${claim.applicability_edge.from} -[${claim.applicability_edge.relationship}]-> ${claim.applicability_edge.to} · ${claim.claim_edge.from} -[${claim.claim_edge.relationship}]-> ${claim.claim_edge.to} · ${claim.source.evidence_link.from} -[${claim.source.evidence_link.relationship}]-> ${claim.source.evidence_link.to}`));
+        claims.append(row);
+      }
+      const conflict=root.querySelector('.source-branch-conflict'); conflict.hidden=!projection.conflict;
+      conflict.textContent=projection.conflict?`Graph-derived unresolved relationship · ${projection.conflict.edge.from} -[${projection.conflict.edge.relationship} · ${projection.conflict.edge.status}]-> ${projection.conflict.edge.to}. Not an authoritative rule.`:'';
+      const record=root.querySelector('.source-branch-record'); record.hidden=!projection.decision_record;
+      if(projection.decision_record) {
+        const item=projection.decision_record; record.replaceChildren();
+        record.append(element('strong','',`Separately evidenced record · ${item.id} · ${item.recorded_state}`));
+        record.append(element('div','',`${item.title} · ${item.recorded_statement}`));
+        record.append(element('small','',`${item.register_id} -[TRACKS]-> ${item.id} -[EVIDENCED_BY]-> ${item.source.id} · observed ${item.source.observed_at}`));
+        for(const edge of projection.decision_considers_edges) record.append(element('small','',`${edge.from} -[${edge.relationship}]-> ${edge.to} · independently source-known claim`));
+      }
+      const unknown=root.querySelector('.source-branch-unknown'); unknown.hidden=Boolean(projection.claims.length||projection.decision_record);
+      unknown.textContent=unknown.hidden?'':'Unknown / incomplete. No branch fact is projected from missing links; mainline is shown separately and is not substituted here.';
+    }
+    function renderSourceBranch(data) {
+      renderBranchPane($('source-branch-mainline'),data.mainline,null,false);
+      const branch=data.hypothetical_branch||{};
+      const visible=Boolean(branch.scenario||data.mainline?.claims?.length||data.mainline?.decision_record);
+      $('decision-source-branch').hidden=!visible;
+      renderBranchPane($('source-branch-hypothetical'),branch.projection||{
+        known_at:null,claim_context_state:'unknown',claims:[],conflict:null,decision_record:null,decision_considers_edges:[]
+      },branch.scenario||null,true);
+      $('source-branch-badge').textContent=branch.scenario?'Graph-linked hypothetical · '+(branch.projection?.claim_context_state||'unknown'):'Branch evidence unknown · no fallback';
+    }
+    async function loadSourceBranch() {
+      const sequence=++sourceBranchRequestSequence;
+      try {
+        const params=new URLSearchParams({scope:'operations',known_at:$('source-branch-cutoff').value});
+        const data=await api(`/api/decision-source-branch?${params.toString()}`);
+        if(sequence!==sourceBranchRequestSequence) return data;
+        renderSourceBranch(data); $('source-branch-notice').textContent='Read-only FalkorDB replay complete. Mainline source facts were not changed.';
+        return data;
+      } catch(error) {
+        if(sequence!==sourceBranchRequestSequence) return null;
+        const unknown={known_at:$('source-branch-cutoff').value,claim_context_state:'unknown',claims:[],conflict:null,decision_record:null,decision_considers_edges:[]};
+        // Keep the isolated failure notice visible even if the graph is cold;
+        // do not hide the only explanation behind the empty-state card.
+        $('decision-source-branch').hidden=false;
+        renderSourceBranch({mainline:unknown,hypothetical_branch:{projection:unknown}});
+        $('source-branch-notice').textContent=`No source-time branch projection is available: ${error.message}. No mainline fallback was attempted.`;
+        return null;
+      }
+    }
     function renderPaths(data) {
       const svg=$('graph'); svg.replaceChildren();
       const positions={
@@ -724,7 +825,7 @@ APP_HTML = r'''<!doctype html>
       }
     }
      async function loadAll() {
-       const [health, data, graph, actions, shiftBoard, timeline, watch]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadKnowledgeTimeline(),loadEvidenceWatch()]);
+       const [health, data, graph, actions, shiftBoard, timeline, watch, sourceBranch]=await Promise.all([api('/api/health'),api('/api/briefing?scope=operations'),api('/api/graph?scope=operations'),api('/api/actions'),loadShiftBoard(),loadKnowledgeTimeline(),loadEvidenceWatch(),loadSourceBranch()]);
        $('db-status').innerHTML='<span class="dot"></span>Live FalkorDB · local';
        renderBriefing(data,graph); renderActions(actions.actions);
      }
@@ -829,6 +930,7 @@ APP_HTML = r'''<!doctype html>
     $('reset').addEventListener('click',async()=>{ const button=$('reset'); button.disabled=true; $('notice').textContent='Resetting the owned synthetic scenario…'; try { await api('/api/scenario/reset',{method:'POST',body:'{}'}); $('preview').hidden=true; $('preview').replaceChildren(); $('notice').textContent='Synthetic scenario reseeded from deterministic fixtures.'; await loadAll(); } catch(e) { $('notice').textContent=`Reset failed: ${e.message}`; } finally { button.disabled=false; } });
     $('knowledge-replay').addEventListener('click',()=>loadKnowledgeTimeline());
     for(const button of document.querySelectorAll('[data-known-at]')) button.addEventListener('click',()=>{ $('knowledge-time').value=button.dataset.knownAt; loadKnowledgeTimeline(); });
+    $('source-branch-cutoff').addEventListener('change',()=>loadSourceBranch());
     $('watch-preview-button').addEventListener('click',async()=>{
       const button=$('watch-preview-button'); button.disabled=true; $('watch-notice').textContent='';
       try {
@@ -1088,6 +1190,49 @@ class WardAtlasService:
                 connection.close()
         return project_knowledge_timeline(normalized, claims, records, considered, conflict)
 
+    def decision_source_branch(self, known_at: str | None = None) -> dict:
+        """Compare the accepted source-time timeline with a graph-linked fork.
+
+        The existing timeline remains the mainline projection. Branch V3 is
+        discovered only through ScenarioBranch -> ObservationOverride ->
+        Evidence, and FalkorDB applies the assumed observation time before
+        the claim/conflict/CONSIDERS projection. This endpoint never writes.
+        """
+        claim_query, record_query, conflict_query, normalized = build_knowledge_timeline_queries(known_at)
+        with self.graph_lock:
+            # The re-entrant lock spans both projections so in-process graph
+            # operations cannot interleave between the mainline and fork.
+            mainline = self.decision_timeline(normalized)
+            connection = self._connection()
+            try:
+                branch_rows = self._rows(connection, SOURCE_BRANCH_PATH_QUERY)
+                if not branch_rows:
+                    return source_branch_response(mainline, normalized, [], None)
+
+                # V2 uses its unchanged source clock. V3 is removed from this
+                # result and can re-enter only via the branch-anchored query.
+                claims = [
+                    row for row in self._rows(connection, claim_query)
+                    if row.get("version_id") != "SOP-OPS-9-V3"
+                ]
+                branch_v3 = self._rows(connection, branch_v3_claim_query(normalized))
+                claims.extend(branch_v3)
+                records = self._rows(connection, record_query)
+                considered = []
+                if records:
+                    considered = self._rows(
+                        connection,
+                        knowledge_timeline_considered_query(
+                            records[0]["decision_id"], normalized or "0001-01-01T00:00:00Z"
+                        ),
+                    )
+                visible_versions = {row["version_id"] for row in claims}
+                conflict = self._rows(connection, conflict_query) if len(visible_versions) >= 2 else []
+                projection = branch_claim_projection(normalized, claims, records, considered, conflict)
+            finally:
+                connection.close()
+        return source_branch_response(mainline, normalized, branch_rows, projection)
+
     @staticmethod
     def _event_order(row: dict) -> datetime:
         return datetime.fromisoformat(row["event_at"].replace("Z", "+00:00"))
@@ -1313,7 +1458,7 @@ class WardAtlasService:
                     existing = self._rows(connection, "MATCH (n) RETURN n.id AS id LIMIT 1")
                     if existing:
                         raise RuntimeError("Refusing to reset a nonempty graph not seeded by this WardAtlas process.")
-                for query in [*seed_queries(), *seed_shift_board_queries(), *decision_seed_queries()]:
+                for query in [*seed_queries(), *seed_shift_board_queries(), *decision_seed_queries(), *source_branch_seed_queries()]:
                     query_result(connection.command("GRAPH.QUERY", self.graph_name, query))
                 self.scenario_seeded_by_this_process = True
             finally:
@@ -1615,7 +1760,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if parsed.path == "/":
                 self._send(200, APP_HTML)
-            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
+            elif parsed.path in {"/api/briefing", "/api/graph", "/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"} and not self._scope_allowed(parsed.query):
                 self._error(403, "This view is not available.")
             elif parsed.path == "/api/health":
                 self._send(200, service.health())
@@ -1652,6 +1797,12 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
                 data = service.decision_timeline(values.get("known_at", [None])[0])
                 self._send(200, data)
+            elif parsed.path == "/api/decision-source-branch":
+                values = parse_qs(parsed.query, keep_blank_values=True)
+                if "known_at" in values and len(values["known_at"]) != 1:
+                    raise ValueError("Invalid timestamp; use an explicit ISO-8601 offset.")
+                data = service.decision_source_branch(values.get("known_at", [None])[0])
+                self._send(200, data)
             elif parsed.path == "/api/handover/compare":
                 values = parse_qs(parsed.query, keep_blank_values=True)
                 for key in ("action_id", "observed_at", "branch_at"):
@@ -1685,7 +1836,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._error(503, "Local graph or action state is unavailable.")
         except ValueError as exc:
-            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/handover/compare", "/api/evidence-watch"}:
+            if parsed.path in {"/api/shift-board", "/api/sop-impact", "/api/decision-docket", "/api/decision-timeline", "/api/decision-source-branch", "/api/handover/compare", "/api/evidence-watch"}:
                 message = str(exc)
                 if parsed.path not in {"/api/handover/compare", "/api/evidence-watch"} and message not in {"Invalid timestamp; use an explicit ISO-8601 offset.", "Invalid timestamp"}:
                     message = "Invalid timestamp; use an explicit ISO-8601 offset."
