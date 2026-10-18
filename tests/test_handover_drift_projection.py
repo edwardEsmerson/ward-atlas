@@ -29,13 +29,22 @@ CANONICAL = ORACLE["canonical_snapshot"]
 @contextmanager
 def temporary_local_directory(prefix: str) -> Iterator[str]:
     local_root = ROOT / ".local"
-    local_root_existed = local_root.exists()
-    local_root.mkdir(exist_ok=True)
+    local_root_existed_before_test = local_root.exists()
+    local_root_created_by_test = False
+    if not local_root_existed_before_test:
+        try:
+            local_root.mkdir()
+        except FileExistsError:
+            # Another actor may have created the parent since the existence
+            # check; use it but never claim cleanup ownership.
+            pass
+        else:
+            local_root_created_by_test = True
     try:
         with TemporaryDirectory(prefix=prefix, dir=local_root) as directory:
             yield directory
     finally:
-        if not local_root_existed:
+        if local_root_created_by_test:
             try:
                 local_root.rmdir()
             except FileNotFoundError:
