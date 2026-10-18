@@ -53,3 +53,5 @@
 - Resume knowledge-diff from preserved a0a91ee and interrupted supervisor evidence, retaining incomplete verification receipts unchanged; newer main and source-only original checks pass without feature/oracle edits. Revert only the restart receipt paragraphs/entry, never prior evidence or concurrent app mounts.
 
 - SOP comparison: use independent source-known version roots and explicit typed edges, not version-number lineage or procedure selection; reversible by removing the namespaced mount/link. Contract pinned before behavior.
+
+- SOP comparison repair: datetime-local controls omit zero seconds; normalize them to explicit seconds before API validation, retaining strict timestamp checks. Revert only with an equivalent browser-safe normalization.

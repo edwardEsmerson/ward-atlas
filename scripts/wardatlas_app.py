@@ -46,6 +46,7 @@ from wardatlas_source_branch import (
 )
 from wardatlas_knowledge_diff import knowledge_diff, parse_parameters as parse_knowledge_diff_parameters
 from wardatlas_replay import mount_replay
+from wardatlas_sop_compare import mount_sop_compare
 from wardatlas_sop_impact import (
     CLAIMS_QUERY as SOP_IMPACT_CLAIMS_QUERY,
     CONFLICT_WITNESS_QUERY,
@@ -318,6 +319,7 @@ APP_HTML = r'''<!doctype html>
     </header>
     <main>
       <p><a href="/resilience" style="color:#86e1be">Evidence resilience · inspect one missing supporting edge →</a></p>
+      <p><a href="/sop-compare" style="color:#86e1be">SOP claim comparison · archived references and unresolved claims →</a></p>
       <p><a href="/time-machine" style="color:#86e1be">Evidence time machine · play live relationship arrival →</a></p>
       <nav aria-label="Clock workbench" style="margin-top:20px"><a href="/clocks" class="button">Ownership clock atlas →</a></nav>
       <section class="hero" aria-labelledby="main-title">
@@ -1782,6 +1784,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlsplit(self.path)
         service = self.server.service
         try:
+            if mount_sop_compare(self, service, parsed):
+                return
             if mount_replay(self, service, parsed):
                 return
             if mount_clock_atlas(self, service, parsed):
