@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "purpose": "Read-only four-cell INC-207 clock atlas, specified before implementation from the admitted contract and accepted synthetic oracles, never candidate output.",
+  "pinned_sources": [
+    {"file":"tests/dock-bitemporal-expected-results.json","sha256":"243c92775d7c1366962dcd7c5c9acd9ea753f2924af84c2c5dc99b0b5c872205"},
+    {"file":"tests/evidence-watch-expected-results.json","sha256":"1ee83f8ad7f9ad52b08b3759b20b590343c44eb09a7aeb2b18f1cd9d79027e1c"}
+  ],
+  "scope": "operations",
+  "effective_times": ["2026-10-14T20:29:00Z","2026-10-14T20:30:00Z"],
+  "known_times": ["2026-10-14T20:17:59Z","2026-10-14T20:19:00Z"],
+  "cells": [
+    {
+      "id":"e0-k0","row":0,"column":0,
+      "effective_at":"2026-10-14T20:29:00Z","known_at":"2026-10-14T20:17:59Z",
+      "role_path":["INC-207","EQ-DOCK-CART-2","SVC-INBOUND-TRANSFER","DEPT-RECEIVING-DOCK","ROLE-DOCK-DUTY"],
+      "role_id":"ROLE-DOCK-DUTY","role_status":"known",
+      "source_versions":[{"source_id":"SRC-DOCK-ROSTER-R1","title":"Synthetic Dock Operations Roster Revision 1","observed_at":"2026-10-14T19:00:00Z"}],
+      "review_candidates":[],"linkage_status":"unknown","candidate_disposition":null
+    },
+    {
+      "id":"e0-k1","row":0,"column":1,
+      "effective_at":"2026-10-14T20:29:00Z","known_at":"2026-10-14T20:19:00Z",
+      "role_path":["INC-207","EQ-DOCK-CART-2","SVC-INBOUND-TRANSFER","DEPT-RECEIVING-DOCK","ROLE-DOCK-DUTY"],
+      "role_id":"ROLE-DOCK-DUTY","role_status":"known",
+      "source_versions":[{"source_id":"SRC-DOCK-ROSTER-R1","title":"Synthetic Dock Operations Roster Revision 1","observed_at":"2026-10-14T19:00:00Z"},{"source_id":"SRC-DOCK-ROSTER-R2","title":"Synthetic Dock Operations Roster Revision 2","observed_at":"2026-10-14T20:18:00Z","effective_at":"2026-10-14T20:30:00Z","supersedes":"SRC-DOCK-ROSTER-R1","status":"recorded/pending"}],
+      "review_candidates":["HND-DOCK-2020","TKT-DOCK-88"],"linkage_status":"linked","candidate_disposition":"pending review; not declared-invalid artifacts"
+    },
+    {
+      "id":"e1-k0","row":1,"column":0,
+      "effective_at":"2026-10-14T20:30:00Z","known_at":"2026-10-14T20:17:59Z",
+      "role_path":[],"role_id":null,"role_status":"unknown",
+      "source_versions":[{"source_id":"SRC-DOCK-ROSTER-R1","title":"Synthetic Dock Operations Roster Revision 1","observed_at":"2026-10-14T19:00:00Z"}],
+      "review_candidates":[],"linkage_status":"unknown","candidate_disposition":null
+    },
+    {
+      "id":"e1-k1","row":1,"column":1,
+      "effective_at":"2026-10-14T20:30:00Z","known_at":"2026-10-14T20:19:00Z",
+      "role_path":["INC-207","EQ-DOCK-CART-2","SVC-INBOUND-TRANSFER","DEPT-RECEIVING-DOCK","ROLE-DOCK-SWING"],
+      "role_id":"ROLE-DOCK-SWING","role_status":"known",
+      "source_versions":[{"source_id":"SRC-DOCK-ROSTER-R1","title":"Synthetic Dock Operations Roster Revision 1","observed_at":"2026-10-14T19:00:00Z"},{"source_id":"SRC-DOCK-ROSTER-R2","title":"Synthetic Dock Operations Roster Revision 2","observed_at":"2026-10-14T20:18:00Z","effective_at":"2026-10-14T20:30:00Z","supersedes":"SRC-DOCK-ROSTER-R1","status":"recorded/pending"}],
+      "review_candidates":["HND-DOCK-2020","TKT-DOCK-88"],"linkage_status":"linked","candidate_disposition":"pending review; not declared-invalid artifacts"
+    }
+  ],
+  "groups": {
+    "four-cells": {"cell_count":4,"independent_axis_pairs":4,"early_no_r2_hint":true,"crossed_unknown":true,"exact_paths":true,"exact_sources":true,"pending_not_invalidated":true,"lexical_decoy_excluded":true},
+    "cold-graph": {"cell_count":4,"all_roles_unknown":true,"all_paths_empty":true,"all_sources_empty":true,"all_reviews_empty":true,"selected_unknown":true},
+    "edge-omissions": {"supersedes_reviews_empty":true,"supersedes_linkage_unknown":true,"ownership_path_empty":true,"role_evidence_path_empty":true,"prefix_path_empty":true,"early_cell_unchanged":true},
+    "source-omission": {"r2_metadata_absent":true,"swing_path_empty":true,"reviews_empty":true,"early_cell_unchanged":true,"reseed_restores_exact":true},
+    "restricted-invariance": {"fixture_connected":true,"full_api_equal":true,"desktop_view_equal":true,"mobile_view_equal":true,"no_hidden_markers":true},
+    "lifecycle": {"idempotent_nodes":true,"idempotent_edges":true,"fresh_client_equal":true,"restarted_app_equal":true,"graph_read_only":true,"state_bytes_unchanged":true,"owned_cleanup":true},
+    "time-validation": {"offset_equal":true,"malformed_effective_rejected":true,"naive_known_rejected":true,"duplicate_effective_rejected":true,"duplicate_known_rejected":true,"duplicate_scope_rejected":true,"unsupported_pair_rejected":true,"invalid_before_queries":true},
+    "keyboard-mobile": {"desktop_four_visible":true,"mobile_four_stacked":true,"arrow_selection":true,"deep_link_pair":true,"detail_only_selected":true,"source_cards_exact":true,"unknown_no_hindsight":true,"non_color_labels":true},
+    "request-isolation": {"busy_clears_detail":true,"error_clears_detail":true,"retry_recovers":true,"stale_response_ignored":true,"selection_reads_live":true}
+  },
+  "browser_policy": "Real API responses only. Network delays/errors may wrap real responses to test races; no fixture answers. Overview may expose separately labeled later snapshots; selected detail, labels and accessible names must use only the selected cell. Arrow keys move within the two-by-two semantic matrix. Mobile stacks cards without horizontal overflow.",
+  "safety": "Synthetic, non-clinical, read-only. No actual assignment claim, mutation, confirmation, ingestion, saved handover, search or arbitrary graph explorer. Each cell calls the accepted shift-board query with both explicit axes."
+}
