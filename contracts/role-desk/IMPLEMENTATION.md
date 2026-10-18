@@ -61,3 +61,22 @@ selectors and duplicate fields return generic 400 before a service read.
 
 No clinical advice, person scoring, contacts, new data, model call or write is
 introduced. No completeness, safety, resolution or real-hospital claim is made.
+
+## Final builder receipt
+
+Implementation `04bf5cc` passed both original commands in the builder and a fresh
+source-only clone with no preinstalled `.local/falkordb`. Each run passed 16
+focused tests and all 8 live groups / 53 mapped assertions. Each repeat browser
+report passed 99 assertions with desktop/mobile screenshots, keyboard evidence,
+escaping, loading/error recovery and an abort-ignoring response race. All five
+owned cleanup flags passed in both runs; the source-only checkout stayed clean.
+Actual module version: 60002; verified module SHA-256:
+`93bc3c1d484f7fcad45c9409c32034c79e876596b18ce5b03922be007dba889c`.
+
+Builder reports: `$WORKSHOP_RUN_DIR/role-desk/live.json`, `repeat.json` and
+`repeat/{desktop,mobile}.png`. Source-only reports for this task are in
+`$WORKSHOP_RUN_DIR/source-only/role-desk/`; unit logs are `role-desk-unit.log`
+and `source-only/unit.log`. Failure receipts remain alongside the builder report.
+Latest origin/main was merged before final build checks and rechecked before
+this evidence-only receipt. This records builder reproduction, not supervisor
+acceptance; no source oracle, acceptance requirement or concurrent mount changed.
