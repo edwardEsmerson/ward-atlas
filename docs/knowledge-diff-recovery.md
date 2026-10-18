@@ -92,3 +92,34 @@ These are builder recovery/reproduction observations, not supervisor acceptance
 or an independent human oracle. Fresh supervisor and merged-integration checks
 remain the supervisor's separate stage. No publication, deployment, clinical
 validation or participant submission eligibility is certified.
+
+## Restart reconciliation and newer-main integration
+
+The resumed builder preserved `a0a91ee` and merged canonical main `29478f7`
+(merged source revision `0a52f70da2d60e7187dad3724f6e10061cb68e66`). The seven
+feature/contract files above remain byte-identical to the fetched preserved
+branch; other lanes' resilience and supplied-server app mounts are retained.
+No product behavior, fixture, oracle, earlier task status or budget was changed.
+
+The interrupted supervisor evidence was inspected rather than discarded:
+`/workspace/evidence/auto-16c1f4814e2931434d33a441/e41ec63bbcfe455ab336933a3b3d16d4/assessment.json`
+records a pass assessment for pinned `a0a91ee`, no observed defects, both original
+checks, 18 accepted-service regression tests and a separately specified
+**100-combination / 667-check** probe. Its `independent-probe.json` is PASS
+(SHA-256 `4a4b9299b7c0888d0f8a6859cd7cb3dcb691c4684585cf8b8ff34183d919baa9`).
+The supervisor result receipts remain incomplete; this builder does not change
+them or promote an interrupted rerun to acceptance. The preserved second
+verification's execution receipt records quota exhaustion, not a product defect.
+
+Both exact original commands above passed again against the newer merged app
+and its dependency-cold source-only export: **20 focused tests; actual FalkorDB
+60002; 10 groups / 63 mapped assertions; desktop/mobile and seven owned cleanup
+checks**. The three accepted decision-service suites also passed **18 tests**.
+This run's evidence root is
+`/workspace/evidence/auto-16c1f4814e2931434d33a441/69b0f8db2ed7415387d4d04a2d334603/`:
+`original-{unit,live}.log`, `fresh-{unit,live}.log`, `service-regression.log`,
+`merged-source-revision.txt`, and `knowledge-diff/` / `fresh/knowledge-diff/`
+API/browser reports and screenshots. The fresh report SHA-256 is
+`2f97e717d88bab988f232905bd983d7d246ca82d1a974080956bd0749138c996`.
+The original commands are rerun after final receipt edits; supervisor acceptance
+and merged integration remain distinct from builder evidence.
